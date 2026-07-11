@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Held | Complete Prototype</title>
+<title>Held | Scripture-led healing</title>
+<link rel="icon" type="image/png" href="assets/held-app-icon.png" />
+<link rel="apple-touch-icon" href="assets/held-app-icon.png" />
+<meta name="theme-color" content="#0f7578" />
+<meta name="description" content="Held is a Scripture-led devotional, Bible study, journaling, and marriage discipleship app." />
 <style>
 :root{
   --cream:#fffaf2;--paper:#fffdf8;--ink:#173a3d;--muted:#6d7a79;
@@ -77,12 +81,135 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
  .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(255,253,248,.96);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:7px;z-index:20}
  .bottom-nav button{border:0;background:transparent;padding:10px 4px;border-radius:12px;font-size:12px;color:var(--muted)}.bottom-nav button.active{background:var(--aqua);color:var(--teal-dark);font-weight:700}
 }
+
+/* Held brand refresh */
+.logo{
+  background:#fffaf2;
+  padding:4px;
+  overflow:hidden;
+}
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+}
+.brand-wordmark{
+  display:flex;
+  flex-direction:column;
+}
+.brand-tagline{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+.hero{
+  position:relative;
+}
+.hero-art{
+  background-image:
+    linear-gradient(180deg,rgba(255,253,248,.10),rgba(255,253,248,.12)),
+    url("assets/held-sunrise.png");
+  background-size:cover;
+  background-position:center;
+}
+.hero-art .sun,.hero-art .hill1,.hero-art .hill2,.hero-art .hill3,.hero-art .river{
+  display:none;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  inset:auto 28px 22px auto;
+  width:90px;
+  height:90px;
+  background:url("assets/held-app-icon.png") center/contain no-repeat;
+  opacity:.16;
+  pointer-events:none;
+}
+.section-title{
+  position:relative;
+}
+.section-title:after{
+  content:"";
+  display:block;
+  width:72px;
+  height:10px;
+  margin-top:8px;
+  background:
+    linear-gradient(90deg,transparent 0 8%,var(--teal) 8% 43%,transparent 43% 57%,var(--peach) 57% 92%,transparent 92%);
+  border-radius:999px;
+  opacity:.55;
+}
+.journey-card:before{
+  content:"";
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  width:32px;
+  height:32px;
+  background:url("assets/held-app-icon.png") center/contain no-repeat;
+  opacity:.06;
+  pointer-events:none;
+}
+.card,.journey-card,.shared,.current-box{
+  backdrop-filter:blur(6px);
+}
+.primary{
+  letter-spacing:.01em;
+}
+.brand-panel{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:linear-gradient(135deg,#fffaf2,#eefaf7);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow);
+}
+.brand-panel img{
+  width:54px;
+  height:54px;
+  border-radius:16px;
+  object-fit:cover;
+}
+.brand-panel strong{
+  font-family:Georgia,serif;
+  font-size:20px;
+  font-weight:500;
+}
+.login-preview{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.login-note{
+  padding:16px;
+  background:linear-gradient(145deg,#fff7e8,#eefaf7);
+  border:1px solid var(--line);
+  border-radius:17px;
+}
+@media(max-width:900px){
+  .brand h1{font-size:25px}
+  .brand small{font-size:11px}
+  .hero:after{width:62px;height:62px;right:16px;bottom:14px}
+  .login-preview{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
 <div class="topbar">
- <div class="brand"><div class="logo">H</div><div><h1>Held</h1><small>Scripture-led healing for real life</small></div></div>
+ <div class="brand">
+      <div class="logo"><img src="assets/held-app-icon.png" alt="Held app icon"></div>
+      <div class="brand-wordmark">
+        <h1>Held</h1>
+        <small>You are known. You are loved. You are held.</small>
+      </div>
+    </div>
  <div class="profile-switch"><button id="pBtn" class="active" onclick="switchProfile('patricia')">Patricia</button><button id="aBtn" onclick="switchProfile('alec')">Alec</button></div>
 </div>
 
@@ -100,6 +227,13 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <main>
 <section id="home" class="view active">
+ <div class="brand-panel">
+   <img src="assets/held-app-icon.png" alt="Held logo">
+   <div>
+     <strong>Held</strong>
+     <div class="muted">Scripture-led healing, study, and shared growth.</div>
+   </div>
+ </div>
  <div class="hero"><div class="hero-copy"><div class="eyebrow">Good morning</div><h2 id="homeTitle"></h2><p id="homeText" class="muted"></p>
  <div class="shared" style="margin-top:18px"><strong id="todayPassage"></strong><p id="todayFocus" style="margin-bottom:0"></p></div>
  <div class="actions"><button class="primary" onclick="showView('devotional')">Continue journey</button><button class="secondary" onclick="showView('library')">Browse journeys</button></div></div>
@@ -151,7 +285,7 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
-<div class="footer">Complete prototype · Saves locally in this browser</div>
+<div class="footer">Held · You are known. You are loved. You are held. · Saves locally in this browser</div>
 </main>
 </div>
 
