@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Held | Soft Uplifting</title>
+<style>
+:root{
+  --cream:#fffaf2;
+  --paper:#fffdf8;
+  --ink:#173a3d;
+  --muted:#6d7a79;
+  --teal:#15989a;
+  --teal-dark:#0f7578;
+  --aqua:#dff5f1;
+  --peach:#f9dfb7;
+  --sand:#f3eadc;
+  --sage:#dce9dc;
+  --line:#eadfce;
+  --shadow:0 14px 34px rgba(66,85,80,.12);
+  --radius:24px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255,229,184,.38), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(193,236,229,.34), transparent 28%),
+    linear-gradient(180deg,#fffdf8 0%,#f8f3ec 100%);
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1180px;margin:0 auto;min-height:100vh;padding:22px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:46px;height:46px;border-radius:16px;
+  background:linear-gradient(145deg,#1aa4a6,#0f7d80);
+  color:white;display:grid;place-items:center;font-weight:800;
+  box-shadow:var(--shadow)
+}
+.brand h1{margin:0;font-family:Georgia,serif;font-size:28px;font-weight:600}
+.brand small{display:block;color:var(--muted);margin-top:2px}
+.profile-switch{
+  display:flex;gap:6px;background:rgba(255,253,248,.92);
+  border:1px solid var(--line);padding:6px;border-radius:999px;box-shadow:var(--shadow)
+}
+.profile-switch button{border:0;background:transparent;padding:9px 13px;border-radius:999px;color:var(--ink)}
+.profile-switch button.active{background:var(--aqua);color:var(--teal-dark);font-weight:700}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:18px}
+.sidebar{
+  background:rgba(255,253,248,.94);border:1px solid var(--line);
+  border-radius:26px;box-shadow:var(--shadow);padding:15px;height:fit-content;position:sticky;top:16px
+}
+.navbtn{
+  width:100%;border:0;background:transparent;text-align:left;padding:12px 13px;border-radius:14px;
+  color:var(--ink);margin:2px 0
+}
+.navbtn:hover,.navbtn.active{background:var(--aqua);color:var(--teal-dark)}
+.current-box{margin-top:16px;padding:15px;border-radius:19px;background:linear-gradient(145deg,#fff8ed,#f2fbf8);border:1px solid var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--teal-dark)}
+.progress{height:8px;background:#e5eee9;border-radius:999px;overflow:hidden;margin:10px 0}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#6fc7bd);width:0}
+main{min-width:0}
+.view{display:none}.view.active{display:block}
+.hero,.card{
+  background:rgba(255,253,248,.95);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)
+}
+.hero{
+  overflow:hidden;
+  display:grid;grid-template-columns:1.15fr .85fr;
+  min-height:390px
+}
+.hero-copy{padding:34px}
+.hero-art{
+  position:relative;
+  min-height:320px;
+  background:
+    radial-gradient(circle at 68% 25%,#ffe1a5 0 9%,transparent 10%),
+    linear-gradient(180deg,#eefbf8 0%,#fdf7eb 100%);
+  overflow:hidden
+}
+.sun{position:absolute;right:70px;top:50px;width:96px;height:96px;border-radius:50%;background:#ffd78f;box-shadow:0 0 0 16px rgba(255,215,143,.18)}
+.hill1,.hill2,.hill3{position:absolute;left:-8%;right:-8%;border-radius:50% 50% 0 0/100% 100% 0 0}
+.hill1{height:150px;bottom:-65px;background:#cfe5da;transform:rotate(-2deg)}
+.hill2{height:120px;bottom:-35px;background:#ead9bf;left:16%;right:-12%;transform:rotate(3deg)}
+.hill3{height:100px;bottom:-20px;background:#b7d9d3;left:42%;right:-18%}
+.river{position:absolute;bottom:-16px;left:46%;width:84px;height:180px;background:linear-gradient(180deg,rgba(255,255,255,.8),#a9d8d5);transform:rotate(15deg);border-radius:50%}
+h2{font-family:Georgia,serif;font-size:43px;line-height:1.06;margin:12px 0 14px;font-weight:500}
+h3{font-family:Georgia,serif;font-size:28px;margin:6px 0 12px;font-weight:500}
+h4{font-size:18px;margin:8px 0}
+p{line-height:1.6}
+.muted{color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.primary,.secondary,.ghost{
+  padding:12px 17px;border-radius:14px;border:1px solid transparent
+}
+.primary{background:linear-gradient(135deg,#19a6a5,#0e888b);color:white;box-shadow:0 8px 18px rgba(21,152,154,.22)}
+.secondary{background:var(--aqua);color:var(--teal-dark)}
+.ghost{background:white;border-color:var(--line);color:var(--ink)}
+.section-title{margin:26px 4px 13px}
+.section-title h3{margin:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.journey-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);
+  transition:transform .18s ease
+}
+.journey-card:hover{transform:translateY(-3px)}
+.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--aqua);color:var(--teal-dark);font-size:12px}
+.study-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:16px}
+.card{padding:22px}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tab{padding:10px 0;border:0;background:transparent;color:var(--muted)}
+.tab.active{color:var(--teal-dark);border-bottom:3px solid var(--teal);font-weight:700}
+.scripture{
+  font-family:Georgia,serif;font-size:21px;line-height:1.75;padding:20px;
+  background:linear-gradient(180deg,#fffdf8,#fff9ef);
+  border-left:4px solid var(--teal);border-radius:16px;margin:18px 0
+}
+.context{background:var(--aqua);padding:17px;border-radius:16px}
+textarea{
+  width:100%;min-height:120px;border:1px solid var(--line);border-radius:15px;padding:14px;background:white;resize:vertical
+}
+.prompt{margin:18px 0}
+.prompt strong{display:block;margin-bottom:8px}
+.choice-row{display:flex;gap:8px;flex-wrap:wrap}
+.choice{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 12px}
+.choice.selected{background:var(--aqua);border-color:#8bcfca;color:var(--teal-dark)}
+.word-card{
+  background:linear-gradient(180deg,#f7fffd,#eefaf7);
+  border:1px solid #cce5df;border-radius:20px;padding:20px
+}
+.word-head{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.greek{font-family:Georgia,serif;font-size:34px;color:var(--teal-dark)}
+.badge{display:inline-block;font-size:12px;padding:5px 8px;border-radius:999px;background:#fff3df;color:#8b6631}
+details{margin-top:13px}
+summary{cursor:pointer;font-weight:700}
+.shared{
+  background:linear-gradient(135deg,#fff7e8,#f3fcfa);
+  border:1px solid var(--line);padding:18px;border-radius:18px
+}
+.entry{padding:15px;background:white;border:1px solid var(--line);border-radius:16px;margin-top:10px}
+.day-strip{display:flex;gap:8px;overflow:auto;padding:4px 0 8px}
+.day{min-width:52px;height:52px;border-radius:16px;border:1px solid var(--line);background:white;display:grid;place-items:center}
+.day.done{background:var(--aqua);color:var(--teal-dark);font-weight:800}
+.day.current{border:2px solid var(--teal)}
+.bottom-nav{display:none}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:900px){
+  .app{padding:12px 12px 88px}
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .hero{grid-template-columns:1fr}
+  .hero-art{min-height:220px}
+  .study-layout,.grid2,.grid3{grid-template-columns:1fr}
+  .topbar{align-items:flex-start;gap:12px}
+  .profile-switch{transform:scale(.92);transform-origin:right top}
+  h2{font-size:35px}
+  .bottom-nav{
+    display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;
+    background:rgba(255,253,248,.96);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:7px;z-index:20
+  }
+  .bottom-nav button{border:0;background:transparent;padding:10px 4px;border-radius:12px;font-size:12px;color:var(--muted)}
+  .bottom-nav button.active{background:var(--aqua);color:var(--teal-dark);font-weight:700}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">H</div>
+      <div><h1>Held</h1><small>Scripture-led healing for real life</small></div>
+    </div>
+    <div class="profile-switch">
+      <button id="pBtn" class="active" onclick="switchProfile('patricia')">Patricia</button>
+      <button id="aBtn" onclick="switchProfile('alec')">Alec</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="navbtn active" data-view="home">Home</button>
+      <button class="navbtn" data-view="devotional">Devotional</button>
+      <button class="navbtn" data-view="study">Bible Study</button>
+      <button class="navbtn" data-view="journal">Journal</button>
+      <button class="navbtn" data-view="together">Together</button>
+      <button class="navbtn" data-view="progress">Journey Map</button>
+      <div class="current-box">
+        <div class="eyebrow">Current journey</div>
+        <strong id="journeyName"></strong>
+        <div class="progress"><span id="journeyProgress"></span></div>
+        <small class="muted" id="journeyDay"></small>
+      </div>
+    </aside>
+
+    <main>
+      <section id="home" class="view active">
+        <div class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">Good morning</div>
+            <h2 id="homeTitle"></h2>
+            <p id="homeText" class="muted"></p>
+            <div class="shared" style="margin-top:18px">
+              <strong id="todayPassage"></strong>
+              <p id="todayFocus" style="margin-bottom:0"></p>
+            </div>
+            <div class="actions">
+              <button class="primary" onclick="showView('devotional')">Continue journey</button>
+              <button class="secondary" onclick="showView('study')">Study this passage</button>
+            </div>
+          </div>
+          <div class="hero-art">
+            <div class="sun"></div><div class="hill1"></div><div class="hill2"></div><div class="hill3"></div><div class="river"></div>
+          </div>
+        </div>
+
+        <div class="section-title"><h3>Your journeys</h3><p class="muted">Choose by topic. Study by book.</p></div>
+        <div id="journeyCards" class="grid3"></div>
+      </section>
+
+      <section id="devotional" class="view">
+        <div class="study-layout">
+          <div class="card">
+            <div class="eyebrow" id="devMeta"></div>
+            <h3 id="devTitle"></h3>
+            <div class="tabs"><button class="tab active">Read</button><button class="tab">Understand</button><button class="tab">Reflect</button></div>
+            <div class="scripture" id="devScripture"></div>
+            <div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
+
+            <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div>
+            <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
+
+            <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
+
+            <div class="actions">
+              <button class="primary" onclick="completeDay()">Complete today</button>
+              <button class="ghost" onclick="saveDraft()">Save draft</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="eyebrow">Look closer</div>
+            <h3 id="wordTitle"></h3>
+            <div class="word-card">
+              <div class="word-head">
+                <div><div class="greek" id="wordGreek"></div><strong id="wordTranslit"></strong></div>
+                <span class="badge">Greek</span>
+              </div>
+              <p id="wordMeaning"></p>
+              <details><summary>Why context matters</summary><p id="wordCaution" class="muted"></p></details>
+              <details><summary>Used elsewhere</summary><p id="wordElsewhere" class="muted"></p></details>
+            </div>
+            <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div>
+            <button class="secondary" onclick="saveStudyNote()">Add to notebook</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="study" class="view">
+        <div class="card">
+          <div class="eyebrow">Bible study</div>
+          <h3>Study the passage, not just the topic</h3>
+          <div class="grid2">
+            <div class="journey-card"><h4>Context before and after</h4><p id="contextBeforeAfter"></p></div>
+            <div class="journey-card"><h4>Key Greek word</h4><p id="studyWordSummary"></p></div>
+            <div class="journey-card"><h4>Cross-reference trail</h4><p id="crossRefs"></p></div>
+            <div class="journey-card"><h4>What this does not mean</h4><p id="notMean"></p></div>
+          </div>
+          <div class="section-title"><h3>Bible notebook</h3></div>
+          <div id="notebookList"></div>
+        </div>
+      </section>
+
+      <section id="journal" class="view">
+        <div class="card">
+          <div class="eyebrow">Private by default</div>
+          <h3 id="journalHeading"></h3>
+          <p class="muted">Nothing is shared unless you choose one takeaway.</p>
+          <textarea id="journalText" placeholder="Write honestly before God..."></textarea>
+          <div class="actions">
+            <button class="primary" onclick="saveJournal()">Save privately</button>
+            <button class="secondary" onclick="shareTakeaway()">Share one takeaway</button>
+          </div>
+          <div class="section-title"><h3>Recent entries</h3></div>
+          <div id="journalEntries"></div>
+        </div>
+      </section>
+
+      <section id="together" class="view">
+        <div class="card">
+          <div class="eyebrow">Together</div>
+          <h3>Walking in faith, side by side</h3>
+          <div class="shared"><strong>Patricia’s lesson</strong><p>Trusting provision without controlling.</p></div>
+          <div class="shared" style="margin-top:10px"><strong>Alec’s lesson</strong><p>Leading without shame.</p></div>
+          <div class="prompt"><strong>Our shared question</strong><p>What fear is shaping us this week?</p></div>
+          <div id="sharedTakeaways"></div>
+        </div>
+      </section>
+
+      <section id="progress" class="view">
+        <div class="card">
+          <div class="eyebrow">Journey map</div>
+          <h3 id="progressTitle"></h3>
+          <div class="day-strip" id="dayStrip"></div>
+          <div class="section-title"><h3>Grace milestones</h3></div>
+          <div class="grid3" id="milestones"></div>
+        </div>
+      </section>
+
+      <div class="footer">Soft Uplifting prototype · Saves locally in this browser</div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <button data-view="home" class="active">Home</button>
+    <button data-view="journal">Journal</button>
+    <button data-view="study">Bible</button>
+    <button data-view="together">Together</button>
+    <button data-view="progress">More</button>
+  </nav>
+</div>
+
+<script>
+const profiles={
+ patricia:{
+  journey:"From Survival to Partnership",
+  homeTitle:"Good morning, Patricia",
+  homeText:"You do not have to carry everything alone anymore.",
+  title:"Responsibility is not the same as control",
+  passage:"Matthew 6:25–34",
+  focus:"Worry and Trust",
+  scripture:"“Therefore I tell you, do not worry about your life, what you will eat or drink; or about your body, what you will wear… Look at the birds of the air… your heavenly Father feeds them.”",
+  context:"Jesus speaks about worry after teaching about treasure, divided loyalty, and serving God rather than money. He is not condemning wise planning. He is confronting the belief that anxious control can secure what only the Father can provide.",
+  p1:"Where do you feel responsible for guaranteeing the outcome?",
+  p2:"What would trusting God and building with Alec look like today?",
+  moods:["Anxious","Hopeful","Tired","Guarded","Peaceful","Overwhelmed"],
+  wordTitle:"Worry and divided attention",
+  greek:"μεριμνάω",
+  translit:"merimnaō",
+  meaning:"To worry, be anxious, or be concerned. In Matthew 6, the word sits inside Jesus’ teaching about trust, provision, treasure, and loyalty.",
+  caution:"The word does not mean every concern is sinful. The sentence and passage determine its meaning.",
+  elsewhere:"Philippians 4:6 and 1 Corinthians 7 use the same word in different contexts.",
+  beforeAfter:"Before this passage, Jesus teaches about treasure and serving God rather than money. After it, He continues teaching Kingdom life.",
+  cross:"Matthew 6:19–24 → Matthew 6:25–34 → Philippians 4:4–9 → 1 Peter 5:6–7",
+  notMean:"Planning is not sinful. Financial concerns should not be ignored. Anxiety is not proof of weak faith.",
+  journeys:[
+   ["Matthew 5–7","Anxiety and the Character of God","Worry, prayer, provision, trust, and seeking the Kingdom first."],
+   ["Luke","Money, Provision, and Trust","Scarcity, stewardship, generosity, and contentment."],
+   ["Ephesians","From Independence to Partnership","Marriage, unity, receiving support, and releasing control."],
+   ["Exodus","Releasing Control","Manna, wilderness, obedience, and daily dependence."],
+   ["Ephesians 1–3","Identity Before Performance","Who you are in Christ before what you prove."],
+   ["Psalms","Faith With Tears","Grief, lament, hope, and honest prayer."]
+  ],
+  milestones:["Asked for help","Released one outcome","Had a calm money conversation"]
+ },
+ alec:{
+  journey:"Redeemed, Not Disqualified",
+  homeTitle:"Good morning, Alec",
+  homeText:"Your past can humble your leadership without disqualifying it.",
+  title:"Jesus restores responsibility after failure",
+  passage:"John 21:15–19",
+  focus:"Restored to Lead",
+  scripture:"“Simon son of John, do you love me?” … “Feed my sheep.”",
+  context:"Peter denied Jesus three times. Jesus does not ignore the failure or shame him into uselessness. He restores Peter honestly, brings him back to love, and entrusts him with responsibility.",
+  p1:"What part of the divorce do you still use to punish yourself?",
+  p2:"What responsibility is Jesus placing in front of you now as husband and father of five girls?",
+  moods:["Guilt","Pressure","Resentment","Hope","Frustration","Gratitude"],
+  wordTitle:"Shepherding as loving responsibility",
+  greek:"ποιμαίνω",
+  translit:"poimainō",
+  meaning:"To shepherd, tend, guide, or care for a flock. In John 21, Jesus connects Peter’s love for Him with practical care for people.",
+  caution:"The word does not permit control or domination. In context, shepherding is tied to love, service, sacrifice, and responsibility.",
+  elsewhere:"Acts 20:28 and 1 Peter 5:2 use the same word for caring leadership.",
+  beforeAfter:"Before this scene, Peter denied Jesus and encountered the risen Christ. After it, Jesus calls him again: “Follow me.”",
+  cross:"Luke 22:54–62 → John 21:15–19 → 2 Corinthians 7:8–11 → 1 Peter 5:1–4",
+  notMean:"The divorce was not made good because something beautiful followed. Jesus can restore a repentant person and call him to faithful love now.",
+  journeys:[
+   ["John 21","Redeemed, Not Disqualified","Repentance, grace, restoration, and responsibility now."],
+   ["Mark 10 · John 13","The Leader God Is Forming","Servant leadership, humility, listening, and strength without control."],
+   ["Matthew 18","Forgiveness Without Pretending","Forgiveness, trust, reconciliation, and releasing resentment."],
+   ["James 1","Listen First","Empathy, patience, and hearing before fixing or defending."],
+   ["Ephesians 5–6","Husband, Father, Example","Marriage, five daughters, blended-family trust, presence, and repair."],
+   ["Psalms · Proverbs","Provision Without Pressure","Responsibility without tying worth to perfect provision."]
+  ],
+  milestones:["Listened without fixing","Encouraged one daughter","Released one old accusation"]
+ }
+};
+
+let currentProfile=localStorage.getItem("held_profile")||"patricia";
+function key(s){return "held_soft_"+currentProfile+"_"+s}
+function currentDay(){return parseInt(localStorage.getItem(key("day"))||"1")}
+function completed(){return JSON.parse(localStorage.getItem(key("completed"))||"[]")}
+
+function switchProfile(p){
+ currentProfile=p;localStorage.setItem("held_profile",p);
+ document.getElementById("pBtn").classList.toggle("active",p==="patricia");
+ document.getElementById("aBtn").classList.toggle("active",p==="alec");
+ renderAll();
+}
+function showView(id){
+ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+function renderAll(){
+ const p=profiles[currentProfile],day=currentDay(),done=completed();
+ document.getElementById("journeyName").textContent=p.journey;
+ document.getElementById("journeyDay").textContent=`Day ${day} of 21`;
+ document.getElementById("journeyProgress").style.width=`${Math.round(done.length/21*100)}%`;
+ document.getElementById("homeTitle").textContent=p.homeTitle;
+ document.getElementById("homeText").textContent=p.homeText;
+ document.getElementById("todayPassage").textContent=p.passage;
+ document.getElementById("todayFocus").textContent=p.focus;
+ document.getElementById("devMeta").textContent=`Day ${day} · ${p.passage}`;
+ document.getElementById("devTitle").textContent=p.title;
+ document.getElementById("devScripture").textContent=p.scripture;
+ document.getElementById("devContext").textContent=p.context;
+ document.getElementById("prompt1Label").textContent=p.p1;
+ document.getElementById("prompt2Label").textContent=p.p2;
+ document.getElementById("prompt1").value=localStorage.getItem(key("draft1"))||"";
+ document.getElementById("prompt2").value=localStorage.getItem(key("draft2"))||"";
+ document.getElementById("wordTitle").textContent=p.wordTitle;
+ document.getElementById("wordGreek").textContent=p.greek;
+ document.getElementById("wordTranslit").textContent=p.translit;
+ document.getElementById("wordMeaning").textContent=p.meaning;
+ document.getElementById("wordCaution").textContent=p.caution;
+ document.getElementById("wordElsewhere").textContent=p.elsewhere;
+ document.getElementById("contextBeforeAfter").textContent=p.beforeAfter;
+ document.getElementById("studyWordSummary").textContent=`${p.greek} (${p.translit}): ${p.meaning}`;
+ document.getElementById("crossRefs").textContent=p.cross;
+ document.getElementById("notMean").textContent=p.notMean;
+ document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
+ document.getElementById("progressTitle").textContent=p.journey+" · 21-day path";
+ document.getElementById("journeyCards").innerHTML=p.journeys.map(j=>`<div class="journey-card"><span class="tag">${j[0]}</span><h4>${j[1]}</h4><p class="muted">${j[2]}</p></div>`).join("");
+ document.getElementById("moodChoices").innerHTML=p.moods.map(m=>`<button class="choice" onclick="selectMood(this,'${m}')">${m}</button>`).join("");
+ document.getElementById("milestones").innerHTML=p.milestones.map(m=>`<div class="journey-card"><h4>${m}</h4><p class="muted">A real-life sign of growth.</p></div>`).join("");
+ renderDays();renderNotebook();renderJournal();renderShared();
+}
+
+function selectMood(btn,m){
+ document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));
+ btn.classList.add("selected");localStorage.setItem(key("mood"),m);
+}
+function saveDraft(){
+ localStorage.setItem(key("draft1"),document.getElementById("prompt1").value);
+ localStorage.setItem(key("draft2"),document.getElementById("prompt2").value);
+ alert("Draft saved privately.");
+}
+function completeDay(){
+ saveDraft();
+ let day=currentDay(),done=completed();
+ if(!done.includes(day))done.push(day);
+ localStorage.setItem(key("completed"),JSON.stringify(done));
+ if(day<21)localStorage.setItem(key("day"),String(day+1));
+ localStorage.removeItem(key("draft1"));localStorage.removeItem(key("draft2"));
+ alert("Today is complete. Your next day is ready when you return.");
+ renderAll();showView("progress");
+}
+function renderDays(){
+ const day=currentDay(),done=completed();
+ document.getElementById("dayStrip").innerHTML=Array.from({length:21},(_,i)=>{
+  const n=i+1;let c="day";if(done.includes(n))c+=" done";if(n===day)c+=" current";
+  return `<div class="${c}">${done.includes(n)?"✓":n}</div>`;
+ }).join("");
+}
+function saveStudyNote(){
+ const t=document.getElementById("studyNote").value.trim();if(!t){alert("Write a note first.");return}
+ const arr=JSON.parse(localStorage.getItem(key("notebook"))||"[]");
+ arr.unshift({text:t,word:profiles[currentProfile].translit,date:new Date().toLocaleDateString()});
+ localStorage.setItem(key("notebook"),JSON.stringify(arr));
+ document.getElementById("studyNote").value="";renderNotebook();alert("Added to your Bible notebook.");
+}
+function renderNotebook(){
+ const arr=JSON.parse(localStorage.getItem(key("notebook"))||"[]");
+ document.getElementById("notebookList").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.word}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No study notes yet.</p>`;
+}
+function saveJournal(){
+ const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}
+ const arr=JSON.parse(localStorage.getItem(key("journal"))||"[]");
+ arr.unshift({text:t,date:new Date().toLocaleDateString()});
+ localStorage.setItem(key("journal"),JSON.stringify(arr));
+ document.getElementById("journalText").value="";renderJournal();alert("Saved privately.");
+}
+function shareTakeaway(){
+ const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}
+ const takeaway=prompt("What one sentence do you want to share?");
+ if(!takeaway)return;
+ const arr=JSON.parse(localStorage.getItem("held_soft_shared")||"[]");
+ arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString()});
+ localStorage.setItem("held_soft_shared",JSON.stringify(arr));renderShared();alert("Only that takeaway was shared.");
+}
+function renderJournal(){
+ const arr=JSON.parse(localStorage.getItem(key("journal"))||"[]");
+ document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No private entries yet.</p>`;
+}
+function renderShared(){
+ const arr=JSON.parse(localStorage.getItem("held_soft_shared")||"[]");
+ document.getElementById("sharedTakeaways").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No shared takeaways yet.</p>`;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+renderAll();
+</script>
+</body>
+</html>
