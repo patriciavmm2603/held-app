@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Held | Complete Prototype</title>
+<style>
+:root{
+  --cream:#fffaf2;--paper:#fffdf8;--ink:#173a3d;--muted:#6d7a79;
+  --teal:#15989a;--teal-dark:#0f7578;--aqua:#dff5f1;--peach:#f9dfb7;
+  --sand:#f3eadc;--sage:#dce9dc;--line:#eadfce;--shadow:0 14px 34px rgba(66,85,80,.12);
+  --radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+background:radial-gradient(circle at top left,rgba(255,229,184,.38),transparent 32%),radial-gradient(circle at bottom right,rgba(193,236,229,.34),transparent 28%),linear-gradient(180deg,#fffdf8 0%,#f8f3ec 100%)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:1200px;margin:0 auto;min-height:100vh;padding:22px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:16px;background:linear-gradient(145deg,#1aa4a6,#0f7d80);color:white;display:grid;place-items:center;font-weight:800;box-shadow:var(--shadow)}
+.brand h1{margin:0;font-family:Georgia,serif;font-size:28px;font-weight:600}.brand small{display:block;color:var(--muted);margin-top:2px}
+.profile-switch{display:flex;gap:6px;background:rgba(255,253,248,.92);border:1px solid var(--line);padding:6px;border-radius:999px;box-shadow:var(--shadow)}
+.profile-switch button{border:0;background:transparent;padding:9px 13px;border-radius:999px;color:var(--ink)}
+.profile-switch button.active{background:var(--aqua);color:var(--teal-dark);font-weight:700}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:18px}
+.sidebar{background:rgba(255,253,248,.94);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:15px;height:fit-content;position:sticky;top:16px}
+.navbtn{width:100%;border:0;background:transparent;text-align:left;padding:12px 13px;border-radius:14px;color:var(--ink);margin:2px 0}
+.navbtn:hover,.navbtn.active{background:var(--aqua);color:var(--teal-dark)}
+.current-box{margin-top:16px;padding:15px;border-radius:19px;background:linear-gradient(145deg,#fff8ed,#f2fbf8);border:1px solid var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--teal-dark)}
+.progress{height:8px;background:#e5eee9;border-radius:999px;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#6fc7bd);width:0}
+main{min-width:0}.view{display:none}.view.active{display:block}
+.hero,.card{background:rgba(255,253,248,.95);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{overflow:hidden;display:grid;grid-template-columns:1.15fr .85fr;min-height:390px}.hero-copy{padding:34px}
+.hero-art{position:relative;min-height:320px;background:radial-gradient(circle at 68% 25%,#ffe1a5 0 9%,transparent 10%),linear-gradient(180deg,#eefbf8 0%,#fdf7eb 100%);overflow:hidden}
+.sun{position:absolute;right:70px;top:50px;width:96px;height:96px;border-radius:50%;background:#ffd78f;box-shadow:0 0 0 16px rgba(255,215,143,.18)}
+.hill1,.hill2,.hill3{position:absolute;left:-8%;right:-8%;border-radius:50% 50% 0 0/100% 100% 0 0}
+.hill1{height:150px;bottom:-65px;background:#cfe5da;transform:rotate(-2deg)}.hill2{height:120px;bottom:-35px;background:#ead9bf;left:16%;right:-12%;transform:rotate(3deg)}.hill3{height:100px;bottom:-20px;background:#b7d9d3;left:42%;right:-18%}
+.river{position:absolute;bottom:-16px;left:46%;width:84px;height:180px;background:linear-gradient(180deg,rgba(255,255,255,.8),#a9d8d5);transform:rotate(15deg);border-radius:50%}
+h2{font-family:Georgia,serif;font-size:43px;line-height:1.06;margin:12px 0 14px;font-weight:500}h3{font-family:Georgia,serif;font-size:28px;margin:6px 0 12px;font-weight:500}h4{font-size:18px;margin:8px 0}
+p{line-height:1.6}.muted{color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.primary,.secondary,.ghost{padding:12px 17px;border-radius:14px;border:1px solid transparent}
+.primary{background:linear-gradient(135deg,#19a6a5,#0e888b);color:white;box-shadow:0 8px 18px rgba(21,152,154,.22)}
+.secondary{background:var(--aqua);color:var(--teal-dark)}.ghost{background:white;border-color:var(--line);color:var(--ink)}
+.section-title{margin:26px 4px 13px}.section-title h3{margin:0}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.journey-card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);transition:transform .18s ease;position:relative}
+.journey-card.clickable{cursor:pointer}.journey-card.clickable:hover{transform:translateY(-4px);border-color:#b9ddd7}
+.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--aqua);color:var(--teal-dark);font-size:12px}
+.status{position:absolute;right:14px;top:14px;font-size:11px;padding:5px 8px;border-radius:999px;background:#fff3df;color:#8b6631}
+.study-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:16px}.card{padding:22px}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:16px}.tab{padding:10px 0;border:0;background:transparent;color:var(--muted)}.tab.active{color:var(--teal-dark);border-bottom:3px solid var(--teal);font-weight:700}
+.scripture{font-family:Georgia,serif;font-size:21px;line-height:1.75;padding:20px;background:linear-gradient(180deg,#fffdf8,#fff9ef);border-left:4px solid var(--teal);border-radius:16px;margin:18px 0}
+.context{background:var(--aqua);padding:17px;border-radius:16px}
+textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:15px;padding:14px;background:white;resize:vertical}
+.prompt{margin:18px 0}.prompt strong{display:block;margin-bottom:8px}
+.choice-row{display:flex;gap:8px;flex-wrap:wrap}.choice{border:1px solid var(--line);background:white;border-radius:999px;padding:9px 12px}.choice.selected{background:var(--aqua);border-color:#8bcfca;color:var(--teal-dark)}
+.word-card{background:linear-gradient(180deg,#f7fffd,#eefaf7);border:1px solid #cce5df;border-radius:20px;padding:20px}
+.word-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.greek{font-family:Georgia,serif;font-size:34px;color:var(--teal-dark)}
+.badge{display:inline-block;font-size:12px;padding:5px 8px;border-radius:999px;background:#fff3df;color:#8b6631}
+details{margin-top:13px}summary{cursor:pointer;font-weight:700}
+.shared{background:linear-gradient(135deg,#fff7e8,#f3fcfa);border:1px solid var(--line);padding:18px;border-radius:18px}
+.entry{padding:15px;background:white;border:1px solid var(--line);border-radius:16px;margin-top:10px}
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{min-height:74px;border-radius:16px;border:1px solid var(--line);background:white;padding:10px;text-align:left}
+.day.done{background:var(--aqua);color:var(--teal-dark)}.day.current{border:2px solid var(--teal)}.day.locked{opacity:.55}
+.day small{display:block;color:var(--muted);margin-top:4px}
+.overview-hero{display:grid;grid-template-columns:1fr .75fr;gap:18px;align-items:stretch}
+.overview-art{border-radius:20px;min-height:240px;background:linear-gradient(145deg,#e3f5ef,#fff0d8);position:relative;overflow:hidden}
+.overview-art:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#ffd995;right:25px;top:25px;opacity:.8}
+.overview-art:after{content:"";position:absolute;left:-15%;right:-15%;bottom:-55px;height:150px;border-radius:50% 50% 0 0;background:#b9d9d2}
+.list{display:grid;gap:10px}.list-item{padding:14px;border:1px solid var(--line);border-radius:15px;background:white}
+.bottom-nav{display:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:900px){
+ .app{padding:12px 12px 88px}.layout{grid-template-columns:1fr}.sidebar{display:none}.hero,.overview-hero{grid-template-columns:1fr}.hero-art{min-height:220px}
+ .study-layout,.grid2,.grid3{grid-template-columns:1fr}.day-grid{grid-template-columns:repeat(3,1fr)}
+ .topbar{align-items:flex-start;gap:12px}.profile-switch{transform:scale(.92);transform-origin:right top}h2{font-size:35px}
+ .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:10px;background:rgba(255,253,248,.96);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:7px;z-index:20}
+ .bottom-nav button{border:0;background:transparent;padding:10px 4px;border-radius:12px;font-size:12px;color:var(--muted)}.bottom-nav button.active{background:var(--aqua);color:var(--teal-dark);font-weight:700}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+ <div class="brand"><div class="logo">H</div><div><h1>Held</h1><small>Scripture-led healing for real life</small></div></div>
+ <div class="profile-switch"><button id="pBtn" class="active" onclick="switchProfile('patricia')">Patricia</button><button id="aBtn" onclick="switchProfile('alec')">Alec</button></div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+ <button class="navbtn active" data-view="home">Home</button>
+ <button class="navbtn" data-view="library">Journeys</button>
+ <button class="navbtn" data-view="devotional">Devotional</button>
+ <button class="navbtn" data-view="study">Bible Study</button>
+ <button class="navbtn" data-view="journal">Journal</button>
+ <button class="navbtn" data-view="together">Together</button>
+ <button class="navbtn" data-view="progress">Journey Map</button>
+ <div class="current-box"><div class="eyebrow">Current journey</div><strong id="journeyName"></strong><div class="progress"><span id="journeyProgress"></span></div><small class="muted" id="journeyDay"></small></div>
+</aside>
+
+<main>
+<section id="home" class="view active">
+ <div class="hero"><div class="hero-copy"><div class="eyebrow">Good morning</div><h2 id="homeTitle"></h2><p id="homeText" class="muted"></p>
+ <div class="shared" style="margin-top:18px"><strong id="todayPassage"></strong><p id="todayFocus" style="margin-bottom:0"></p></div>
+ <div class="actions"><button class="primary" onclick="showView('devotional')">Continue journey</button><button class="secondary" onclick="showView('library')">Browse journeys</button></div></div>
+ <div class="hero-art"><div class="sun"></div><div class="hill1"></div><div class="hill2"></div><div class="hill3"></div><div class="river"></div></div></div>
+ <div class="section-title"><h3>Your journeys</h3><p class="muted">Choose by topic. Study by book.</p></div><div id="homeJourneyCards" class="grid3"></div>
+</section>
+
+<section id="library" class="view">
+ <div class="card"><div class="eyebrow">Journey library</div><h3>Choose the path that meets this season</h3><p class="muted">Every journey has its own 21-day progress, journal notes, and Bible study trail.</p><div id="libraryCards" class="grid3"></div></div>
+</section>
+
+<section id="overview" class="view">
+ <div class="card">
+  <div class="overview-hero">
+   <div><div class="eyebrow" id="overviewBook"></div><h2 id="overviewTitle"></h2><p id="overviewDescription" class="muted"></p>
+   <div class="actions"><button id="startJourneyBtn" class="primary" onclick="startSelectedJourney()"></button><button class="ghost" onclick="showView('library')">Back to journeys</button></div></div>
+   <div class="overview-art"></div>
+  </div>
+  <div class="section-title"><h3>What you’ll walk through</h3></div><div id="overviewThemes" class="grid3"></div>
+  <div class="section-title"><h3>21-day outline</h3></div><div id="overviewDays" class="list"></div>
+ </div>
+</section>
+
+<section id="devotional" class="view">
+ <div class="study-layout">
+  <div class="card"><div class="eyebrow" id="devMeta"></div><h3 id="devTitle"></h3><div class="tabs"><button class="tab active">Read</button><button class="tab">Understand</button><button class="tab">Reflect</button></div>
+  <div class="scripture" id="devScripture"></div><div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
+  <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div><div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
+  <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
+  <div class="actions"><button class="primary" onclick="completeDay()">Complete today</button><button class="ghost" onclick="saveDraft()">Save draft</button></div></div>
+  <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3><div class="word-card"><div class="word-head"><div><div class="greek" id="wordGreek"></div><strong id="wordTranslit"></strong></div><span class="badge">Word study</span></div>
+  <p id="wordMeaning"></p><details><summary>Why context matters</summary><p id="wordCaution" class="muted"></p></details><details><summary>Used elsewhere</summary><p id="wordElsewhere" class="muted"></p></details></div>
+  <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div><button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
+ </div>
+</section>
+
+<section id="study" class="view"><div class="card"><div class="eyebrow">Bible study</div><h3>Study the passage, not just the topic</h3><div class="grid2">
+ <div class="journey-card"><h4>Context before and after</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
+ <div class="journey-card"><h4>Cross-reference trail</h4><p id="crossRefs"></p></div><div class="journey-card"><h4>What this does not mean</h4><p id="notMean"></p></div></div>
+ <div class="section-title"><h3>Bible notebook</h3></div><div id="notebookList"></div></div></section>
+
+<section id="journal" class="view"><div class="card"><div class="eyebrow">Private by default</div><h3 id="journalHeading"></h3><p class="muted">Nothing is shared unless you choose one takeaway.</p>
+<textarea id="journalText" placeholder="Write honestly before God..."></textarea><div class="actions"><button class="primary" onclick="saveJournal()">Save privately</button><button class="secondary" onclick="shareTakeaway()">Share one takeaway</button></div>
+<div class="section-title"><h3>Recent entries</h3></div><div id="journalEntries"></div></div></section>
+
+<section id="together" class="view"><div class="card"><div class="eyebrow">Together</div><h3>Walking in faith, side by side</h3>
+<div class="shared"><strong>Patricia’s active journey</strong><p id="patSharedJourney"></p></div><div class="shared" style="margin-top:10px"><strong>Alec’s active journey</strong><p id="alecSharedJourney"></p></div>
+<div class="prompt"><strong>Our shared question</strong><p>What is God inviting each of us to release, receive, or practice this week?</p></div><div id="sharedTakeaways"></div></div></section>
+
+<section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
+<div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
+<div class="footer">Complete prototype · Saves locally in this browser</div>
+</main>
+</div>
+
+<nav class="bottom-nav"><button data-view="home" class="active">Home</button><button data-view="library">Journeys</button><button data-view="study">Bible</button><button data-view="together">Together</button><button data-view="progress">More</button></nav>
+</div>
+
+<script>
+const profileData={
+patricia:{
+ homeTitle:"Good morning, Patricia",homeText:"You do not have to carry everything alone anymore.",moods:["Anxious","Hopeful","Tired","Guarded","Peaceful","Overwhelmed"],
+ journeys:[
+  makeJourney("survival","Matthew 5–7","From Survival to Partnership","Learn to separate wise responsibility from fear-driven control and receive partnership without losing your voice.",
+   ["Safety and trust","Money and control","Marriage and receiving support"],
+   [["Matthew 6:19–24","Where your treasure rests"],["Matthew 6:25–34","The Father knows what you need"],["Matthew 7:7–11","Learning to ask and receive"],["Matthew 5:3–10","Strength that looks different"],["Matthew 6:5–13","Prayer before control"],["Matthew 6:14–15","Release and forgiveness"],["Matthew 7:24–27","Building on the rock"],["Matthew 5:21–26","Repair before resentment"],["Matthew 5:38–48","Responding without retaliation"],["Matthew 6:1–4","Giving without performance"],["Matthew 6:16–18","Private faithfulness"],["Matthew 7:1–5","Seeing clearly"],["Matthew 7:6","Wisdom and boundaries"],["Matthew 7:12","Living the way of love"],["Matthew 5:13–16","Faith that becomes visible"],["Matthew 5:17–20","Obedience from the heart"],["Matthew 6:22–23","What shapes your vision"],["Matthew 6:24","One true master"],["Matthew 7:13–14","Choosing the narrow way"],["Matthew 7:15–20","Looking for fruit"],["Matthew 7:28–29","Living under Jesus’ authority"]]),
+  makeJourney("anxiety","Matthew 5–7","Anxiety and the Character of God","Study worry, prayer, provision, trust, and the Father’s care through the Sermon on the Mount.",
+   ["God’s care","Daily provision","Prayer and peace"],
+   [["Matthew 6:25–27","What worry cannot add"],["Matthew 6:28–30","The God who clothes the flowers"],["Matthew 6:31–34","Today has enough trouble"],["Matthew 7:7–11","The Father gives good gifts"],["Matthew 6:9–13","Daily bread"],["Matthew 5:1–12","Blessed in the middle of need"],["Matthew 6:19–21","Treasure and anxiety"],["Matthew 6:22–23","A clear eye"],["Matthew 6:24","Divided loyalty"],["Matthew 5:44–48","Love beyond fear"],["Matthew 7:24–27","A foundation for storms"],["Matthew 5:13–16","Light in anxious places"],["Matthew 6:5–8","The Father already knows"],["Matthew 6:16–18","Hidden faithfulness"],["Matthew 7:1–5","Anxiety and judgment"],["Matthew 7:12","The next loving step"],["Matthew 5:38–42","Releasing the need to control others"],["Matthew 5:43–48","Trusting God with enemies"],["Matthew 7:13–14","A narrow but steady path"],["Matthew 7:15–20","Fruit over fear"],["Matthew 7:28–29","Resting in Jesus’ authority"]]),
+  makeJourney("money","Luke","Money, Provision, and Trust","Explore scarcity, stewardship, generosity, contentment, and what money reveals about the heart.",
+   ["Scarcity and trust","Generosity","Stewardship and contentment"],
+   [["Luke 12:13–21","The rich fool"],["Luke 12:22–34","Do not be afraid, little flock"],["Luke 16:1–13","Faithful with little"],["Luke 18:18–30","The rich ruler"],["Luke 19:1–10","Zacchaeus and changed stewardship"],["Luke 21:1–4","The widow’s offering"],["Luke 6:27–38","Generosity and mercy"],["Luke 11:1–13","Daily bread and asking"],["Luke 14:25–33","Counting the cost"],["Luke 15:11–32","The Father’s abundance"],["Luke 10:25–37","Generosity as neighbor love"],["Luke 10:38–42","One thing needed"],["Luke 8:4–15","What chokes the word"],["Luke 9:10–17","Jesus feeds the crowd"],["Luke 5:1–11","Trust beyond what you can see"],["Luke 7:36–50","Love flowing from forgiveness"],["Luke 18:1–8","Persistent trust"],["Luke 22:24–27","Greatness through service"],["Luke 22:35–38","Remembering provision"],["Luke 24:13–35","Recognizing Jesus in the journey"],["Luke 24:44–49","Living from promise, not panic"]]),
+  makeJourney("control","Exodus","Releasing Control","Walk through manna, wilderness, obedience, and the God who leads one day at a time.",
+   ["Daily dependence","Fear in the wilderness","Obedience and trust"],
+   [["Exodus 3:1–12","God meets Moses"],["Exodus 4:1–17","Fear and excuses"],["Exodus 13:17–22","The long way with God"],["Exodus 14:10–18","Stand firm and move forward"],["Exodus 15:22–27","Bitter water"],["Exodus 16:1–12","Complaining and provision"],["Exodus 16:13–21","Daily manna"],["Exodus 16:22–30","Learning Sabbath"],["Exodus 17:1–7","Testing God in thirst"],["Exodus 17:8–16","Receiving help"],["Exodus 18:13–27","You cannot carry this alone"],["Exodus 19:1–8","A treasured people"],["Exodus 20:1–17","Freedom with boundaries"],["Exodus 24:1–18","Covenant and presence"],["Exodus 32:1–14","Control and the golden calf"],["Exodus 33:12–23","If Your presence does not go"],["Exodus 34:1–9","The character of God"],["Exodus 35:20–29","Willing hearts"],["Exodus 36:1–7","Enough and more than enough"],["Exodus 40:34–38","The glory fills the tabernacle"],["Deuteronomy 8:2–10","Remembering the wilderness"]]),
+  makeJourney("identity","Ephesians 1–3","Identity Before Performance","Begin with who you are in Christ before what you fix, prove, or accomplish.",
+   ["Chosen and loved","Grace before effort","Belonging and purpose"],
+   [["Ephesians 1:1–6","Chosen in love"],["Ephesians 1:7–10","Redeemed and forgiven"],["Ephesians 1:11–14","Sealed with the Spirit"],["Ephesians 1:15–23","Eyes of the heart"],["Ephesians 2:1–10","Saved by grace"],["Ephesians 2:11–18","Brought near"],["Ephesians 2:19–22","A place to belong"],["Ephesians 3:1–6","The mystery revealed"],["Ephesians 3:7–13","Grace for calling"],["Ephesians 3:14–21","Rooted in love"],["Ephesians 4:1–6","Walk worthy"],["Ephesians 4:7–16","Growing into maturity"],["Ephesians 4:17–24","The new self"],["Ephesians 4:25–32","Truthful and tender"],["Ephesians 5:1–2","Walk in love"],["Ephesians 5:8–14","Walk as light"],["Ephesians 5:15–20","Walk wisely"],["Ephesians 5:21–33","Mutual honor in marriage"],["Ephesians 6:1–4","Family and formation"],["Ephesians 6:10–18","Strength in the Lord"],["Ephesians 6:19–24","Grace and peace"]]),
+  makeJourney("grief","Psalms","Faith With Tears","Bring grief, lament, confusion, and hope honestly before God.",
+   ["Honest lament","God’s nearness","Hope without pretending"],
+   [["Psalm 13","How long, Lord?"],["Psalm 22","Why have You forsaken me?"],["Psalm 23","The Shepherd in the valley"],["Psalm 27","Waiting with courage"],["Psalm 31","Into Your hands"],["Psalm 34","Near to the brokenhearted"],["Psalm 42","Why are you downcast?"],["Psalm 46","A very present help"],["Psalm 55","Cast your burden"],["Psalm 56","When I am afraid"],["Psalm 61","Lead me to the rock"],["Psalm 62","Quiet trust"],["Psalm 69","Deep waters"],["Psalm 73","When life feels unfair"],["Psalm 77","Remembering in the dark"],["Psalm 84","Strength for the journey"],["Psalm 88","A prayer without a neat ending"],["Psalm 103","Remember His benefits"],["Psalm 121","Where help comes from"],["Psalm 130","Waiting for the Lord"],["Psalm 139","Known and held"]])
+ ]},
+alec:{
+ homeTitle:"Good morning, Alec",homeText:"Your past can humble your leadership without disqualifying it.",moods:["Guilt","Pressure","Resentment","Hope","Frustration","Gratitude"],
+ journeys:[
+  makeJourney("redeemed","John 21","Redeemed, Not Disqualified","Move from self-punishment toward repentance, grace, responsibility, and faithful leadership now.",
+   ["Repentance and grace","Restoration","Faithful responsibility"],
+   [["John 21:1–14","Jesus meets Peter again"],["John 21:15–17","Do you love Me?"],["John 21:18–19","Follow Me again"],["Luke 22:54–62","Peter’s failure"],["Luke 22:31–34","Jesus prayed for Peter"],["2 Corinthians 7:8–11","Godly sorrow"],["Romans 8:1–4","No condemnation"],["Romans 8:18–28","God at work in suffering"],["Psalm 51","A broken and contrite heart"],["Psalm 32","The relief of confession"],["Micah 7:8–9","Though I fall, I will rise"],["Genesis 50:15–21","God’s redemption without denial"],["1 Timothy 1:12–17","Mercy for an example"],["Philippians 3:12–14","Pressing forward"],["Isaiah 43:18–19","A new thing"],["Joel 2:25–27","Restoration after loss"],["Ephesians 2:1–10","Grace and good works"],["1 Peter 5:1–4","Shepherd without domineering"],["Mark 10:42–45","Leadership through service"],["John 13:1–17","Love that washes feet"],["John 21:20–22","Follow Me, not comparison"]]),
+  makeJourney("leader","Mark 10 · John 13","The Leader God Is Forming","Learn servant leadership, humility, listening, responsibility, and strength without control.",
+   ["Servant leadership","Humility","Strength under God"],
+   [["Mark 10:35–45","Greatness through service"],["John 13:1–17","Washing feet"],["Philippians 2:1–11","The mind of Christ"],["1 Peter 5:1–4","Not domineering"],["James 1:19–20","Quick to listen"],["Proverbs 15:1–4","A gentle answer"],["Proverbs 11:14","Receiving counsel"],["Proverbs 16:9","Planning under God"],["Micah 6:8","Walking humbly"],["Joshua 1:1–9","Courage rooted in God"],["Nehemiah 1:1–11","Leadership begins in prayer"],["Nehemiah 2:11–18","Seeing and acting wisely"],["Matthew 20:20–28","The cup and the servant"],["Luke 22:24–27","Jesus among us as one who serves"],["Ephesians 5:21–33","Love that sacrifices"],["Colossians 3:12–17","Compassion and patience"],["1 Corinthians 13:1–7","Love before achievement"],["2 Timothy 2:1–7","Strength through grace"],["Titus 1:7–9","Character before authority"],["Psalm 78:70–72","Integrity and skill"],["John 15:1–17","Leadership that abides"]]),
+  makeJourney("forgiveness","Matthew 18","Forgiveness Without Pretending","Face resentment honestly while learning the difference between forgiveness, trust, boundaries, and reconciliation.",
+   ["Honest hurt","Release without denial","Boundaries and reconciliation"],
+   [["Matthew 18:21–35","The unforgiving servant"],["Matthew 5:21–26","Repair quickly"],["Matthew 5:38–48","Love beyond retaliation"],["Luke 17:1–4","Rebuke and forgive"],["Ephesians 4:25–32","Tenderhearted forgiveness"],["Colossians 3:12–15","Bear with one another"],["Romans 12:17–21","Overcome evil with good"],["Genesis 50:15–21","Naming harm and seeing redemption"],["Psalm 55","Betrayal brought to God"],["Psalm 73","When bitterness takes root"],["Hebrews 12:14–15","The root of bitterness"],["Mark 11:20–25","Forgiveness and prayer"],["2 Corinthians 2:5–11","Restoration after discipline"],["Philemon 8–21","Appeal, dignity, and reconciliation"],["1 Samuel 24","David refuses revenge"],["1 Samuel 26","Restraint a second time"],["Proverbs 19:11","Glory in overlooking offense"],["Proverbs 27:5–6","Faithful wounds"],["Matthew 7:1–5","Judgment and self-examination"],["Galatians 6:1–2","Restore gently"],["Romans 5:6–11","Forgiven people become forgiving people"]]),
+  makeJourney("empathy","James 1","Listen First","Practice empathy, patience, curiosity, and hearing before fixing, minimizing, or defending.",
+   ["Listening","Compassion","Repair and presence"],
+   [["James 1:19–20","Quick to listen"],["Proverbs 18:13","Answering before listening"],["Proverbs 20:5","Drawing out the heart"],["Romans 12:15","Weep with those who weep"],["Colossians 3:12–14","Clothe yourself with compassion"],["Luke 10:25–37","Seeing and moving toward pain"],["John 11:28–36","Jesus wept"],["Mark 10:46–52","What do you want Me to do?"],["1 Peter 3:7–9","Living with understanding"],["Philippians 2:1–4","Looking to others’ interests"],["Proverbs 15:1","A gentle answer"],["Proverbs 12:18","Words that heal"],["Ephesians 4:29","Words that build up"],["Job 2:11–13","Sitting in silence"],["Job 16:1–5","Miserable comforters"],["Luke 24:13–35","Walking and listening"],["John 4:4–26","Truth with dignity"],["Galatians 6:2","Bearing burdens"],["1 Corinthians 12:21–26","When one suffers"],["Matthew 9:35–38","Compassion that sees"],["John 13:34–35","Love as the mark of discipleship"]]),
+  makeJourney("father","Ephesians 5–6","Husband, Father, Example","Lead a blended family with love, repentance, presence, emotional safety, and steady care for five daughters.",
+   ["Marriage as witness","Fatherhood and blessing","Blended-family trust"],
+   [["Ephesians 5:21–33","Love that gives itself"],["Ephesians 6:1–4","Do not provoke your children"],["Colossians 3:18–21","Tender authority"],["Psalm 78:1–8","Tell the next generation"],["Deuteronomy 6:4–9","Faith in everyday life"],["Proverbs 20:7","The legacy of integrity"],["Mark 10:13–16","Welcoming children"],["Luke 15:11–24","A father who runs"],["1 Thessalonians 2:7–12","Gentle and encouraging"],["James 3:13–18","Wisdom that is gentle"],["Proverbs 15:1–4","Words that give life"],["Proverbs 27:17","Growth through relationship"],["Micah 6:8","Justice, mercy, humility"],["1 Corinthians 13:4–7","The shape of love"],["Romans 12:9–18","Honor and peace"],["Ephesians 4:25–32","Repair and forgiveness"],["Psalm 103:8–14","Compassion like a father"],["Joshua 24:14–15","As for me and my house"],["Genesis 33:1–11","Reunion and humility"],["Ruth 1:16–17","Covenant love in blended family"],["John 13:34–35","Let them see love"]]),
+  makeJourney("provision","Psalms · Proverbs","Provision Without Pressure","Separate faithful responsibility from the fear that your worth depends on providing perfectly.",
+   ["Work and worth","Wisdom and planning","Trusting God as source"],
+   [["Psalm 23","The Lord is my shepherd"],["Psalm 37:1–7","Trust and do good"],["Psalm 127","Unless the Lord builds"],["Proverbs 3:5–10","Trust and honor God"],["Proverbs 6:6–11","Diligence without panic"],["Proverbs 10:22","The blessing of the Lord"],["Proverbs 11:24–28","Generosity and trust"],["Proverbs 13:11","Patient growth"],["Proverbs 15:16–17","Better with love"],["Proverbs 16:1–9","Plans under God"],["Proverbs 21:5","Diligent planning"],["Matthew 6:25–34","The Father knows"],["Luke 12:13–34","Rich toward God"],["Philippians 4:10–20","Contentment and provision"],["1 Timothy 6:6–10","Godliness with contentment"],["1 Timothy 6:17–19","Hope in God, not wealth"],["2 Thessalonians 3:6–13","Faithful work"],["Deuteronomy 8:10–18","Remember who gives power"],["Exodus 16","Daily bread"],["Psalm 90:12–17","Establish the work of our hands"],["Hebrews 13:5–6","Content and unafraid"]])
+ ]}
+};
+
+function makeJourney(id,book,title,description,themes,days){return {id,book,title,description,themes,days}}
+
+let currentProfile=localStorage.getItem("held_profile")||"patricia";
+let selectedJourneyId=null;
+function profile(){return profileData[currentProfile]}
+function activeJourneyId(){return localStorage.getItem(`held_${currentProfile}_activeJourney`)||profile().journeys[0].id}
+function activeJourney(){return profile().journeys.find(j=>j.id===activeJourneyId())||profile().journeys[0]}
+function progressKey(jid){return `held_${currentProfile}_${jid}_completed`}
+function dayKey(jid){return `held_${currentProfile}_${jid}_day`}
+function journalKey(jid){return `held_${currentProfile}_${jid}_journal`}
+function notebookKey(jid){return `held_${currentProfile}_${jid}_notebook`}
+function draftKey(jid,n){return `held_${currentProfile}_${jid}_draft${n}`}
+function getCompleted(jid){return JSON.parse(localStorage.getItem(progressKey(jid))||"[]")}
+function getDay(jid){return parseInt(localStorage.getItem(dayKey(jid))||"1")}
+
+function switchProfile(p){
+ currentProfile=p;localStorage.setItem("held_profile",p);
+ document.getElementById("pBtn").classList.toggle("active",p==="patricia");
+ document.getElementById("aBtn").classList.toggle("active",p==="alec");
+ renderAll();showView("home")
+}
+function showView(id){
+ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+ window.scrollTo({top:0,behavior:"smooth"})
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+function renderJourneyCards(containerId){
+ const c=document.getElementById(containerId);
+ c.innerHTML=profile().journeys.map(j=>{
+  const done=getCompleted(j.id).length;
+  const status=done===21?"Completed":done>0?`${done}/21`:"New";
+  return `<div class="journey-card clickable" onclick="openJourney('${j.id}')"><span class="tag">${j.book}</span><span class="status">${status}</span><h4>${j.title}</h4><p class="muted">${j.description}</p></div>`
+ }).join("")
+}
+function openJourney(id){
+ selectedJourneyId=id;const j=profile().journeys.find(x=>x.id===id);
+ document.getElementById("overviewBook").textContent=j.book;
+ document.getElementById("overviewTitle").textContent=j.title;
+ document.getElementById("overviewDescription").textContent=j.description;
+ document.getElementById("overviewThemes").innerHTML=j.themes.map(t=>`<div class="journey-card"><h4>${t}</h4><p class="muted">A core theme in this path.</p></div>`).join("");
+ document.getElementById("overviewDays").innerHTML=j.days.map((d,i)=>`<div class="list-item"><strong>Day ${i+1}: ${d[1]}</strong><div class="muted">${d[0]}</div></div>`).join("");
+ const active=activeJourneyId()===id,done=getCompleted(id).length;
+ document.getElementById("startJourneyBtn").textContent=active?(done?"Continue this journey":"Start this journey"):(done?"Resume this journey":"Start this journey");
+ showView("overview")
+}
+function startSelectedJourney(){
+ if(!selectedJourneyId)return;
+ localStorage.setItem(`held_${currentProfile}_activeJourney`,selectedJourneyId);
+ renderAll();showView("devotional")
+}
+function dayContent(j,day){
+ const item=j.days[day-1]||j.days[0],passage=item[0],theme=item[1];
+ const isGreek=(passage.includes("Matthew")||passage.includes("John")||passage.includes("Luke")||passage.includes("Mark")||passage.includes("Ephesians")||passage.includes("Philippians")||passage.includes("Romans")||passage.includes("James")||passage.includes("Colossians")||passage.includes("1 Peter")||passage.includes("1 Timothy")||passage.includes("2 Corinthians")||passage.includes("Hebrews"));
+ let word=isGreek?{orig:"χάρις",trans:"charis",meaning:"Grace, favor, or gift. In the New Testament, the word often points to God’s undeserved kindness and empowering generosity.",elsewhere:"John 1:16–17, Romans 3:24, Ephesians 2:8, and Titus 2:11.",caution:"A word study supports the passage, but it does not replace the sentence, paragraph, or book context."}:{orig:"חֶסֶד",trans:"hesed",meaning:"Steadfast love, covenant loyalty, mercy, or faithful kindness. The exact shade depends on the passage.",elsewhere:"Exodus 34:6, Psalm 23:6, Psalm 136, and Micah 7:18.",caution:"Hebrew words can carry a range of meaning. Context determines which shade is emphasized."};
+ if(passage.includes("Matthew 6"))word={orig:"μεριμνάω",trans:"merimnaō",meaning:"To worry, be anxious, or be concerned. In Matthew 6, it is tied to divided attention, provision, and trust.",elsewhere:"Philippians 4:6 and 1 Corinthians 7.",caution:"The word does not mean every concern is sinful. Jesus’ full argument controls the meaning."};
+ if(passage.includes("John 21"))word={orig:"ποιμαίνω",trans:"poimainō",meaning:"To shepherd, tend, guide, or care for a flock. Jesus connects love for Him with practical care for people.",elsewhere:"Acts 20:28 and 1 Peter 5:2.",caution:"Shepherding does not mean domination. In context, it is loving responsibility."};
+ return {
+  passage,theme,
+  scripture:`Read ${passage} slowly. Notice what the passage reveals about God, what it exposes in the human heart, and what faithful response looks like today.`,
+  context:`This day belongs to the journey “${j.title}.” The focus is ${theme.toLowerCase()}. Read the verses before and after the selected section so the application grows from the passage rather than from the topic alone.`,
+  p1:`What does ${passage} reveal about God’s character or His ways?`,
+  p2:`Where does the theme “${theme}” meet your life right now?`,
+  word
+ }
+}
+function renderAll(){
+ const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
+ document.getElementById("pBtn").classList.toggle("active",currentProfile==="patricia");
+ document.getElementById("aBtn").classList.toggle("active",currentProfile==="alec");
+ document.getElementById("journeyName").textContent=j.title;
+ document.getElementById("journeyDay").textContent=`Day ${day} of 21`;
+ document.getElementById("journeyProgress").style.width=`${Math.round(done.length/21*100)}%`;
+ document.getElementById("homeTitle").textContent=p.homeTitle;
+ document.getElementById("homeText").textContent=p.homeText;
+ document.getElementById("todayPassage").textContent=content.passage;
+ document.getElementById("todayFocus").textContent=content.theme;
+ renderJourneyCards("homeJourneyCards");renderJourneyCards("libraryCards");
+ document.getElementById("devMeta").textContent=`Day ${day} · ${content.passage}`;
+ document.getElementById("devTitle").textContent=content.theme;
+ document.getElementById("devScripture").textContent=content.scripture;
+ document.getElementById("devContext").textContent=content.context;
+ document.getElementById("prompt1Label").textContent=content.p1;
+ document.getElementById("prompt2Label").textContent=content.p2;
+ document.getElementById("prompt1").value=localStorage.getItem(draftKey(j.id,1))||"";
+ document.getElementById("prompt2").value=localStorage.getItem(draftKey(j.id,2))||"";
+ document.getElementById("moodChoices").innerHTML=p.moods.map(m=>`<button class="choice" onclick="selectMood(this,'${m}')">${m}</button>`).join("");
+ document.getElementById("wordTitle").textContent=content.theme;
+ document.getElementById("wordGreek").textContent=content.word.orig;
+ document.getElementById("wordTranslit").textContent=content.word.trans;
+ document.getElementById("wordMeaning").textContent=content.word.meaning;
+ document.getElementById("wordCaution").textContent=content.word.caution;
+ document.getElementById("wordElsewhere").textContent=content.word.elsewhere;
+ document.getElementById("contextBeforeAfter").textContent=`Read the verses immediately before and after ${content.passage}. Ask how this section fits the larger argument of ${j.book}.`;
+ document.getElementById("studyWordSummary").textContent=`${content.word.orig} (${content.word.trans}): ${content.word.meaning}`;
+ document.getElementById("crossRefs").textContent=j.days.slice(Math.max(0,day-2),Math.min(21,day+2)).map(x=>x[0]).join(" → ");
+ document.getElementById("notMean").textContent=`This passage should not be used to force a quick emotional result or to ignore wisdom, boundaries, grief, or responsibility.`;
+ document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
+ document.getElementById("progressTitle").textContent=j.title+" · 21-day path";
+ document.getElementById("patSharedJourney").textContent=profileData.patricia.journeys.find(x=>x.id===(localStorage.getItem("held_patricia_activeJourney")||profileData.patricia.journeys[0].id)).title;
+ document.getElementById("alecSharedJourney").textContent=profileData.alec.journeys.find(x=>x.id===(localStorage.getItem("held_alec_activeJourney")||profileData.alec.journeys[0].id)).title;
+ renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared()
+}
+function selectMood(btn,m){document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(`held_${currentProfile}_${activeJourney().id}_mood`,m)}
+function saveDraft(){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);alert("Draft saved privately.")}
+function completeDay(){const j=activeJourney();saveDraft();let day=getDay(j.id),done=getCompleted(j.id);if(!done.includes(day))done.push(day);localStorage.setItem(progressKey(j.id),JSON.stringify(done));if(day<21)localStorage.setItem(dayKey(j.id),String(day+1));localStorage.removeItem(draftKey(j.id,1));localStorage.removeItem(draftKey(j.id,2));alert(day===21?"Journey complete.":"Today is complete. Your next day is ready.");renderAll();showView("progress")}
+function renderDayGrid(){const j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id);document.getElementById("dayGrid").innerHTML=j.days.map((d,i)=>{const n=i+1;let c="day";if(done.includes(n))c+=" done";if(n===day)c+=" current";if(n>day&&!done.includes(n))c+=" locked";return `<button class="${c}" onclick="jumpToDay(${n})"><strong>${done.includes(n)?"✓ Day "+n:"Day "+n}</strong><small>${d[1]}</small></button>`}).join("")}
+function jumpToDay(n){const j=activeJourney(),done=getCompleted(j.id),day=getDay(j.id);if(n>day&&!done.includes(n)){alert("Complete the earlier days first.");return}localStorage.setItem(dayKey(j.id),String(n));renderAll();showView("devotional")}
+function renderAllProgress(){document.getElementById("allProgress").innerHTML=profile().journeys.map(j=>{const done=getCompleted(j.id).length;return `<div class="journey-card clickable" onclick="openJourney('${j.id}')"><span class="tag">${j.book}</span><h4>${j.title}</h4><p class="muted">${done} of 21 days completed</p><div class="progress"><span style="width:${Math.round(done/21*100)}%"></span></div></div>`}).join("")}
+function saveStudyNote(){const j=activeJourney(),t=document.getElementById("studyNote").value.trim();if(!t){alert("Write a note first.");return}const arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(notebookKey(j.id),JSON.stringify(arr));document.getElementById("studyNote").value="";renderNotebook();alert("Added to your Bible notebook.")}
+function renderNotebook(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");document.getElementById("notebookList").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${j.title} · Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No study notes yet for this journey.</p>`}
+function saveJournal(){const j=activeJourney(),t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(journalKey(j.id),JSON.stringify(arr));document.getElementById("journalText").value="";renderJournal();alert("Saved privately.")}
+function shareTakeaway(){const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const takeaway=prompt("What one sentence do you want to share?");if(!takeaway)return;const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString(),journey:activeJourney().title});localStorage.setItem("held_shared",JSON.stringify(arr));renderShared();alert("Only that takeaway was shared.")}
+function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No private entries yet for this journey.</p>`}
+function renderShared(){const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");document.getElementById("sharedTakeaways").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.journey} · ${x.date}</small></div>`).join(""):`<p class="muted">No shared takeaways yet.</p>`}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+renderAll()
+</script>
+</body>
+</html>
