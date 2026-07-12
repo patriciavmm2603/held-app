@@ -405,7 +405,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
     <div class="scripture" id="devScripture"></div>
     <div class="reading-note">
       <strong>Read slowly</strong>
-      <p class="muted" style="margin-bottom:0">Read the verses before and after today’s passage. Notice repeated words, contrasts, commands, promises, and what the text reveals about God.</p>
+      <p class="muted" style="margin-bottom:0">Read the biblical passage first. Then move to Understand for an explanation of the scene, the author’s point, the book context, and the key original-language word.</p>
     </div>
     <div class="actions"><button class="primary" type="button" data-dev-tab="understand">Next: Understand</button></div>
   </div>
@@ -434,14 +434,48 @@ button:disabled{opacity:.55;cursor:not-allowed}
     </div>
   </div>
  </div>
-  <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3><div class="word-card"><div class="word-head"><div><div class="greek" id="wordGreek"></div><strong id="wordTranslit"></strong></div><span class="badge">Word study</span></div>
-  <p id="wordMeaning"></p><details><summary>Why context matters</summary><p id="wordCaution" class="muted"></p></details><details><summary>Used elsewhere</summary><p id="wordElsewhere" class="muted"></p></details></div>
+  <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3>
+  <div class="word-card">
+    <div class="word-head">
+      <div>
+        <div class="greek" id="wordGreek"></div>
+        <strong id="wordTranslit"></strong>
+        <div class="muted" id="wordLanguage" style="margin-top:4px"></div>
+      </div>
+      <span class="badge">Word study</span>
+    </div>
+
+    <div class="list-item">
+      <strong>Basic meaning</strong>
+      <p id="wordMeaning" class="muted"></p>
+    </div>
+
+    <div class="list-item">
+      <strong>Other meanings this word can carry</strong>
+      <p id="wordRange" class="muted"></p>
+    </div>
+
+    <div class="list-item">
+      <strong>What it means in this passage</strong>
+      <p id="wordInPassage" class="muted"></p>
+    </div>
+
+    <details open>
+      <summary>How it is used elsewhere</summary>
+      <p id="wordElsewhere" class="muted"></p>
+    </details>
+
+    <details>
+      <summary>Do not force every meaning into this verse</summary>
+      <p id="wordCaution" class="muted"></p>
+    </details>
+  </div>
   <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div><button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
  </div>
 </section>
 
 <section id="study" class="view"><div class="card"><div class="eyebrow">Bible study</div><h3>Study the passage, not just the topic</h3><div class="grid2">
- <div class="journey-card"><h4>Context before and after</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
+ <div class="journey-card"><h4>How this fits the book</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
  <div class="journey-card"><h4>Cross-reference trail</h4><p id="crossRefs"></p></div><div class="journey-card"><h4>What this does not mean</h4><p id="notMean"></p></div></div>
  <div class="section-title"><h3>Bible notebook</h3></div><div id="notebookList"></div></div></section>
 
@@ -601,20 +635,314 @@ function startSelectedJourney(){
  localStorage.setItem(`held_${currentProfile}_activeJourney`,selectedJourneyId);
  renderAll();showView("devotional")
 }
+
+const bookContexts = {
+  "Matthew": "Matthew presents Jesus as the promised Messiah and authoritative teacher. Chapters 5–7 form the Sermon on the Mount, where Jesus describes life in God’s kingdom and moves obedience from outward performance to the heart.",
+  "Luke": "Luke carefully presents Jesus’ life and teaching with special attention to outsiders, the poor, prayer, money, mercy, and the reversal of human values in God’s kingdom.",
+  "John": "John selects signs and conversations so readers may believe Jesus is the Messiah, the Son of God, and find life in His name.",
+  "Exodus": "Exodus tells how God rescues Israel from slavery, forms them into His covenant people, teaches them dependence, and chooses to dwell among them.",
+  "Deuteronomy": "Deuteronomy records Moses preparing Israel to enter the land. He calls them to remember God’s faithfulness and obey from love rather than forgetfulness.",
+  "Ephesians": "Ephesians begins with what God has done in Christ, then explains how that new identity reshapes the church, relationships, speech, work, marriage, family, and spiritual resistance.",
+  "Psalms": "The Psalms are prayers and songs that teach God’s people to bring the full range of human experience to Him, including fear, anger, grief, praise, confession, and hope.",
+  "Mark": "Mark emphasizes Jesus’ authority, suffering, and servant-shaped kingship. Disciples repeatedly misunderstand greatness until Jesus defines it through sacrifice.",
+  "Romans": "Romans explains humanity’s need, God’s saving righteousness in Christ, life in the Spirit, and the transformed life that grows from mercy.",
+  "James": "James addresses believers under pressure and shows that genuine faith becomes visible through endurance, speech, listening, mercy, humility, and action.",
+  "Philippians": "Philippians is written from imprisonment and calls believers to joy, humility, unity, perseverance, and contentment rooted in Christ.",
+  "Proverbs": "Proverbs gathers wisdom for living skillfully under the fear of the Lord. Its sayings describe patterns, not mechanical guarantees.",
+  "1 Peter": "First Peter encourages Christians living as outsiders to remain holy, hopeful, humble, and faithful in suffering.",
+  "1 Timothy": "First Timothy instructs church leaders about sound teaching, godliness, care for people, money, and trustworthy leadership.",
+  "2 Corinthians": "Second Corinthians reveals Paul’s vulnerable ministry and shows how God’s power is displayed through weakness, reconciliation, generosity, and faithful endurance.",
+  "Hebrews": "Hebrews presents Jesus as the final and sufficient revelation of God, the superior High Priest, and the One in whom believers can persevere with confidence.",
+  "Colossians": "Colossians centers the supremacy and sufficiency of Christ and shows how union with Him changes character, relationships, work, and worship.",
+  "Genesis": "Genesis introduces creation, rebellion, covenant, and God’s promise to bless the nations through Abraham’s family despite repeated human failure.",
+  "Micah": "Micah confronts injustice and false security while promising that God will shepherd, forgive, and restore His people.",
+  "Isaiah": "Isaiah exposes sin and misplaced trust while revealing God’s holiness, promised Servant, comfort, and future restoration.",
+  "Joel": "Joel interprets national disaster as a call to return to God and points toward restoration and the outpouring of God’s Spirit.",
+  "Nehemiah": "Nehemiah records the rebuilding of Jerusalem’s walls and community through prayerful leadership, wise planning, shared work, and covenant renewal.",
+  "Joshua": "Joshua narrates Israel’s entry into the land and repeatedly connects courage with God’s presence and obedience to His word.",
+  "Job": "Job explores innocent suffering, limited human understanding, poor comfort, honest lament, and the wisdom and freedom of God.",
+  "Galatians": "Galatians defends justification by faith and explains freedom that expresses itself through love and life by the Spirit.",
+  "1 Corinthians": "First Corinthians corrects a divided church and applies the gospel to power, sexuality, worship, gifts, love, and resurrection.",
+  "1 Thessalonians": "First Thessalonians encourages a young church to persevere in holiness, love, hope, and faithful work while awaiting Christ.",
+  "2 Thessalonians": "Second Thessalonians corrects confusion about Christ’s return and calls believers to steady faith and responsible work.",
+  "Ruth": "Ruth is a story of covenant loyalty, providence, family redemption, and God’s welcome of a faithful outsider into Israel and David’s family line."
+};
+
+const passageStudies = [
+  {
+    match: p => p.includes("Matthew 6:19–24") || p.includes("Matthew 6:19–21"),
+    context: "Jesus has just warned against practicing devotion for human applause. He now turns to possessions and asks where a person is building security. Treasure, vision, and mastery are connected: what we store up shapes the heart, what fills the eye shapes the whole person, and no one can give ultimate allegiance to both God and wealth.",
+    fit: "This section begins the Sermon’s teaching about possessions and worry. Matthew 6:25 begins with “therefore,” so Jesus’ words about anxiety grow directly from His warning about treasure and divided masters.",
+    notMean: "Jesus is not saying material things have no value or that saving is automatically sinful. He is confronting possessions as ultimate security, identity, or master.",
+    word: {
+      orig:"θησαυρός", trans:"thēsauros · thay-sow-ROSS", language:"Greek noun",
+      meaning:"Treasure, a store of valuables, or the place where valuables are kept.",
+      range:"It can mean a literal treasure chest or storehouse, accumulated wealth, or figuratively the inner store from which a person brings out words and actions.",
+      inPassage:"Here it refers both to what a person values and where that person places lasting security. Jesus’ point is that the location of the treasure reveals and directs the heart.",
+      elsewhere:"Matthew 2:11 uses it for the wise men’s treasure chests. Matthew 12:35 uses it figuratively for the good or evil stored in the heart. Matthew 13:44 uses it for treasure hidden in a field.",
+      caution:"The word itself does not mean that every possession is an idol. The surrounding contrast between earth and heaven, followed by the two masters in verse 24, identifies the problem as ultimate allegiance."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 6:25") || p.includes("Matthew 6:28") || p.includes("Matthew 6:31"),
+    context: "This passage is part of Jesus’ Sermon on the Mount. Immediately before it, Jesus says that no one can serve both God and wealth. His command not to worry therefore addresses more than a feeling: it confronts the attempt to make possessions and control provide the security that belongs to the Father. Food and clothing were serious daily needs for Jesus’ first hearers. He does not mock those needs. He points to birds and flowers to reveal the Father’s attentive care, then calls His disciples to seek God’s kingdom one day at a time.",
+    fit: "Matthew 6 moves from secret devotion, to treasure, to undivided loyalty, to anxiety. The section belongs to Jesus’ larger description of trusting the Father rather than performing for people or being mastered by material security.",
+    notMean: "Jesus is not forbidding planning, work, saving, medical care, asking for help, or every experience of anxiety. The same Greek verb can describe appropriate concern elsewhere. Here He addresses consuming worry that dominates attention and treats tomorrow as though the Father is absent.",
+    word: {
+      orig:"μεριμνάω", trans:"merimnaō · meh-rim-NAH-oh", language:"Greek verb",
+      meaning:"To be anxious, to worry, to be concerned, or to give careful attention to something.",
+      range:"The word can describe troubled anxiety, but it can also describe responsible concern or care. Paul uses it positively for caring about another person’s welfare and for members of Christ’s body caring for one another.",
+      inPassage:"In Matthew 6 the repeated verb describes anxious preoccupation with food, clothing, and tomorrow. The issue is not that a need matters; it is that worry becomes the controlling focus and competes with trust in the Father.",
+      elsewhere:"Philippians 4:6 uses it for being anxious. Philippians 2:20 uses it positively of Timothy’s genuine concern. First Corinthians 12:25 uses the related idea for members caring for one another.",
+      caution:"It is popular to say the word literally means “a divided mind.” That picture may help describe anxiety, but the verb’s ordinary meanings include worry, concern, and care. The context, not a word-root alone, tells us which sense is intended."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 7:7–11"),
+    context: "Jesus is teaching disciples how to live under the Father’s care. After warning against hypocritical judgment, He encourages persistent asking, seeking, and knocking. He argues from ordinary parental care: imperfect human parents still give useful gifts rather than harmful substitutes, so the heavenly Father can be trusted to give what is truly good.",
+    fit: "The Sermon repeatedly presents God as Father: He sees in secret, knows needs before prayer, forgives, feeds, clothes, and gives good gifts. This paragraph gathers those themes into an invitation to approach Him.",
+    notMean: "This is not a promise that God will grant every request in the exact form or timing requested. Jesus promises the Father’s goodness, not human control over outcomes.",
+    word: {
+      orig:"αἰτέω", trans:"aiteō · eye-TEH-oh", language:"Greek verb",
+      meaning:"To ask, request, or petition.",
+      range:"It can describe ordinary requests between people, asking from someone in authority, or prayer addressed to God.",
+      inPassage:"The present commands “ask, seek, knock” portray a continuing posture of dependence. The confidence rests in the Father’s character, not in the intensity of the requester.",
+      elsewhere:"The word appears in Matthew 5:42 for someone asking from you, John 14:13–14 in prayer connected to Jesus’ name, and James 1:5 when asking God for wisdom.",
+      caution:"The verb does not carry a hidden guarantee that repetition earns an answer. Jesus’ comparison centers on the wise goodness of the giver."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 5:3–10") || p.includes("Matthew 5:1–12"),
+    context: "Jesus begins the Sermon on the Mount by announcing who is blessed in God’s kingdom. He speaks to disciples within hearing of the crowds. The Beatitudes do not celebrate suffering as good in itself; they declare God’s favor and promised future to people who appear weak, grieving, hungry for justice, merciful, pure in heart, peacemaking, or persecuted.",
+    fit: "The Beatitudes introduce the values of the kingdom that the rest of the Sermon explains. They describe people receiving God’s reign before Jesus describes the life that flows from it.",
+    notMean: "They are not eight techniques for earning salvation, nor do they require pretending pain is pleasant. They are announcements of God’s kingdom and descriptions of the people shaped by it.",
+    word: {
+      orig:"μακάριος", trans:"makarios · mah-KAH-ree-oss", language:"Greek adjective",
+      meaning:"Blessed, favored, fortunate, or deeply well because of God’s approval.",
+      range:"It can describe a person in an enviable state, not necessarily because circumstances feel pleasant, but because that person stands within God’s favor and promised good.",
+      inPassage:"Jesus calls people “blessed” whose present condition often looks unimpressive or painful. Their blessedness rests in God’s kingdom, comfort, mercy, presence, and future vindication.",
+      elsewhere:"It appears in Psalm 1 in the Greek Old Testament for the blessed person, in Luke 1:45 for Mary’s believing response, and in John 20:29 for those who believe without seeing.",
+      caution:"“Blessed” here does not simply mean happy feelings. Some of the blessed are mourning or persecuted, so the word points beyond emotion to God’s favor and promised future."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 6:5–13") || p.includes("Matthew 6:9–13"),
+    context: "Jesus contrasts prayer offered to impress people with prayer directed to the Father who sees and knows. He also contrasts trustful prayer with piling up words as though God must be manipulated. The Lord’s Prayer begins with God’s name, kingdom, and will, then brings daily provision, forgiveness, and protection into the Father’s care.",
+    fit: "This prayer sits in a chapter about hidden devotion. Giving, prayer, and fasting are meant to be lived before the Father rather than performed for an audience.",
+    notMean: "Jesus is not banning public prayer, repeated prayer, or detailed requests. He is rejecting performance and empty repetition that treats prayer as a technique for controlling God.",
+    word: {
+      orig:"πατήρ", trans:"patēr · pah-TAIR", language:"Greek noun",
+      meaning:"Father, parent, ancestor, or originator.",
+      range:"It can refer to a biological father, an ancestor, a respected predecessor, or God as Father.",
+      inPassage:"“Our Father” names both relationship and allegiance. Disciples approach God as the One who knows, provides, forgives, protects, and gathers them into a shared family.",
+      elsewhere:"Matthew repeatedly uses “your Father” in the Sermon. John 5 uses it in Jesus’ unique relationship with the Father. James 1:17 calls God the Father of lights.",
+      caution:"The word does not mean God is male in a bodily human sense, nor does it make every earthly father an adequate picture of Him. Jesus defines the Father by God’s own character."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 6:14–15"),
+    context: "These verses immediately follow the Lord’s Prayer, whose request for forgiveness is joined to forgiving others. Jesus highlights forgiveness because kingdom prayer cannot be separated from kingdom relationships. Receiving mercy creates an obligation to release personal vengeance and pursue reconciliation.",
+    fit: "The Sermon consistently joins worship to relationships: anger requires repair, love extends even to enemies, and prayer includes forgiveness.",
+    notMean: "Forgiveness does not deny harm, erase consequences, require instant trust, or prevent wise boundaries and legal protection. It means surrendering revenge and placing judgment in God’s hands.",
+    word: {
+      orig:"ἀφίημι", trans:"aphiēmi · ah-FEE-ay-mee", language:"Greek verb",
+      meaning:"To release, let go, leave, send away, cancel, or forgive.",
+      range:"It can mean leaving something behind, permitting something, releasing a debt, or forgiving wrongdoing.",
+      inPassage:"The image is release: disciples ask God to release their debts and are called to release the debts they hold against others.",
+      elsewhere:"Matthew 4:20 uses it when the disciples leave their nets. Matthew 9:2 uses it for sins being forgiven. Matthew 18 uses it in the parable of the unforgiving servant.",
+      caution:"Because the word can mean “leave,” it does not follow that forgiveness always requires leaving a relationship. Its meaning here is determined by the explicit object: trespasses or debts."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 7:24–27"),
+    context: "Jesus closes the Sermon with two builders who both hear His words and both face a storm. The difference is not exposure to teaching or absence of trouble. One acts on Jesus’ words; the other hears without obedience. The storm reveals the foundation already chosen.",
+    fit: "This is the final warning after the narrow gate, false prophets, and false professions. Jesus claims authority over the response to the entire Sermon.",
+    notMean: "Building on the rock does not promise a storm-free life. Both houses are struck. The contrast is between obedient and non-obedient hearing.",
+    word: {
+      orig:"ποιέω", trans:"poieō · poy-EH-oh", language:"Greek verb",
+      meaning:"To do, make, produce, practice, or carry out.",
+      range:"It is a broad action word used for making things, producing fruit, practicing behavior, or carrying out a command.",
+      inPassage:"The wise builder is the person who hears Jesus’ words and does them. Wisdom is embodied obedience, not admiration alone.",
+      elsewhere:"Matthew 3:8 uses it for producing fruit. Matthew 5:19 uses it for doing the commandments. Matthew 7:21 contrasts saying with doing the Father’s will.",
+      caution:"The word does not teach salvation by flawless performance. In this conclusion it exposes the emptiness of hearing that never becomes allegiance and practice."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 5:21–26"),
+    context: "Jesus quotes the command against murder and exposes the anger, contempt, and broken relationship from which violence grows. He does not cancel the command; He presses it inward. Worship cannot be used to avoid responsibility for relational repair.",
+    fit: "This is the first of several examples in which Jesus says, “You have heard… but I say to you,” revealing the deeper righteousness of the kingdom.",
+    notMean: "Jesus is not saying every feeling of anger is identical in consequence to murder. He is showing that contempt and dehumanization belong to the same moral direction and must be taken seriously.",
+    word: {
+      orig:"καταλλάσσω", trans:"katallassō · kah-tah-LASS-oh", language:"Greek verb",
+      meaning:"To reconcile, restore a relationship, or change from hostility to peace.",
+      range:"It can describe the restoration of human relationships and, in Paul, God reconciling people to Himself through Christ.",
+      inPassage:"The command is urgent: pursue repair with the person who has something against you rather than hiding unresolved harm behind religious activity.",
+      elsewhere:"Romans 5:10 and 2 Corinthians 5:18–20 use the word family for reconciliation with God and the ministry of reconciliation.",
+      caution:"Reconciliation normally involves restored relationship, but it cannot always be completed by one person alone. Jesus commands sincere pursuit of repair, not control over another person’s response."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 5:38–48") || p.includes("Matthew 5:38–42") || p.includes("Matthew 5:43–48") || p.includes("Matthew 5:44–48"),
+    context: "Jesus addresses retaliation and enemy-love in a setting where “eye for eye” was meant to limit revenge through proportional justice. He calls disciples away from personal vengeance and toward surprising generosity, prayer, and love that reflects the Father, who gives sun and rain to both the evil and the good.",
+    fit: "These examples complete Jesus’ contrast between conventional righteousness and the whole-hearted love of God’s kingdom.",
+    notMean: "Jesus is not commanding people to remain in abuse, abolishing public justice, or forbidding every form of resistance. He confronts revenge, hatred, and the demand to mirror an enemy’s evil.",
+    word: {
+      orig:"ἀγαπάω", trans:"agapaō · ah-gah-PAH-oh", language:"Greek verb",
+      meaning:"To love, value, seek another’s good, or act with committed goodwill.",
+      range:"The word can describe God’s love, human love, wrongly directed love, or chosen commitment. The object and context determine its moral quality.",
+      inPassage:"Enemy-love means refusing hatred and seeking the good even of those who oppose you. Prayer becomes one concrete expression of that love.",
+      elsewhere:"John 3:16 uses it for God’s love for the world. John 13:34 uses it for disciples loving one another. Second Timothy 4:10 uses it negatively for loving the present world.",
+      caution:"The Greek word does not automatically mean a uniquely divine or emotionless love. Here its radical meaning comes from the object, “your enemies,” and the Father’s example."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 7:1–5"),
+    context: "Jesus warns against condemning others while remaining blind to one’s own larger fault. The humorous image of a beam and speck exposes hypocrisy. The goal is not moral indifference but clear sight: first receive correction, then help another gently.",
+    fit: "This teaching belongs to a Sermon that requires discernment. The next verses speak about wisdom, and later Jesus warns about false prophets. The prohibition is against hypocritical judgment, not all evaluation.",
+    notMean: "“Do not judge” does not mean never distinguish truth from error or never address harm. It forbids self-exalting condemnation and unequal standards.",
+    word: {
+      orig:"κρίνω", trans:"krinō · KREE-noh", language:"Greek verb",
+      meaning:"To judge, decide, evaluate, distinguish, condemn, or bring to trial.",
+      range:"The word can refer to neutral decision-making, legal judgment, discernment, or negative condemnation.",
+      inPassage:"The measuring image and the command to remove one’s own beam show that Jesus targets condemning, hypocritical judgment rather than every form of discernment.",
+      elsewhere:"John 7:24 commands judging with right judgment. Romans 14 warns against judging another servant. First Corinthians 6 uses it for deciding disputes.",
+      caution:"Because the word has a broad range, one cannot translate every occurrence as “condemn.” The surrounding argument decides the sense."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 7:12"),
+    context: "After teaching about the Father’s generosity in prayer, Jesus summarizes the ethical direction of the Law and the Prophets: actively do for others what you would want done for you. The command is positive, not merely a rule against causing harm.",
+    fit: "This saying gathers much of the Sermon’s relational teaching into one memorable command and connects Jesus’ instruction with Israel’s Scriptures.",
+    notMean: "It does not mean imposing your personal preferences on everyone else. Loving action requires understanding what truly serves the other person.",
+    word: {
+      orig:"ποιέω", trans:"poieō · poy-EH-oh", language:"Greek verb",
+      meaning:"To do, make, practice, or carry out.",
+      range:"It can describe creating, producing, acting, practicing, or fulfilling.",
+      inPassage:"The emphasis is active: disciples are not merely to avoid mistreatment but to initiate the kind of good they themselves would hope to receive.",
+      elsewhere:"Matthew 5:44 uses action words for loving and praying. Matthew 7:21 uses poieō for doing the Father’s will.",
+      caution:"The command is not fulfilled by sentiment alone. The verb requires action shaped by the whole teaching of Jesus."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 5:13–16"),
+    context: "Immediately after the Beatitudes, Jesus tells the same vulnerable and sometimes persecuted disciples that they are salt and light. Their visible good works are meant to preserve faithful witness and direct attention not to themselves but to the Father.",
+    fit: "The images connect kingdom identity to public faithfulness before Jesus explains the deeper righteousness of the Law.",
+    notMean: "Jesus is not calling for religious self-promotion. The goal of visible goodness is that others glorify the Father, not admire the disciple.",
+    word: {
+      orig:"φῶς", trans:"phōs · fohs", language:"Greek noun",
+      meaning:"Light, illumination, or that which makes things visible.",
+      range:"It can refer to physical light, revelation, moral goodness, truth, life, or God’s saving presence.",
+      inPassage:"The disciples are light as their faithful lives make the reality of God’s kingdom visible in the world.",
+      elsewhere:"John 1 calls Jesus the light. Ephesians 5:8 tells believers to walk as children of light. First John 1 uses light for God’s holy truth.",
+      caution:"The word does not mean believers are the source of divine truth independently of God. Their light is a received and representative calling."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 6:22–23"),
+    context: "This difficult saying sits between treasure and the two masters. In the ancient world the eye could function as an image for generosity or stinginess. A healthy, undivided eye fills life with light; a bad or envious eye leaves the person darkened.",
+    fit: "The paragraph connects what a person treasures, how that person sees possessions and neighbors, and whom that person ultimately serves.",
+    notMean: "Jesus is not giving a medical explanation of eyesight or claiming that positive thinking creates spiritual light.",
+    word: {
+      orig:"ἁπλοῦς", trans:"haplous · hah-PLOOSS", language:"Greek adjective",
+      meaning:"Single, sincere, sound, uncomplicated, or generous.",
+      range:"Depending on context, the word can stress singleness, sincerity, openness, or generosity.",
+      inPassage:"Because the saying is surrounded by teaching about treasure and wealth, the sense likely includes an undivided and generous outlook rather than a grasping one.",
+      elsewhere:"The related noun and adverb are used in Romans 12:8 and 2 Corinthians 8–9 for generosity or sincerity.",
+      caution:"No single English word captures the whole range. “Healthy,” “single,” and “generous” each express part of the picture; the money context helps narrow the meaning."
+    }
+  },
+  {
+    match: p => p.includes("Matthew 6:24"),
+    context: "Jesus concludes the treasure section by personifying wealth as a rival master. Slavery language makes the claim absolute: two masters with competing claims cannot both receive ultimate service.",
+    fit: "This verse explains why the next section addresses worry. Anxiety about necessities can reveal the pressure of serving wealth as the source of security.",
+    notMean: "The verse does not say that earning, possessing, budgeting, or using money is evil. It says wealth cannot be obeyed as lord.",
+    word: {
+      orig:"μαμωνᾶς", trans:"mamōnas · mah-moh-NAHS", language:"Aramaic loanword used in Greek",
+      meaning:"Wealth, riches, property, or material resources.",
+      range:"It refers to money or possessions and can be personified as a power demanding trust and service.",
+      inPassage:"Jesus treats wealth as a rival master because it can promise security, identity, and control. The issue is not merely having money but serving it.",
+      elsewhere:"The term appears again in Luke 16:9, 11, and 13 in Jesus’ teaching about stewardship and faithfulness with wealth.",
+      caution:"It is sometimes explained as literally “that in which one trusts.” The term is associated with wealth and may echo trust, but in the passage its rival-master role comes from Jesus’ personification and contrast with God."
+    }
+  },
+  {
+    match: p => p.includes("John 21"),
+    context: "John 21 takes place after Jesus’ resurrection and after Peter’s threefold denial. Jesus meets the disciples in ordinary work, provides a meal, and publicly restores Peter through a threefold question and commission. Restoration does not erase Peter’s failure; it transforms it into humble, responsible service under Jesus’ continuing call, “Follow Me.”",
+    fit: "John 20 appears to conclude the Gospel, while chapter 21 functions as an epilogue showing what resurrection faithfulness looks like for failed disciples and future shepherds.",
+    notMean: "Peter’s restoration is not permission to minimize betrayal or skip repentance. Nor does leadership become domination. The commission is to care for Jesus’ people as people who still belong to Jesus.",
+    word: {
+      orig:"ποιμαίνω", trans:"poimainō · poy-MY-noh", language:"Greek verb",
+      meaning:"To shepherd, tend, guide, feed, or care for a flock.",
+      range:"It can describe literal shepherding or figuratively the protective, nourishing, guiding responsibility of leaders.",
+      inPassage:"Jesus connects Peter’s love for Him with concrete care for Jesus’ sheep. The flock remains Christ’s possession, which limits and shapes Peter’s authority.",
+      elsewhere:"Acts 20:28 tells elders to shepherd the church. First Peter 5:2 commands leaders to shepherd willingly and not domineer. Revelation 7:17 uses the image of the Lamb shepherding His people.",
+      caution:"Shepherding includes guidance and protection, but the word does not justify control. Other shepherd texts explicitly reject domineering leadership."
+    }
+  },
+  {
+    match: p => p.includes("Exodus 16"),
+    context: "Israel has been rescued from Egypt but has not yet learned to trust God in the wilderness. Hunger produces grumbling and distorted memory of slavery. God responds with daily manna and specific gathering instructions so the people learn dependence, limits, equality, and Sabbath.",
+    fit: "Exodus moves from rescue through the sea to formation in the wilderness. Before Israel receives the covenant at Sinai, God teaches them that freedom requires learning a new source of provision.",
+    notMean: "Daily manna does not forbid saving in every circumstance. The command was a specific lesson for Israel in this stage of the wilderness; later Scripture also commends planning and storing wisely.",
+    word: {
+      orig:"מָן", trans:"mān · mahn", language:"Hebrew noun",
+      meaning:"Manna, the bread-like provision God gave Israel in the wilderness.",
+      range:"The name is connected in the story with the people’s question, “What is it?” It becomes a concrete symbol of God’s daily provision and Israel’s dependence.",
+      inPassage:"Manna is provision with boundaries: gather enough for the day, do not hoard against God’s command, and gather differently before Sabbath.",
+      elsewhere:"Deuteronomy 8 interprets manna as a lesson that people live by what comes from God’s mouth. Psalm 78 calls it bread from heaven. John 6 uses it as background for Jesus as the bread of life.",
+      caution:"Manna is not a general promise that believers will receive resources without work or planning. Its theological meaning grows from Israel’s specific wilderness formation."
+    }
+  }
+];
+
+function getBookName(passage){
+  const match = passage.match(/^(?:[1-3]\s)?[A-Za-z]+/);
+  return match ? match[0] : "";
+}
+
+function defaultStudy(passage, theme){
+  const book = getBookName(passage);
+  const bookContext = bookContexts[book] || "This passage belongs to a larger biblical book with its own historical setting, argument, and purpose.";
+  const isNewTestament = ["Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"].includes(book);
+
+  return {
+    context: `${bookContext} Today’s section focuses on “${theme}.” The scene, command, promise, or prayer should first be understood as part of that book before it is applied personally.`,
+    fit: bookContext,
+    notMean: "This passage should not be reduced to a slogan or used to ignore the author’s purpose, human responsibility, wise boundaries, grief, justice, or the rest of Scripture.",
+    word: isNewTestament ? {
+      orig:"πίστις", trans:"pistis · PISS-tiss", language:"Greek noun",
+      meaning:"Faith, trust, belief, faithfulness, or reliability.",
+      range:"Depending on context, it can describe the act of trusting, the content believed, a life of faithfulness, or the quality of being trustworthy.",
+      inPassage:`In this reading, the word is used as a lens for the journey theme “${theme}”: biblical trust is a response to God’s character and action, not denial of reality.`,
+      elsewhere:"Romans 3–4 uses it for trusting God’s saving promise. Galatians 5:22 can use the same word family for faithfulness. James 2 emphasizes that living faith produces action.",
+      caution:"Every possible meaning does not belong in every occurrence. Grammar, sentence, paragraph, and author determine whether “faith,” “faithfulness,” or another shade is intended."
+    } : {
+      orig:"בָּטַח", trans:"bāṭaḥ · bah-TAHKH", language:"Hebrew verb",
+      meaning:"To trust, feel secure, rely on, or place confidence in.",
+      range:"It can describe appropriate trust in God or misplaced confidence in people, power, wealth, or false security.",
+      inPassage:`For this reading, the word highlights that trust has an object. The question is not whether a person relies on something, but whether the object of reliance is faithful.`,
+      elsewhere:"Proverbs 3:5 commands trust in the Lord. Psalm 20 contrasts trust in military power with trust in God’s name. Psalm 56 connects trust with honest fear.",
+      caution:"Hebrew word roots do not contain a complete hidden theology. The surrounding poetic or narrative context identifies what kind of trust is praised or rejected."
+    }
+  };
+}
+
 function dayContent(j,day){
- const item=j.days[day-1]||j.days[0],passage=item[0],theme=item[1];
- const isGreek=(passage.includes("Matthew")||passage.includes("John")||passage.includes("Luke")||passage.includes("Mark")||passage.includes("Ephesians")||passage.includes("Philippians")||passage.includes("Romans")||passage.includes("James")||passage.includes("Colossians")||passage.includes("1 Peter")||passage.includes("1 Timothy")||passage.includes("2 Corinthians")||passage.includes("Hebrews"));
- let word=isGreek?{orig:"χάρις",trans:"charis",meaning:"Grace, favor, or gift. In the New Testament, the word often points to God’s undeserved kindness and empowering generosity.",elsewhere:"John 1:16–17, Romans 3:24, Ephesians 2:8, and Titus 2:11.",caution:"A word study supports the passage, but it does not replace the sentence, paragraph, or book context."}:{orig:"חֶסֶד",trans:"hesed",meaning:"Steadfast love, covenant loyalty, mercy, or faithful kindness. The exact shade depends on the passage.",elsewhere:"Exodus 34:6, Psalm 23:6, Psalm 136, and Micah 7:18.",caution:"Hebrew words can carry a range of meaning. Context determines which shade is emphasized."};
- if(passage.includes("Matthew 6"))word={orig:"μεριμνάω",trans:"merimnaō",meaning:"To worry, be anxious, or be concerned. In Matthew 6, it is tied to divided attention, provision, and trust.",elsewhere:"Philippians 4:6 and 1 Corinthians 7.",caution:"The word does not mean every concern is sinful. Jesus’ full argument controls the meaning."};
- if(passage.includes("John 21"))word={orig:"ποιμαίνω",trans:"poimainō",meaning:"To shepherd, tend, guide, or care for a flock. Jesus connects love for Him with practical care for people.",elsewhere:"Acts 20:28 and 1 Peter 5:2.",caution:"Shepherding does not mean domination. In context, it is loving responsibility."};
- return {
-  passage,theme,
-  scripture:`Read ${passage} slowly. Notice what the passage reveals about God, what it exposes in the human heart, and what faithful response looks like today.`,
-  context:`This day belongs to the journey “${j.title}.” The focus is ${theme.toLowerCase()}. Read the verses before and after the selected section so the application grows from the passage rather than from the topic alone.`,
-  p1:`What does ${passage} reveal about God’s character or His ways?`,
-  p2:`Where does the theme “${theme}” meet your life right now?`,
-  word
- }
+  const item=j.days[day-1]||j.days[0], passage=item[0], theme=item[1];
+  const specific = passageStudies.find(study => study.match(passage));
+  const study = specific || defaultStudy(passage, theme);
+
+  return {
+    passage,
+    theme,
+    scripture:`Today’s reading is ${passage}. Read the passage itself first. Then use the explanation below to understand the scene, argument, and key language before moving to personal reflection.`,
+    context:study.context,
+    fit:study.fit,
+    notMean:study.notMean,
+    p1:`What does ${passage} reveal about God, people, or faithful life in its original setting?`,
+    p2:`After understanding the passage, where does “${theme}” meet your life right now?`,
+    word:study.word
+  };
 }
 function renderAll(){
  const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
@@ -641,17 +969,20 @@ function renderAll(){
  document.getElementById("wordGreek").textContent=content.word.orig;
  document.getElementById("wordTranslit").textContent=content.word.trans;
  document.getElementById("wordMeaning").textContent=content.word.meaning;
+ document.getElementById("wordLanguage").textContent=content.word.language;
+ document.getElementById("wordRange").textContent=content.word.range;
+ document.getElementById("wordInPassage").textContent=content.word.inPassage;
  document.getElementById("wordCaution").textContent=content.word.caution;
  document.getElementById("wordElsewhere").textContent=content.word.elsewhere;
- document.getElementById("contextBeforeAfter").textContent=`Read the verses immediately before and after ${content.passage}. Ask how this section fits the larger argument of ${j.book}.`;
+ document.getElementById("contextBeforeAfter").textContent=content.fit;
  document.getElementById("studyWordSummary").textContent=`${content.word.orig} (${content.word.trans}): ${content.word.meaning}`;
  document.getElementById("crossRefs").textContent=j.days.slice(Math.max(0,day-2),Math.min(21,day+2)).map(x=>x[0]).join(" → ");
- document.getElementById("notMean").textContent=`This passage should not be used to force a quick emotional result or to ignore wisdom, boundaries, grief, or responsibility.`;
+ document.getElementById("notMean").textContent=content.notMean;
  const before=document.getElementById("devContextBefore");
  const notMean=document.getElementById("devNotMean");
  const prayer=document.getElementById("devPrayer");
- if(before) before.textContent=`Read the verses immediately before and after ${content.passage}. Ask how this section fits the larger message of ${j.book}.`;
- if(notMean) notMean.textContent="This passage should not be used to force a quick emotional result or ignore wisdom, boundaries, grief, or responsibility.";
+ if(before) before.textContent=content.fit;
+ if(notMean) notMean.textContent=content.notMean;
  if(prayer) prayer.textContent=heldPrayer();
  setDevTab("read");
  document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
