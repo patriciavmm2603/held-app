@@ -271,6 +271,89 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 button:disabled{opacity:.55;cursor:not-allowed}
 .click-feedback{transform:scale(.985)}
 
+
+.study-explanation{
+  display:grid;
+  gap:14px;
+  margin-top:16px;
+}
+.study-section{
+  padding:18px 20px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.78);
+}
+.study-section h4{
+  margin:0 0 8px;
+  font-size:1rem;
+  color:var(--ink);
+}
+.study-section p{margin:0;line-height:1.7}
+.word-card .list-item{
+  padding:15px 0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  background:transparent;
+}
+.word-card .list-item:last-of-type{border-bottom:0}
+.word-card details{
+  margin-top:10px;
+  padding:13px 0;
+  border-top:1px solid var(--line);
+}
+.word-card summary{cursor:pointer;font-weight:700}
+.word-label{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--teal);
+  font-weight:800;
+  margin-bottom:5px;
+}
+.study-quality{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:.78rem;
+  font-weight:800;
+  color:var(--teal);
+  background:#e8f7f4;
+  border-radius:999px;
+  padding:6px 10px;
+  margin-bottom:12px;
+}
+@media(max-width:800px){
+  .study-section{padding:16px}
+}
+
+
+.companion-grid{display:grid;gap:12px;margin-top:14px}
+.companion-card{
+  padding:15px 16px;border:1px solid var(--line);border-radius:16px;
+  background:rgba(255,255,255,.82)
+}
+.companion-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.companion-ref{font-weight:800;color:var(--ink)}
+.companion-type{
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;
+  color:var(--teal);background:#e8f7f4;border-radius:999px;padding:5px 8px;white-space:nowrap
+}
+.companion-relation{font-size:.78rem;font-weight:750;color:#8a5a12;margin-top:5px}
+.companion-card p{margin:7px 0 0;line-height:1.55}
+.observe-list,.movement-list{margin:8px 0 0;padding-left:20px}
+.observe-list li,.movement-list li{margin:8px 0;line-height:1.55}
+.practice-card{
+  padding:18px;border-radius:18px;border:1px solid var(--line);
+  background:linear-gradient(135deg,#eefaf7,#fff8eb);margin-top:16px
+}
+.practice-card p{margin:7px 0}
+.guardrail{color:var(--muted);font-size:.92rem}
+.pending-note{
+  padding:16px;border:1px solid #efd5a8;border-radius:16px;background:#fff4df;
+  color:#744a0a;margin-top:12px
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -407,15 +490,61 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <strong>Read slowly</strong>
       <p class="muted" style="margin-bottom:0">Read the biblical passage first. Then move to Understand for an explanation of the scene, the author’s point, the book context, and the key original-language word.</p>
     </div>
+    <div class="study-section" style="margin-top:16px">
+      <div class="word-label">Companion reading set</div>
+      <h4>Read these alongside the main passage</h4>
+      <p class="muted">Each companion has a defined relationship to the main passage. It may reinforce, contrast, challenge, or develop the same biblical concern.</p>
+      <div id="devCompanions" class="companion-grid"></div>
+    </div>
     <div class="actions"><button class="primary" type="button" data-dev-tab="understand">Next: Understand</button></div>
   </div>
 
   <div id="understandPanel" class="dev-tab-panel" hidden style="display:none">
-    <div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
-    <div class="grid2" style="margin-top:16px">
-      <div class="journey-card"><h4>Context before and after</h4><p id="devContextBefore" class="muted"></p></div>
-      <div class="journey-card"><h4>What this does not mean</h4><p id="devNotMean" class="muted"></p></div>
+    <div class="study-quality" id="studyQuality">✓ Passage-specific study</div>
+
+    <div class="study-explanation">
+      <div class="study-section">
+        <div class="word-label">Before the explanation</div>
+        <h4>What should you notice in the text?</h4>
+        <ul id="devObserve" class="observe-list"></ul>
+      </div>
+
+      <div class="study-section">
+        <div class="word-label">The shape of the passage</div>
+        <h4>How does the passage move?</h4>
+        <ol id="devMovement" class="movement-list"></ol>
+      </div>
+
+      <div class="study-section">
+        <div class="word-label">The situation</div>
+        <h4>What is happening in this passage?</h4>
+        <p id="devContext"></p>
+      </div>
+
+      <div class="study-section">
+        <div class="word-label">The surrounding passage</div>
+        <h4>How does this fit here?</h4>
+        <p id="devContextBefore"></p>
+      </div>
+
+      <div class="study-section">
+        <div class="word-label">The main point</div>
+        <h4>What is the biblical writer emphasizing?</h4>
+        <p id="devMainPoint"></p>
+      </div>
+
+      <div class="study-section">
+        <div class="word-label">Interpret carefully</div>
+        <h4>What does this passage not mean?</h4>
+        <p id="devNotMean"></p>
+      </div>
+      <div class="study-section">
+        <div class="word-label">Do not flatten the tension</div>
+        <h4>What remains difficult or unresolved?</h4>
+        <p id="devTension"></p>
+      </div>
     </div>
+
     <div class="actions">
       <button class="ghost" type="button" data-dev-tab="read">Back to Read</button>
       <button class="primary" type="button" data-dev-tab="reflect">Next: Reflect</button>
@@ -427,6 +556,12 @@ button:disabled{opacity:.55;cursor:not-allowed}
     <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
     <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
     <div class="prayer-box"><strong>Pray the passage</strong><p id="devPrayer" class="muted">Lord, help me receive what is true here and respond faithfully today.</p></div>
+    <div class="practice-card">
+      <div class="word-label">Practice the passage</div>
+      <strong>One concrete response</strong>
+      <p id="devPractice"></p>
+      <p id="devBoundary" class="guardrail"></p>
+    </div>
     <div class="actions">
       <button class="ghost" type="button" data-dev-tab="understand">Back to Understand</button>
       <button class="primary" onclick="completeDay()">Complete today</button>
@@ -434,7 +569,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
     </div>
   </div>
  </div>
-  <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3>
+  <div class="card"><div class="eyebrow">Original-language study</div><h3 id="wordTitle"></h3>
   <div class="word-card">
     <div class="word-head">
       <div>
@@ -446,17 +581,17 @@ button:disabled{opacity:.55;cursor:not-allowed}
     </div>
 
     <div class="list-item">
-      <strong>Basic meaning</strong>
+      <div class="word-label">Dictionary range</div><strong>Basic meaning</strong>
       <p id="wordMeaning" class="muted"></p>
     </div>
 
     <div class="list-item">
-      <strong>Other meanings this word can carry</strong>
+      <div class="word-label">Semantic range</div><strong>Other meanings this word can carry</strong>
       <p id="wordRange" class="muted"></p>
     </div>
 
     <div class="list-item">
-      <strong>What it means in this passage</strong>
+      <div class="word-label">Meaning here</div><strong>What it means in this passage</strong>
       <p id="wordInPassage" class="muted"></p>
     </div>
 
@@ -475,7 +610,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 </section>
 
 <section id="study" class="view"><div class="card"><div class="eyebrow">Bible study</div><h3>Study the passage, not just the topic</h3><div class="grid2">
- <div class="journey-card"><h4>How this fits the book</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
+ <div class="journey-card"><h4>How this passage fits</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
  <div class="journey-card"><h4>Cross-reference trail</h4><p id="crossRefs"></p></div><div class="journey-card"><h4>What this does not mean</h4><p id="notMean"></p></div></div>
  <div class="section-title"><h3>Bible notebook</h3></div><div id="notebookList"></div></div></section>
 
@@ -498,7 +633,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
-<div class="footer">Held · You are known. You are loved. You are held. · Saves locally in this browser</div>
+<div class="footer">Held · You are known. You are loved. You are held. · Private notes sync when signed in · selected shared takeaways are visible to your spouse</div>
 </main>
 </div>
 
@@ -666,6 +801,749 @@ const bookContexts = {
   "1 Thessalonians": "First Thessalonians encourages a young church to persevere in holiness, love, hope, and faithful work while awaiting Christ.",
   "2 Thessalonians": "Second Thessalonians corrects confusion about Christ’s return and calls believers to steady faith and responsible work.",
   "Ruth": "Ruth is a story of covenant loyalty, providence, family redemption, and God’s welcome of a faithful outsider into Israel and David’s family line."
+};
+
+
+
+const moneyJourneyDaily = {
+"Luke 12:13–21":{
+  observe:[
+    "Count the first-person words in the man’s speech in verses 17–19. Notice how often his world is organized around “I” and “my.”",
+    "Identify what the man believes his stored goods will give him, and notice which people and responsibilities never enter his plan."
+  ],
+  movement:[
+    "A man asks Jesus to settle an inheritance dispute.",
+    "Jesus warns about greed and tells of a landowner planning larger barns.",
+    "God interrupts the man’s imagined future, and Jesus names the contrast: storing for self versus being rich toward God."
+  ],
+  tension:"The story does not tell us exactly what “rich toward God” looks like in every financial situation. It leaves the listener responsible to ask how ownership, planning, generosity, mortality, and accountability to God belong together.",
+  companions:[
+    {passage:"Matthew 6:19–24",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus connects treasure, the heart, spiritual vision, and the impossibility of serving both God and wealth."},
+    {passage:"Psalm 49:5–20",category:"Psalm",relation:"thematic reinforcement",reason:"The psalm exposes wealth’s inability to ransom a person from death, the same limit the rich fool refuses to face."},
+    {passage:"Proverbs 11:24–28",category:"Wisdom",relation:"contrast",reason:"These sayings contrast openhanded generosity with trusting in riches."},
+    {passage:"1 Timothy 6:17–19",category:"Epistle",relation:"ethical development",reason:"Paul redirects wealthy believers from uncertain riches toward generosity, good works, and hope in God."}
+  ],
+  p1:"What do the repeated words “I” and “my,” together with the absence of God and neighbor from the man’s plan, reveal about the kind of world he has built?",
+  p2:"Where has responsible financial planning begun to act like a promise that you can control your future or owe nothing to anyone else?",
+  prayer:"God of every breath and every good gift, expose the places where I treat possessions as life itself. Teach me to plan responsibly without imagining that planning makes me sovereign. Make what You entrust to me available for Your purposes and the good of others. Keep mortality from making me fearful, and let it make me faithful.",
+  practice:"Review one financial goal and add one sentence answering: “Whom is this intended to serve besides me?”",
+  boundary:"Do not cancel savings, give away needed household resources, or make a major financial decision from one devotional reading. Bring significant changes into prayer, wise counsel, and honest conversation."
+},
+"Luke 12:22–34":{
+  observe:[
+    "Trace every reason Jesus gives for resisting anxiety. Do not stop at the repeated command; follow the argument.",
+    "Notice the movement from food and clothing to the Father, the kingdom, generosity, and treasure."
+  ],
+  movement:[
+    "Jesus names anxiety about basic needs.",
+    "He points to ravens and flowers as evidence of the Father’s care.",
+    "He redirects desire toward the kingdom and links trust with generous, durable treasure."
+  ],
+  tension:"Jesus promises the Father’s knowledge and care, yet faithful people can still experience deprivation, persecution, and loss. The passage relocates ultimate trust without pretending that disciples are insulated from suffering.",
+  companions:[
+    {passage:"John 6:25–35",category:"Gospel",relation:"theological development",reason:"Jesus moves a crowd from seeking bread alone toward receiving Him as the bread of life."},
+    {passage:"Psalm 104:10–30",category:"Psalm",relation:"thematic reinforcement",reason:"The psalm portrays creatures receiving food and life from God’s sustaining hand."},
+    {passage:"Proverbs 30:7–9",category:"Wisdom",relation:"prayerful response",reason:"Agur asks for neither poverty nor riches but the food appropriate for him, guarding against both desperation and self-sufficiency."},
+    {passage:"Philippians 4:10–13",category:"Epistle",relation:"canonical tension",reason:"Paul’s learned contentment includes both abundance and hunger, preventing provision from being reduced to continual comfort."}
+  ],
+  p1:"List the images, questions, and commands Jesus uses. Which part of His reasoning rests most directly on the Father’s character rather than your ability to calm yourself?",
+  p2:"What form of worry currently consumes attention without producing faithful action, and what responsible action can you take while refusing to treat anxiety as your provider?",
+  prayer:"Father, You know the needs I can name and the needs I cannot yet see. Free me from using worry as though it were preparation. Give me courage to work, plan, ask, and receive without making control my master. Teach me to seek Your kingdom with an open hand.",
+  practice:"Name one real need, one responsible action available today, and one outcome you cannot control.",
+  boundary:"Trusting God does not forbid planning, medicine, therapy, budgeting, work, or asking for help. Seek appropriate support when anxiety is persistent or disabling."
+},
+"Luke 16:1–13":{
+  observe:[
+    "Notice exactly what the manager is praised for and what he is not praised for.",
+    "Track the repeated ideas of little, much, another’s property, true riches, and two masters."
+  ],
+  movement:[
+    "A manager learns that his stewardship is ending.",
+    "He acts decisively with temporary resources because he understands his future situation.",
+    "Jesus applies the story to faithfulness, trustworthiness, and the impossibility of serving God and wealth."
+  ],
+  tension:"The parable deliberately uses a morally compromised character to teach foresight. The discomfort is part of the lesson: Jesus can isolate one shrewd feature of a bad man’s conduct without endorsing the conduct as a whole.",
+  companions:[
+    {passage:"Matthew 25:14–30",category:"Gospel",relation:"thematic reinforcement",reason:"The parable of the talents also treats resources as entrusted property for which servants will answer."},
+    {passage:"Psalm 24:1–6",category:"Psalm",relation:"theological foundation",reason:"The psalm begins with God’s ownership of the earth, challenging the assumption that stewardship begins with private possession."},
+    {passage:"Proverbs 27:23–27",category:"Wisdom",relation:"ethical embodiment",reason:"Careful knowledge of one’s resources illustrates responsible attention rather than passive spirituality."},
+    {passage:"1 Corinthians 4:1–5",category:"Epistle",relation:"theological development",reason:"Paul defines ministry through stewardship and says the required quality of a steward is faithfulness."}
+  ],
+  p1:"How do verses 10–12 move from little to much, worldly wealth to true riches, and another’s property to your own? What argument is Jesus building?",
+  p2:"Which resource under your care do you tend to treat as entirely yours rather than entrusted, and what would faithfulness look like this week?",
+  prayer:"Lord, everything I manage remains Yours. Make me trustworthy in ordinary decisions that no one applauds. Give me wisdom without manipulation, foresight without fear, and freedom from serving money as master. Let my use of temporary things reflect lasting allegiance.",
+  practice:"Choose one ordinary financial responsibility you have delayed and complete the next honest step.",
+  boundary:"Shrewdness is not permission for deception. Do not use this parable to justify hiding information, manipulating people, or bending ethical boundaries."
+},
+"Luke 18:18–30":{
+  observe:[
+    "Compare what the ruler asks, what he claims to have done, what Jesus asks him to release, and how he responds.",
+    "Notice the disciples’ question after the ruler leaves and Jesus’ answer about what is possible for God."
+  ],
+  movement:[
+    "A ruler asks about inheriting eternal life.",
+    "Jesus exposes the allegiance his moral record has not touched.",
+    "The man grieves, and Jesus teaches the disciples about wealth, impossibility, and God’s power."
+  ],
+  tension:"Jesus’ command is specific and severe, while the New Testament does not prescribe identical economic arrangements for every disciple. The text still refuses to let readers protect possessions from Jesus’ authority.",
+  companions:[
+    {passage:"Mark 10:17–31",category:"Gospel",relation:"parallel account",reason:"Mark’s version includes Jesus looking at the man and loving him, holding costly confrontation and love together."},
+    {passage:"Psalm 73:23–28",category:"Psalm",relation:"contrast",reason:"The psalmist discovers that nearness to God, not possessions or status, is his final good."},
+    {passage:"Proverbs 3:5–10",category:"Wisdom",relation:"ethical development",reason:"Trust in the Lord includes honoring God with wealth rather than leaning solely on personal calculation."},
+    {passage:"Philippians 3:7–11",category:"Epistle",relation:"contrast",reason:"Paul counts former gains as loss because knowing Christ has reordered what he considers valuable."}
+  ],
+  p1:"What does the ruler’s sadness reveal that his claim of obedience does not? How does the final exchange with the disciples keep the story from becoming only a lesson in personal effort?",
+  p2:"What possession, status, plan, or self-image would make obedience to Jesus feel like losing yourself?",
+  prayer:"Jesus, You see the loyalties I can hide beneath respectable obedience. Do not let me confuse sorrow over cost with surrender. Show me what I am protecting from Your authority, and give me grace to follow without pretending the cost is small. Make my treasure consistent with my confession.",
+  practice:"Write down one thing you fear Jesus could ask you to release. Then name the deeper security or identity attached to it.",
+  boundary:"Do not imitate the ruler’s command mechanically by making an impulsive transfer of assets. Use the passage to examine allegiance, then pursue concrete obedience with wisdom and accountability."
+},
+"Luke 19:1–10":{
+  observe:[
+    "Track what Zacchaeus does before Jesus speaks to him, what Jesus initiates, and what changes after the welcome.",
+    "Notice the financial specificity of Zacchaeus’s response: generosity and restitution are not the same action."
+  ],
+  movement:[
+    "Zacchaeus seeks to see Jesus but is socially and physically blocked.",
+    "Jesus publicly chooses fellowship with him despite the crowd’s complaint.",
+    "Zacchaeus responds with generosity and restitution, and Jesus names salvation and His mission to seek the lost."
+  ],
+  tension:"The story celebrates real change, but it does not tell us how every victim experienced Zacchaeus’s restitution or whether social trust was immediately restored. Repair can be necessary without being simple.",
+  companions:[
+    {passage:"Matthew 9:9–13",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus’ meal with another tax collector explains His mission toward sinners and confronts religious contempt."},
+    {passage:"Psalm 15:1–5",category:"Psalm",relation:"ethical embodiment",reason:"The psalm describes integrity through truthful speech, refusal of exploitation, and trustworthy conduct."},
+    {passage:"Proverbs 28:13",category:"Wisdom",relation:"ethical development",reason:"Concealing wrongdoing is contrasted with confession and forsaking it, which fits Zacchaeus’s visible change."},
+    {passage:"Exodus 22:1–4",category:"Law",relation:"legal background",reason:"Torah’s restitution laws help explain why Zacchaeus’s fourfold promise is more than symbolic generosity."}
+  ],
+  p1:"What actions in the story belong to Jesus, what actions belong to Zacchaeus, and what does that order show about grace and repentance?",
+  p2:"Is there harm in your life that requires measurable repair rather than only regret or a private apology?",
+  prayer:"Jesus, thank You for seeing people whom others reduce to their worst reputation. Let Your welcome produce honesty rather than presumption in me. Give me courage to name harm, return what should be returned, and accept that repair may cost more than words. Make grace visible in changed conduct.",
+  practice:"Identify one wrong that may require repair. Write the next truthful step without contacting anyone impulsively.",
+  boundary:"Restitution should not be used to force contact with someone who needs distance or safety. Seek wise counsel when repair involves trauma, legal concerns, or significant financial consequences."
+},
+"Luke 21:1–4":{
+  observe:[
+    "Notice who Jesus is watching, who appears impressive, and whose gift He interprets differently.",
+    "Read the warning about scribes immediately before the widow’s gift and the temple judgment immediately after it."
+  ],
+  movement:[
+    "Jesus observes wealthy people giving from abundance.",
+    "A poor widow gives two small coins.",
+    "Jesus measures the gifts by sacrifice rather than public amount."
+  ],
+  tension:"The widow’s devotion is honored inside a temple setting Jesus is also judging. The passage holds together genuine sacrifice and the possibility of religious exploitation.",
+  companions:[
+    {passage:"Mark 12:38–44",category:"Gospel",relation:"parallel with sharper context",reason:"Mark places the widow directly after Jesus condemns leaders who devour widows’ houses, intensifying the institutional warning."},
+    {passage:"Psalm 68:4–6",category:"Psalm",relation:"theological foundation",reason:"God identifies Himself as defender of widows, setting a standard for how vulnerable worshipers must be treated."},
+    {passage:"Proverbs 22:22–23",category:"Wisdom",relation:"canonical correction",reason:"The proverb forbids exploiting the poor and says the Lord Himself will defend their cause."},
+    {passage:"2 Corinthians 8:12–15",category:"Epistle",relation:"ethical development",reason:"Paul says gifts are acceptable according to what one has and rejects a pattern in which one person is burdened so another is eased."}
+  ],
+  p1:"How does the placement of the widow’s gift between the condemnation of scribes and the coming temple judgment change the way you hear the scene?",
+  p2:"Where might admiration for sacrifice be preventing you from asking whether a vulnerable person is being protected or pressured?",
+  prayer:"God who sees what public measures miss, honor the quiet faithfulness that receives no applause. Protect vulnerable people from spiritual pressure and institutions from using devotion as a resource to consume. Give me generosity that is free, truthful, and attentive to justice.",
+  practice:"Support one person or organization in a way that protects dignity rather than showcasing your generosity.",
+  boundary:"Do not use this passage to pressure yourself or another person to give money needed for food, housing, medicine, or safety."
+},
+"Luke 6:27–38":{
+  observe:[
+    "List the commands Jesus gives toward enemies and the reasons He attaches to them.",
+    "Notice the repeated language of giving, lending, measuring, mercy, and the Father’s character."
+  ],
+  movement:[
+    "Jesus commands active love toward enemies.",
+    "He grounds this love in the Father’s kindness and mercy.",
+    "He applies mercy to judgment, forgiveness, giving, and the measure used toward others."
+  ],
+  tension:"Enemy-love rejects revenge but does not erase the need for protection, truthful confrontation, or public justice. The challenge is to resist becoming like the wrongdoer without pretending the wrong is harmless.",
+  companions:[
+    {passage:"Matthew 5:43–48",category:"Gospel",relation:"parallel teaching",reason:"Matthew’s form also grounds enemy-love in the Father’s indiscriminate gifts of sun and rain."},
+    {passage:"Psalm 35:1–10",category:"Psalm",relation:"canonical tension",reason:"The lament shows that refusing personal vengeance does not require denying danger or ceasing to ask God for justice."},
+    {passage:"Proverbs 25:21–22",category:"Wisdom",relation:"ethical embodiment",reason:"The proverb commands feeding an enemy and is later taken up by Paul."},
+    {passage:"Romans 12:17–21",category:"Epistle",relation:"theological development",reason:"Paul joins non-retaliation, public peace where possible, God’s justice, and concrete care for enemies."}
+  ],
+  p1:"Which commands in the paragraph require inward disposition, and which require visible action? How does Jesus connect both to the Father?",
+  p2:"What would non-retaliation look like in one relationship without surrendering truth, safety, or appropriate consequences?",
+  prayer:"Merciful Father, keep injury from reproducing itself through me. Teach me to refuse hatred without naming evil as good. Give me courage for boundaries, patience for justice, and freedom from revenge. Let my conduct reflect Your mercy rather than another person’s hostility.",
+  practice:"Choose one non-retaliatory action that does not place you in danger: prayer, truthful silence, returning a measured response, or seeking mediated help.",
+  boundary:"Enemy-love does not require remaining accessible to abuse. Use safety plans, legal protection, pastoral care, or professional help when needed."
+},
+"Luke 11:1–13":{
+  observe:[
+    "Separate the requests in Jesus’ prayer into those centered on God and those centered on human need.",
+    "Notice how the friend-at-midnight story and the parent-child comparison support persistence without portraying God as cruel."
+  ],
+  movement:[
+    "A disciple asks Jesus to teach them to pray.",
+    "Jesus gives a pattern of God-centered, dependent prayer.",
+    "He encourages persistence and argues from flawed human parents to the Father’s greater goodness."
+  ],
+  tension:"Jesus invites bold asking, yet faithful prayer does not guarantee the requested outcome in the requested form. The Father’s goodness remains the foundation when the answer is delayed or different.",
+  companions:[
+    {passage:"Matthew 6:5–13",category:"Gospel",relation:"parallel teaching",reason:"Matthew’s version places the Lord’s Prayer within Jesus’ warning against performance and empty repetition."},
+    {passage:"Psalm 86:1–13",category:"Psalm",relation:"prayerful response",reason:"The psalm combines direct need, confidence in God’s character, and a request for an undivided heart."},
+    {passage:"Proverbs 2:1–6",category:"Wisdom",relation:"thematic reinforcement",reason:"Wisdom is sought persistently but ultimately given by the Lord."},
+    {passage:"James 1:5–8",category:"Epistle",relation:"ethical development",reason:"James directs those who lack wisdom to ask the generous God while confronting divided allegiance."}
+  ],
+  p1:"What does the sequence of the prayer teach about priority, dependence, relationships, and spiritual danger?",
+  p2:"Where have you treated prayer either as a technique to control God or as unnecessary because you assume the answer will not come?",
+  prayer:"Father, hallow Your name in the way I desire and ask. Give what is needed for today, forgive me as You form me into a forgiving person, and guard me in testing. Teach me persistence that trusts Your character rather than trying to wear You down.",
+  practice:"Pray the passage slowly, adding one honest sentence beneath each request.",
+  boundary:"Do not interpret an unanswered request as proof that you lacked enough faith. Seek help and take responsible action while continuing to pray."
+},
+"Luke 14:25–33":{
+  observe:[
+    "Identify the three statements beginning with “cannot be My disciple.” What competing claims do they expose?",
+    "Compare the two planning images: a builder and a king. What does counting the cost prevent?"
+  ],
+  movement:[
+    "Jesus turns to enthusiastic crowds and names the cost of allegiance.",
+    "Two planning images call for sober assessment rather than impulsive enthusiasm.",
+    "Jesus concludes with the relinquishment of possessions."
+  ],
+  tension:"The call is absolute, yet discipleship unfolds through ordinary responsibilities, relationships, and possessions that are not simply discarded. Renunciation must be understood as transferred lordship, not carelessness.",
+  companions:[
+    {passage:"John 12:23–26",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus links following Him with losing self-protective control and serving where He is."},
+    {passage:"Psalm 16:1–11",category:"Psalm",relation:"prayerful response",reason:"The psalm confesses God as refuge, portion, and secure inheritance."},
+    {passage:"Proverbs 16:1–9",category:"Wisdom",relation:"canonical tension",reason:"Human beings plan, but the Lord establishes direction, holding preparation and dependence together."},
+    {passage:"Philippians 2:5–11",category:"Epistle",relation:"Christological foundation",reason:"Jesus’ own self-giving and obedience define the shape of costly discipleship."}
+  ],
+  p1:"How do the family language, cross image, construction estimate, military estimate, and possessions work together to confront casual allegiance?",
+  p2:"What commitment are you tempted to call discipleship even though you have protected one area from Jesus’ authority?",
+  prayer:"Jesus, keep me from promising quickly what I have not considered honestly. You are worthy of allegiance greater than every possession, relationship, and plan. Teach me to count the cost without using the cost as an excuse to remain unchanged. Make my surrender responsible, durable, and true.",
+  practice:"Name one protected area of life and one small act that acknowledges Jesus’ authority there.",
+  boundary:"Do not use this passage to abandon dependents, violate commitments, or create unnecessary financial instability. Costly obedience is not irresponsible harm."
+},
+"Luke 15:11–32":{
+  observe:[
+    "Track every movement of the father toward each son.",
+    "Compare the younger son’s prepared speech with the older son’s complaint. What transactional assumptions do both reveal?"
+  ],
+  movement:[
+    "The younger son takes the inheritance, leaves, and is ruined.",
+    "The father runs to restore him and begins a celebration.",
+    "The older son refuses the feast, and the father goes out to him too."
+  ],
+  tension:"The story ends without telling us whether the older son enters. Jesus leaves His complaining listeners, and us, standing before the father’s invitation.",
+  companions:[
+    {passage:"John 4:7–26",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus meets a socially exposed person with truth that neither humiliates nor avoids her history."},
+    {passage:"Psalm 103:8–14",category:"Psalm",relation:"theological foundation",reason:"The psalm describes the Lord’s compassion as a father and His refusal to treat people according to their sins."},
+    {passage:"Proverbs 19:11",category:"Wisdom",relation:"ethical echo",reason:"The proverb connects wisdom with patience and glory in overlooking an offense, while the parable shows mercy initiating restoration."},
+    {passage:"2 Corinthians 5:16–21",category:"Epistle",relation:"theological development",reason:"Paul describes reconciliation as God’s initiative in Christ and a ministry entrusted to reconciled people."}
+  ],
+  p1:"What does the father give each son, and how does each son misunderstand life in the father’s house?",
+  p2:"Which posture is closer to yours right now: escaping the Father, bargaining your way back, or serving resentfully as though love were wages?",
+  prayer:"Father, meet the rebellion I confess and the resentment I defend. Free me from treating Your house as either a prison or a workplace where love must be earned. Give me courage to receive mercy and humility to rejoice when mercy reaches someone else. Bring me into Your joy.",
+  practice:"Write two columns: “What I think I must earn” and “What the Father gives in the story.”",
+  boundary:"The father’s welcome does not require ignoring ongoing danger or granting immediate trust to an unrepentant person. Mercy and wise boundaries can coexist."
+},
+"Luke 10:25–37":{
+  observe:[
+    "Notice how the legal expert’s question changes from eternal life to defining the neighbor.",
+    "Compare what each traveler sees and what the Samaritan’s compassion costs in time, touch, transportation, money, and follow-up."
+  ],
+  movement:[
+    "An expert tests Jesus and correctly names love of God and neighbor.",
+    "He seeks to limit the category of neighbor.",
+    "Jesus tells of a Samaritan who becomes neighbor through costly mercy."
+  ],
+  tension:"The story offers no explanation for why the respected travelers pass by. That silence prevents readers from excusing them too easily and directs attention to what the Samaritan actually does.",
+  companions:[
+    {passage:"Matthew 22:34–40",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus again joins love of God and neighbor as the center of the Law and Prophets."},
+    {passage:"Psalm 82:1–4",category:"Psalm",relation:"ethical development",reason:"The psalm calls for justice and rescue on behalf of the weak and vulnerable."},
+    {passage:"Proverbs 3:27–28",category:"Wisdom",relation:"ethical embodiment",reason:"The proverb forbids withholding available good from the person to whom it is due."},
+    {passage:"Leviticus 19:33–34",category:"Law",relation:"canonical expansion",reason:"Torah extends neighbor-like love to the resident foreigner, undermining narrow ethnic boundaries."}
+  ],
+  p1:"How does Jesus transform the question from “Who qualifies as my neighbor?” into “Who became a neighbor?”",
+  p2:"Whose need have you kept theoretical because responding would require inconvenience, money, attention, or crossing a social boundary?",
+  prayer:"God of mercy, expose the boundaries I use to protect compassion from becoming costly. Give me eyes that do not merely notice suffering and a heart that does not outsource every responsibility. Teach me to help without controlling, to give without performing, and to become a neighbor.",
+  practice:"Take one concrete step toward a need you can responsibly address today.",
+  boundary:"Do not place yourself alone in an unsafe situation. Mercy may require involving professionals, emergency services, community organizations, or other trusted people."
+},
+"Luke 10:38–42":{
+  observe:[
+    "Notice what Martha is doing, what she says Jesus should make Mary do, and how Jesus describes Martha’s inner condition.",
+    "Compare “many things” with “one thing.” What is Jesus correcting: service itself, or service shaped by distraction and resentment?"
+  ],
+  movement:[
+    "Martha welcomes Jesus and serves.",
+    "Her distraction becomes accusation toward Mary and Jesus.",
+    "Jesus names her anxiety and defends Mary’s attention as the better portion."
+  ],
+  tension:"Necessary work does not disappear simply because attention to Jesus is primary. The passage calls for ordered love, not a fantasy in which nobody cooks, hosts, or carries responsibility.",
+  companions:[
+    {passage:"Mark 6:30–32",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus calls His workers away to rest after ministry, recognizing that service without withdrawal has limits."},
+    {passage:"Psalm 27:4–8",category:"Psalm",relation:"prayerful response",reason:"The psalmist gathers scattered desire into one central request: to seek the Lord’s face."},
+    {passage:"Proverbs 4:20–27",category:"Wisdom",relation:"ethical embodiment",reason:"The proverb calls for guarded attention, focused sight, and a straight path."},
+    {passage:"Acts 6:1–7",category:"Narrative",relation:"canonical tension",reason:"The early church does not dismiss practical service; it organizes responsibilities so both word and care are honored."}
+  ],
+  p1:"At what point does Martha’s service become spiritually disordered, and what evidence in her speech reveals the change?",
+  p2:"Which responsibility is genuinely necessary, and which layer of resentment, comparison, or control have you attached to it?",
+  prayer:"Jesus, receive the work that is truly mine and expose the agitation I add to it. Keep service from becoming a way to avoid listening or control others. Teach me the better portion without making me careless toward people who depend on me. Give my attention a faithful center.",
+  practice:"Before beginning one recurring task, sit in silence for three minutes and name why you are doing it.",
+  boundary:"Do not use this story to abandon shared labor or leave another person carrying the practical burden. Attention to Jesus should reshape service, not excuse neglect."
+},
+"Luke 8:4–15":{
+  observe:[
+    "Track what happens to the same seed in each kind of soil.",
+    "Notice that worries, riches, and pleasures are grouped together as competing growth rather than obvious rejection."
+  ],
+  movement:[
+    "Jesus tells the crowd a parable of seed and soils.",
+    "He explains why parables reveal and expose responses.",
+    "He identifies four patterns of hearing and emphasizes persevering fruitfulness."
+  ],
+  tension:"The parable raises difficult questions about divine revelation and human responsiveness. Its pastoral force is examination and endurance, not assigning fixed spiritual categories to other people.",
+  companions:[
+    {passage:"Matthew 13:18–23",category:"Gospel",relation:"parallel teaching",reason:"Matthew’s version highlights understanding and identifies the deceitfulness of wealth as part of the choking process."},
+    {passage:"Psalm 1:1–6",category:"Psalm",relation:"thematic reinforcement",reason:"The fruitful tree portrays sustained receptivity to God’s instruction over time."},
+    {passage:"Proverbs 4:23",category:"Wisdom",relation:"ethical embodiment",reason:"Guarding the heart matters because the direction of life flows from it."},
+    {passage:"Hebrews 3:12–14",category:"Epistle",relation:"communal development",reason:"Perseverance is protected not only privately but through daily mutual encouragement against hardened hearts."}
+  ],
+  p1:"Which threats act immediately and which grow gradually? What does that difference teach about how spiritual fruit is lost?",
+  p2:"What competing growth is consuming the attention, time, or desire needed for the word to mature in you?",
+  prayer:"Sower of truth, break what is hardened, deepen what is shallow, and expose what is choking growth. Give me patience for fruit that forms slowly and humility to receive help from Your people. Let Your word become enduring obedience rather than a brief response.",
+  practice:"Remove one recurring distraction for a defined period today and use that space to reread the passage.",
+  boundary:"Do not label another person as permanently hard, shallow, or thorny soil. Use the parable first for self-examination."
+},
+"Luke 9:10–17":{
+  observe:[
+    "Notice the disciples’ proposed solution to the crowd’s need and Jesus’ response.",
+    "Trace the verbs applied to Jesus and the bread: took, blessed, broke, gave."
+  ],
+  movement:[
+    "The apostles return, but the crowds follow and Jesus welcomes them.",
+    "The disciples see scarcity and recommend dismissal.",
+    "Jesus receives what is available, provides abundantly, and involves the disciples in distribution."
+  ],
+  tension:"The miracle reveals extraordinary provision, but Scripture does not promise that every limited resource will be visibly multiplied. Disciples may still face real scarcity while being called to responsible compassion.",
+  companions:[
+    {passage:"John 6:5–13",category:"Gospel",relation:"parallel account",reason:"John emphasizes Jesus testing Philip and the significance of gathering the fragments."},
+    {passage:"Psalm 145:14–21",category:"Psalm",relation:"theological foundation",reason:"The psalm praises God as the One who opens His hand and satisfies living creatures."},
+    {passage:"Proverbs 11:25",category:"Wisdom",relation:"ethical echo",reason:"The proverb portrays generosity as life-giving rather than self-depleting in the simplistic sense."},
+    {passage:"2 Kings 4:42–44",category:"Narrative",relation:"typological background",reason:"Elisha’s feeding miracle provides an Old Testament pattern of prophetic provision with food remaining."}
+  ],
+  p1:"Where do the disciples participate, and where is only Jesus able to provide? What does the division of action teach about ministry and dependence?",
+  p2:"What need are you tempted to dismiss because your available contribution appears too small?",
+  prayer:"Jesus, keep scarcity from making me indifferent and keep compassion from making me pretend I am the provider. Receive what is available, direct it wisely, and teach me to participate without claiming Your role. Give daily bread and make me attentive to who is still hungry.",
+  practice:"Offer one limited but real resource—time, food, transportation, skill, or money—to an appropriate need.",
+  boundary:"Do not promise resources you do not have or take sole responsibility for a need requiring a community or professional response."
+},
+"Luke 5:1–11":{
+  observe:[
+    "Compare Simon’s description of the failed night with the reason he lowers the nets again.",
+    "Notice how the abundant catch leads not to expansion of the business but to confession and calling."
+  ],
+  movement:[
+    "Jesus teaches from Simon’s boat after an unsuccessful night.",
+    "Simon acts on Jesus’ word and receives an overwhelming catch.",
+    "He recognizes his unworthiness, and Jesus redirects him toward a new vocation."
+  ],
+  tension:"The passage joins abundance and surrender. The provision is real, but it cannot be reduced to a formula that obedience produces commercial success.",
+  companions:[
+    {passage:"Matthew 4:18–22",category:"Gospel",relation:"parallel calling",reason:"Matthew emphasizes the immediate call to follow and become fishers of people."},
+    {passage:"Psalm 107:23–32",category:"Psalm",relation:"thematic background",reason:"The psalm presents workers on the sea encountering God’s authority beyond their skill."},
+    {passage:"Proverbs 16:3",category:"Wisdom",relation:"ethical reflection",reason:"Committing work to the Lord challenges the idea that planning and outcomes belong entirely to us."},
+    {passage:"Isaiah 6:1–8",category:"Prophet",relation:"typological pattern",reason:"Like Simon, Isaiah encounters divine holiness, confesses uncleanness, receives assurance, and is commissioned."}
+  ],
+  p1:"What does Simon know from experience, what does Jesus command, and what exactly becomes the basis of Simon’s action?",
+  p2:"Where do you need to name the evidence honestly and still remain open to obedient action that does not guarantee your preferred outcome?",
+  prayer:"Lord Jesus, meet me in the work I understand and the failure I cannot hide. Keep experience from becoming cynicism and hope from becoming fantasy. Let Your word carry greater authority than my need to guarantee results. Call me beyond provision into faithful purpose.",
+  practice:"Take one responsible step you have avoided because previous failure made action feel pointless.",
+  boundary:"This passage does not promise business success, financial return, or visible abundance for every obedient decision."
+},
+"Luke 7:36–50":{
+  observe:[
+    "Compare the actions of Simon the host with the actions of the woman.",
+    "In Jesus’ short debt story, notice what both debtors share despite the unequal amounts."
+  ],
+  movement:[
+    "A Pharisee hosts Jesus while a publicly shamed woman offers costly devotion.",
+    "The host silently judges, and Jesus answers with a parable of canceled debts.",
+    "Jesus interprets the woman’s love as response to forgiveness and sends her in peace."
+  ],
+  tension:"The scene centers grace, yet social shame, public exposure, and costly devotion remain emotionally complex. Forgiveness does not make the woman’s history unreal or the room immediately safe.",
+  companions:[
+    {passage:"Mark 14:3–9",category:"Gospel",relation:"contrast and echo",reason:"A different anointing scene also exposes how observers can misread costly devotion."},
+    {passage:"Psalm 32:1–7",category:"Psalm",relation:"prayerful response",reason:"The psalm moves from concealed sin and inner wasting to confession, forgiveness, and refuge."},
+    {passage:"Proverbs 10:12",category:"Wisdom",relation:"thematic reinforcement",reason:"The proverb contrasts hatred that stirs conflict with love that covers offenses."},
+    {passage:"Ephesians 2:4–10",category:"Epistle",relation:"theological development",reason:"Grace precedes and creates a transformed life rather than functioning as wages for devotion."}
+  ],
+  p1:"What evidence in the story shows that the woman’s love is a response to forgiveness rather than payment for it?",
+  p2:"Do you tend to minimize your need for mercy, or try to repay grace through intensity and performance?",
+  prayer:"Jesus, free me from both self-righteous distance and desperate attempts to purchase mercy. Let forgiveness produce love that is honest, embodied, and unashamed. Teach me to receive peace without denying the truth about sin. Keep me from measuring another person’s worship through my own pride.",
+  practice:"Write a brief gratitude prayer naming one specific mercy rather than describing yourself generally as “blessed.”",
+  boundary:"Strong emotion is not proof of repentance by itself, and costly giving does not purchase forgiveness."
+},
+"Luke 18:1–8":{
+  observe:[
+    "Identify the stated purpose of the parable before reading the story.",
+    "Compare the judge’s character with God’s character; notice that the logic moves from lesser to greater."
+  ],
+  movement:[
+    "Jesus explains that the parable concerns prayer and not losing heart.",
+    "A vulnerable widow persists before an unjust judge.",
+    "Jesus contrasts the judge with God and ends with a question about enduring faith."
+  ],
+  tension:"Jesus promises justice while the experience of delay remains real. The final question does not let persistence become a technique; it asks whether faith will endure while justice is awaited.",
+  companions:[
+    {passage:"Matthew 7:7–11",category:"Gospel",relation:"thematic reinforcement",reason:"Jesus also argues from flawed human responses to the greater goodness of the Father."},
+    {passage:"Psalm 13:1–6",category:"Psalm",relation:"prayerful response",reason:"The psalm gives language for persistent prayer when God’s action feels delayed."},
+    {passage:"Proverbs 24:10–12",category:"Wisdom",relation:"ethical challenge",reason:"The sayings connect adversity, rescue, responsibility, and God’s knowledge of the heart."},
+    {passage:"Revelation 6:9–11",category:"Apocalyptic",relation:"canonical tension",reason:"The martyrs’ cry for justice is heard, but they are told to wait, preserving both promise and delay."}
+  ],
+  p1:"How does Jesus’ description of the judge prevent you from reading God as a reluctant official who must be exhausted into acting?",
+  p2:"Where has delay tempted you either to stop praying or to treat prayer as your only responsibility when faithful action is also available?",
+  prayer:"Just God, hear the cries that seem unanswered and keep delay from hollowing out faith. Protect me from imagining You resemble the unjust judge. Give me endurance in prayer, courage in action, and humility about timing I cannot control. Sustain those who are waiting under real injustice.",
+  practice:"Pray one unresolved request again, then identify one just action that remains yours to take.",
+  boundary:"Persistent prayer does not replace reporting abuse, seeking legal protection, medical care, or practical intervention."
+},
+"Luke 22:24–27":{
+  observe:[
+    "Notice where this argument occurs in the narrative: during Jesus’ final meal before His suffering.",
+    "Compare the world’s language of greatness with Jesus’ words about the younger, the servant, and His own example."
+  ],
+  movement:[
+    "The disciples dispute status and greatness.",
+    "Jesus contrasts dominating rulers with kingdom leadership.",
+    "He identifies Himself as the One who serves."
+  ],
+  tension:"Servant leadership can itself become a flattering title while power remains untouched. The passage requires examining who benefits from authority, not merely adopting humble language.",
+  companions:[
+    {passage:"Mark 10:35–45",category:"Gospel",relation:"parallel teaching",reason:"Jesus answers another status dispute by grounding greatness in service and His life given for many."},
+    {passage:"Psalm 72:1–14",category:"Psalm",relation:"canonical vision",reason:"The ideal king uses authority to defend the poor, rescue the needy, and oppose oppression."},
+    {passage:"Proverbs 29:2–4",category:"Wisdom",relation:"ethical contrast",reason:"Righteous rule brings joy and justice, while exploitative leadership destroys."},
+    {passage:"1 Peter 5:1–4",category:"Epistle",relation:"ethical development",reason:"Peter tells leaders to shepherd willingly and eagerly without domineering over those entrusted to them."}
+  ],
+  p1:"What does Jesus change: the existence of leadership, or the definition and purpose of greatness?",
+  p2:"In one area where you hold influence, who currently carries the cost of your convenience or need to be recognized?",
+  prayer:"Servant King, expose ambition that borrows the language of service while seeking status. Teach me to use influence for protection, nourishment, and another person’s growth. Give me courage to lead when leadership is needed and humility to refuse domination. Make Your presence among us the pattern.",
+  practice:"Do one necessary act of service that benefits someone else and cannot easily be displayed for recognition.",
+  boundary:"Servant leadership does not mean tolerating manipulation, refusing accountability, or avoiding necessary decisions."
+},
+"Luke 22:35–38":{
+  observe:[
+    "Compare the earlier mission, when the disciples lacked nothing, with the hostile conditions Jesus now describes.",
+    "Notice the disciples’ literal response about swords and how the following arrest scene interprets that response."
+  ],
+  movement:[
+    "Jesus recalls the disciples’ earlier experience of provision.",
+    "He prepares them for a more dangerous phase of mission.",
+    "They misunderstand His words through weapons, and Jesus abruptly ends the exchange."
+  ],
+  tension:"The passage uses difficult figurative and literal language at the edge of violence. Its interpretation must include the arrest, where Jesus rejects the sword’s use and heals the injured man.",
+  companions:[
+    {passage:"Matthew 10:5–10",category:"Gospel",relation:"narrative background",reason:"The earlier mission instructions explain the period when the disciples traveled without ordinary provisions."},
+    {passage:"Psalm 121:1–8",category:"Psalm",relation:"prayerful response",reason:"The psalm locates help in the Lord’s watchful care without promising a trouble-free road."},
+    {passage:"Proverbs 21:31",category:"Wisdom",relation:"canonical balance",reason:"Preparation has a place, but final deliverance does not come from equipment or strategy."},
+    {passage:"Ephesians 6:10–18",category:"Epistle",relation:"theological development",reason:"Paul describes readiness for spiritual conflict through truth, righteousness, peace, faith, salvation, the word, and prayer."}
+  ],
+  p1:"How does the memory “we lacked nothing” function before Jesus describes a harder season?",
+  p2:"What past provision should shape your response to a present season that requires different preparation?",
+  prayer:"Jesus, help me remember provision without expecting every season to look the same. Give me readiness without panic and courage without violence. Keep tools, plans, and precautions from replacing trust in You. Teach me to read difficult words through Your own conduct.",
+  practice:"Write one example of past provision and one practical preparation appropriate to your current season.",
+  boundary:"Do not use this passage by itself to justify violence or weapon ownership. The immediate narrative shows Jesus stopping violent action."
+},
+"Luke 24:13–35":{
+  observe:[
+    "Track what the travelers believe happened, what they hoped, and how Jesus reconstructs the meaning of the events.",
+    "Notice the repeated movement from eyes kept from recognition, to opened Scriptures, to opened eyes."
+  ],
+  movement:[
+    "Two disappointed disciples leave Jerusalem and describe failed hope.",
+    "Jesus joins them and interprets the Scriptures around Messiah’s suffering and glory.",
+    "They recognize Him in the breaking of bread and return to the community."
+  ],
+  tension:"Jesus is present before He is recognized. The story honors slow understanding but also shows that sincere interpretation can still be wrong and require correction.",
+  companions:[
+    {passage:"John 20:11–18",category:"Gospel",relation:"resurrection parallel",reason:"Mary also encounters the risen Jesus without initially recognizing Him, and recognition leads to witness."},
+    {passage:"Psalm 22:22–31",category:"Psalm",relation:"canonical development",reason:"A psalm that begins in abandonment turns toward vindication, worship, and proclamation to future generations."},
+    {passage:"Proverbs 3:11–12",category:"Wisdom",relation:"canonical tension",reason:"The proverb frames painful correction within covenant love without pretending correction feels pleasant."},
+    {passage:"Acts 8:26–35",category:"Narrative",relation:"interpretive echo",reason:"Philip likewise begins from Scripture and explains how suffering and good news converge in Jesus."}
+  ],
+  p1:"Which details in the disciples’ summary are factually correct, and where is their interpretation still deficient?",
+  p2:"What disappointment are you interpreting as though the story is already finished?",
+  prayer:"Risen Jesus, walk with me in interpretations shaped by disappointment. Correct me through Scripture without shaming honest grief. Open what I cannot yet see, and make recognition lead me back toward faithful community rather than private certainty. Let hope become witness.",
+  practice:"Write your current disappointment in two columns: “What I know happened” and “What I am assuming it means.”",
+  boundary:"Do not dismiss grief by telling yourself that everything is secretly good. The risen Jesus listens before He corrects."
+},
+"Luke 24:44–49":{
+  observe:[
+    "Notice the four elements Jesus joins: Scripture fulfilled, understanding opened, a message proclaimed, and power awaited.",
+    "Identify what the disciples are commanded to do and what they are commanded not to do yet."
+  ],
+  movement:[
+    "Jesus explains the fulfillment of Scripture in His suffering and resurrection.",
+    "He commissions proclamation of repentance and forgiveness to all nations.",
+    "He calls the disciples witnesses and commands them to wait for promised power."
+  ],
+  tension:"The disciples possess true testimony but are still told to wait. Knowledge of the mission does not eliminate dependence on God’s timing and empowerment.",
+  companions:[
+    {passage:"Matthew 28:16–20",category:"Gospel",relation:"commission parallel",reason:"Matthew joins Jesus’ authority, disciple-making, teaching, and His continuing presence."},
+    {passage:"Psalm 67:1–7",category:"Psalm",relation:"canonical vision",reason:"The psalm asks for God’s blessing so His way and saving power may be known among all nations."},
+    {passage:"Proverbs 11:30",category:"Wisdom",relation:"ethical echo",reason:"The proverb links righteous fruit with life-giving influence and wise winning of people."},
+    {passage:"Acts 1:4–8",category:"Narrative",relation:"direct continuation",reason:"Luke’s second volume repeats the command to wait and identifies the Spirit’s power for witness."}
+  ],
+  p1:"Why does Jesus place understanding, message, mission, witness, waiting, and power in this particular order?",
+  p2:"Where are you tempted either to act without dependence or to call fear and delay “waiting on God”?",
+  prayer:"Risen Lord, root my witness in what You have done rather than in my need to be impressive. Open my understanding, make repentance and forgiveness clear, and keep me dependent on Your Spirit. Give me patience to wait and courage to move when obedience is due.",
+  practice:"Write one sentence describing the good news of this passage without centering yourself.",
+  boundary:"Do not use mission language to pressure or manipulate another person. Christian witness should be truthful, patient, and consistent with the character of Jesus."
+}
+};
+
+const lukeMoneyStudies = {
+"Luke 12:13–21":{
+  context:"A man interrupts Jesus while He is teaching a crowd and asks Him to force a brother to divide an inheritance. Jesus refuses to become the man’s private arbitrator and instead exposes the deeper danger beneath the dispute: greed. He then tells about a landowner whose harvest is so abundant that he plans larger barns, many years of ease, and a life centered entirely on himself. The man speaks repeatedly of “my” crops, “my” barns, and “my” goods, but never asks what God desires or how abundance might serve another person.",
+  fit:"Immediately before this scene, Jesus warns His disciples about hypocrisy, fear of people, and the need to acknowledge God. Immediately after the parable, He teaches them not to live anxiously about food and clothing. The two sections belong together: the rich fool tries to secure tomorrow through accumulation, while Jesus teaches His disciples to receive life and provision from the Father.",
+  main:"Jesus is not condemning a successful harvest. He is exposing a life that treats possessions as personal security, ignores God, and has no outward movement of generosity. The final contrast is between storing up for oneself and being “rich toward God.”",
+  notMean:"The parable does not teach that planning, saving, retirement, ownership, or building adequate storage is automatically sinful. The man is called a fool because he mistakes wealth for life, assumes control of the future, and uses abundance only for himself.",
+  word:{orig:"πλεονεξία",trans:"pleonexia · pleh-oh-nek-SEE-ah",language:"Greek noun",
+    meaning:"Greed, covetousness, or the desire to have more.",
+    range:"The word can describe grasping for more money, possessions, advantage, or gratification. It is not limited to being wealthy; it names a desire that is never satisfied with enough.",
+    inPassage:"Jesus names pleonexia before telling the parable. The problem is not the size of the harvest but the heart that sees abundance only as an opportunity to enlarge private security and pleasure.",
+    elsewhere:"Mark 7:22 includes greed among the evils that come from within. Ephesians 5:3 warns that greed should not characterize God’s people. Colossians 3:5 calls greed idolatry because it gives created things the place of ultimate desire.",
+    caution:"The word does not mean that every desire for improvement or every financial goal is greed. The passage identifies greed through self-enclosed accumulation, false security, and the absence of responsibility toward God and neighbor."}
+},
+"Luke 12:22–34":{
+  context:"Jesus turns from the crowd and the rich fool to His disciples. He addresses real concerns about food, clothing, and the future, then points to ravens and wildflowers as witnesses to the Father’s care. He does not tell them that needs are imaginary. He tells them that life is more than the things anxiety tries to secure and that the Father already knows what they need.",
+  fit:"This teaching follows directly after the rich fool, who tried to guarantee his future through stored abundance. Jesus offers a different posture: receive the kingdom, trust the Father, practice generosity, and place treasure where loss cannot destroy it.",
+  main:"The center of the passage is not “stop feeling anxious” through willpower. It is the character of the Father, who knows, values, gives, and invites His children to seek His kingdom. Freedom from scarcity grows through trust and openhandedness.",
+  notMean:"Jesus is not forbidding work, budgets, preparation, medical care, or asking others for help. He is confronting an anxious way of life that treats worry and accumulation as the source of safety.",
+  word:{orig:"μετεωρίζομαι",trans:"meteōrizomai · meh-teh-oh-RID-zoh-my",language:"Greek verb",
+    meaning:"To be unsettled, suspended, anxious, or carried about in uncertainty.",
+    range:"Outside the New Testament the word could describe something lifted or suspended in the air. Figuratively, it could describe a person left unsettled, wavering, or anxious.",
+    inPassage:"In verse 29 Jesus tells His disciples not to remain suspended in anxious uncertainty about food and drink. The image fits a heart that cannot settle because it is trying to secure what the Father already knows is needed.",
+    elsewhere:"This exact verb appears only here in the New Testament, so its meaning must be read from Luke’s sentence and wider Greek usage rather than built from many biblical occurrences.",
+    caution:"The word is sometimes turned into an elaborate picture of being emotionally “up in the air.” That image can help, but the clear point in context is anxious instability, not a secret technical definition."}
+},
+"Luke 16:1–13":{
+  context:"Jesus tells a difficult parable about a manager who is about to lose his position. The manager reduces the debts recorded for his master’s clients so that those people may receive him later. Jesus does not praise the manager’s dishonesty. He draws attention to the manager’s decisive awareness that money is temporary and should be used with the future in view.",
+  fit:"Luke 15 has emphasized God’s joy over the lost, and Luke 16 turns to the use of possessions. The section ends with the declaration that no servant can serve both God and wealth, making allegiance the controlling issue.",
+  main:"Resources are entrusted, not ultimate. Faithfulness with temporary wealth reveals character, and money should be used in ways consistent with God’s kingdom rather than treated as a master.",
+  notMean:"The parable does not authorize fraud, manipulation, or unethical financial behavior. Jesus distinguishes the manager’s shrewd foresight from his dishonesty.",
+  word:{orig:"πιστός",trans:"pistos · piss-TOSS",language:"Greek adjective",
+    meaning:"Faithful, trustworthy, reliable, or believing.",
+    range:"It can describe a person who can be trusted, God as faithful, a statement that is reliable, or a person characterized by faith.",
+    inPassage:"Jesus uses the word for someone trustworthy with very little and therefore trustworthy with much. The emphasis is proven reliability in the handling of what belongs to another.",
+    elsewhere:"Luke 12:42 describes a faithful and wise manager. First Corinthians 4:2 says managers must be found faithful. Revelation 2:10 calls believers to remain faithful even under pressure.",
+    caution:"Here pistos does not mainly mean having an inward feeling of faith. The contrast with dishonesty shows that the intended sense is practical trustworthiness."}
+},
+"Luke 18:18–30":{
+  context:"A wealthy ruler asks Jesus what he must do to inherit eternal life. He presents himself as commandment-keeping, but Jesus exposes the possession that governs him: sell, distribute to the poor, treasure in heaven, and follow Me. The man becomes deeply sad because he is very rich.",
+  fit:"The scene follows Jesus welcoming children who receive the kingdom without status or leverage. The ruler arrives with achievement and possessions, but the kingdom must be received rather than controlled.",
+  main:"Jesus’ command reveals the ruler’s divided allegiance. The issue is not that possessions are uniquely evil but that he cannot follow Jesus while wealth remains his controlling security.",
+  notMean:"The passage should not be flattened into either “every Christian must sell absolutely everything” or “this command applied only to one man and has nothing to say about us.” Jesus’ exact command is personal, but the warning about wealth’s power applies broadly.",
+  word:{orig:"περίλυπος",trans:"perilypos · peh-REE-loo-poss",language:"Greek adjective",
+    meaning:"Deeply grieved, very sorrowful, or surrounded by sadness.",
+    range:"The word describes intense sorrow, not mild disappointment. It can be used for grief that presses on a person from every side.",
+    inPassage:"The ruler’s profound sadness reveals the cost of Jesus’ invitation. He wants eternal life, but the loss of wealth feels unbearable because wealth is bound to identity and security.",
+    elsewhere:"The same word describes Jesus’ sorrow in Gethsemane in Matthew 26:38 and Mark 14:34. Its use here shows the emotional seriousness of the ruler’s conflict.",
+    caution:"His sorrow should not be mistaken for repentance by itself. Strong emotion can reveal attachment without yet producing surrender."}
+},
+"Luke 19:1–10":{
+  context:"Zacchaeus is a chief tax collector, wealthy through a system widely associated with exploitation and collaboration with Rome. Jesus publicly chooses to stay at his house, and Zacchaeus responds by giving half his possessions to the poor and promising fourfold restitution where he has defrauded anyone.",
+  fit:"The story follows the rich ruler, who could not release wealth, and a blind beggar who cried out for mercy. Zacchaeus becomes a living contrast: a wealthy man receives Jesus joyfully, and grace produces concrete economic change.",
+  main:"Salvation reaches both belonging and behavior. Jesus welcomes Zacchaeus before the crowd approves, and Zacchaeus’ repentance becomes visible through generosity and restitution.",
+  notMean:"The passage does not teach that charitable giving purchases salvation. The financial response is evidence of a changed allegiance, not the price of Jesus’ welcome.",
+  word:{orig:"ἀποδίδωμι",trans:"apodidōmi · ah-poh-DEE-doh-mee",language:"Greek verb",
+    meaning:"To give back, repay, render, restore, or pay what is owed.",
+    range:"It can refer to paying wages or taxes, returning something, rewarding deeds, or making restitution.",
+    inPassage:"Zacchaeus promises to restore four times what he took through fraud. His repentance does not stop at regret; it moves toward repairing measurable harm.",
+    elsewhere:"Luke 20:25 uses it for rendering to Caesar and to God. Romans 13:7 uses it for paying what is owed. Revelation 22:12 uses it for Christ repaying according to deeds.",
+    caution:"Restitution cannot repair every consequence or force reconciliation, but the word shows that biblical repentance seeks concrete repair where repair is possible."}
+},
+"Luke 21:1–4":{
+  context:"Jesus watches people place gifts into the temple treasury. Wealthy people contribute from abundance, while a poor widow gives two very small coins. Jesus says she has put in more because they gave from surplus, but she gave from her lack, all the living she had.",
+  fit:"Immediately before this, Jesus condemns scribes who devour widows’ houses while displaying long prayers. Immediately after, He announces judgment on the temple. The widow’s gift therefore sits beside a warning about a religious system capable of consuming the vulnerable.",
+  main:"Jesus sees sacrifice that public calculations miss. At the same time, the surrounding context prevents the story from becoming a tool for pressuring vulnerable people to surrender their last resources to religious institutions.",
+  notMean:"The passage should not be used to romanticize poverty, shame people who cannot give, or excuse institutions that exploit sacrificial generosity. Jesus praises the widow’s wholehearted gift while condemning leaders who consume widows.",
+  word:{orig:"βίος",trans:"bios · BEE-oss",language:"Greek noun",
+    meaning:"Life, livelihood, means of living, or material resources that sustain life.",
+    range:"The word can refer to earthly life, one’s manner of life, or the possessions and income by which life is supported.",
+    inPassage:"Luke says the widow gave her whole bios, meaning not merely “all the cash in her pocket” but the resources on which her daily life depended.",
+    elsewhere:"Luke 8:14 uses it for the pleasures of life. First John 2:16 speaks of pride in possessions or livelihood. First John 3:17 uses it for material means that can meet another’s need.",
+    caution:"The word does not prove the widow immediately died or had absolutely no other possible support. It emphasizes the totality and vulnerability of her gift."}
+},
+"Luke 6:27–38":{
+  context:"Jesus speaks to disciples about loving enemies, blessing those who curse, giving without retaliation, and refusing the cycle of harm. He grounds this difficult ethic in God’s own kindness toward the ungrateful and evil.",
+  fit:"This is Luke’s Sermon on the Plain. Jesus has just announced blessings and woes that reverse ordinary measures of success, then describes the merciful life of people who belong to God’s kingdom.",
+  main:"Kingdom generosity is not a transaction designed to secure return. It reflects the Father’s mercy and refuses to let another person’s hostility determine the disciple’s character.",
+  notMean:"Jesus is not requiring people to remain in abuse, abandon protection, or give every requester exactly what is demanded. The passage confronts vengeance and calculating love, not wise boundaries or public justice.",
+  word:{orig:"οἰκτίρμων",trans:"oiktirmōn · oyk-teer-MOHN",language:"Greek adjective",
+    meaning:"Merciful, compassionate, or moved with pity.",
+    range:"The word describes a disposition that sees suffering and responds with compassionate mercy.",
+    inPassage:"Jesus commands disciples to be merciful because their Father is merciful. The standard is not merely social reciprocity but God’s generous character.",
+    elsewhere:"James 5:11 uses the related adjective for the Lord as compassionate and merciful. The related noun appears in Romans 12:1 for God’s mercies.",
+    caution:"Mercy does not mean calling evil good or eliminating consequences. Biblical mercy seeks another’s good without surrendering truth."}
+},
+"Luke 11:1–13":{
+  context:"After watching Jesus pray, a disciple asks Him to teach them. Jesus gives a brief pattern centered on God’s name, kingdom, daily bread, forgiveness, and protection. He then tells a story about persistent asking and compares God’s generosity with ordinary parental care.",
+  fit:"The prayer follows the Mary and Martha scene, where attention to Jesus is called the one necessary thing. It teaches dependence that returns to God for daily provision rather than self-sufficient control.",
+  main:"Prayer rests on relationship with the Father. Disciples bring ordinary needs, moral need, and spiritual danger to God with persistence because God is neither reluctant nor cruel.",
+  notMean:"The passage does not teach that repetition pressures God into giving whatever we demand. The climax is the Father giving the Holy Spirit, showing that God gives what is truly good.",
+  word:{orig:"ἐπιούσιος",trans:"epiousios · eh-pee-OO-see-oss",language:"Greek adjective",
+    meaning:"Daily, necessary for existence, or for the coming day.",
+    range:"The word is extremely rare and appears in the New Testament only in the Lord’s Prayer. Proposed meanings include bread needed for the day, bread for the coming day, or bread necessary for life.",
+    inPassage:"Whatever nuance is chosen, the request expresses daily dependence rather than imagined self-sufficiency: give us the bread we need.",
+    elsewhere:"The word also appears in Matthew 6:11, the other form of the Lord’s Prayer. Because there are only these two biblical occurrences, certainty about every shade of meaning is limited.",
+    caution:"It is not responsible to claim the word has one secret, undisputed definition. Its rarity is exactly why interpreters compare context, early translations, and usage carefully."}
+},
+"Luke 14:25–33":{
+  context:"Large crowds travel with Jesus, and He turns to warn them that discipleship cannot be added casually to an unchanged life. He uses strong family language, the image of carrying a cross, a builder calculating cost, and a king assessing battle.",
+  fit:"Luke has shown people accepting invitations, making excuses, and misunderstanding the kingdom. Jesus now prevents crowd enthusiasm from being mistaken for settled allegiance.",
+  main:"Following Jesus requires a loyalty greater than every competing attachment and a willingness to relinquish control of possessions. Counting the cost is honest preparation for allegiance, not a way to earn discipleship.",
+  notMean:"The Semitic contrast translated “hate” does not command emotional cruelty toward family. Jesus elsewhere commands love; here He demands that even the closest relationship cannot outrank Him.",
+  word:{orig:"ἀποτάσσομαι",trans:"apotassomai · ah-poh-TASS-oh-my",language:"Greek verb",
+    meaning:"To say farewell, take leave, renounce, or give up a claim.",
+    range:"It can describe saying goodbye to people, dismissing someone, or renouncing attachment or control.",
+    inPassage:"In verse 33 Jesus says a disciple must renounce all possessions. The force is not merely feeling detached; possessions can no longer hold the final claim over the disciple.",
+    elsewhere:"Luke 9:61 uses the word for saying farewell to family. Acts 18:18 uses it when Paul takes leave of believers.",
+    caution:"The word does not by itself settle one universal economic arrangement for every Christian. The surrounding call establishes surrendered ownership and allegiance to Jesus."}
+},
+"Luke 15:11–32":{
+  context:"Jesus tells this parable because religious leaders complain that He welcomes sinners and eats with them. A younger son dishonors his father, wastes the estate, and returns prepared to become a servant. The father runs, embraces, restores, and celebrates him. The older son then reveals his own estrangement through resentment and transactional obedience.",
+  fit:"This is the third of three stories about the lost: sheep, coin, and sons. The final story remains open because Jesus is inviting the grumbling religious listeners to enter the Father’s joy.",
+  main:"The Father’s abundance is relational, not merely financial. Both sons misunderstand life with him: one seeks freedom through the inheritance, the other treats obedience as wages. The father goes out to both.",
+  notMean:"The parable does not trivialize the younger son’s harm or suggest repentance is unnecessary. Nor does it portray the father’s welcome as approval of everything the son did.",
+  word:{orig:"σπλαγχνίζομαι",trans:"splagchnizomai · splangk-NID-zoh-my",language:"Greek verb",
+    meaning:"To be moved with deep compassion.",
+    range:"The word describes compassion felt in the deepest inner parts and often followed by merciful action.",
+    inPassage:"The father sees the returning son from far away, is moved with compassion, runs, embraces, and kisses him. Compassion becomes restorative action before the son can complete his prepared speech.",
+    elsewhere:"Luke 7:13 uses it when Jesus sees a grieving widow. Luke 10:33 uses it for the Samaritan who sees the wounded man. It frequently describes Jesus’ response to suffering.",
+    caution:"Compassion here is not sentiment detached from truth. The son has returned confessing sin, and restoration creates a new relational reality."}
+},
+"Luke 10:25–37":{
+  context:"A legal expert tests Jesus by asking how to inherit eternal life. After correctly naming love for God and neighbor, he asks, “Who is my neighbor?” Jesus answers with a story in which respected religious figures pass an injured man, while a Samaritan, a member of a despised group, moves toward him and provides costly care.",
+  fit:"The question seeks a boundary around obligation. Jesus redirects it from identifying who qualifies as neighbor to becoming a neighbor through mercy.",
+  main:"Neighbor love crosses hostility, inconvenience, and social identity. The Samaritan’s compassion becomes time, touch, transportation, money, and a promise of continued care.",
+  notMean:"The parable is not merely advice to be generally nice. It confronts self-justification and calls for concrete mercy toward a person whose need interrupts us.",
+  word:{orig:"πλησίον",trans:"plēsion · PLAY-see-on",language:"Greek adverb used as a noun",
+    meaning:"Near, nearby, or one’s neighbor.",
+    range:"It can refer to the person who is near, a fellow member of a community, or broadly another person toward whom love is owed.",
+    inPassage:"The legal expert asks which people belong inside the category. Jesus ends by asking which person became neighbor to the wounded man. Neighbor becomes a practiced relationship, not a protected boundary.",
+    elsewhere:"The word appears in the command “love your neighbor as yourself” in Luke 10:27, Romans 13:9, and James 2:8.",
+    caution:"The word does not mean only geographical neighbors. Jesus deliberately places the obligation across ethnic and religious hostility."}
+},
+"Luke 10:38–42":{
+  context:"Martha welcomes Jesus and becomes distracted by much serving, while Mary sits at Jesus’ feet as a disciple and listens. Martha asks Jesus to correct Mary, but Jesus names Martha’s anxiety and agitation and says one thing is necessary.",
+  fit:"The scene follows the Good Samaritan. Together the stories prevent a false choice: love acts mercifully, but action must remain rooted in attention to Jesus rather than anxious performance.",
+  main:"Jesus does not shame service. He addresses distracted service that has become agitated, resentful, and controlling. Mary’s “better portion” is receiving Jesus’ teaching as a disciple.",
+  notMean:"The passage does not teach that practical work is spiritually inferior or that responsibilities should always be abandoned. The issue is the inward condition and the priority of receiving from Jesus.",
+  word:{orig:"περισπάω",trans:"perispaō · peh-ree-SPAH-oh",language:"Greek verb",
+    meaning:"To be pulled away, distracted, or drawn around.",
+    range:"The image is of attention being dragged in different directions by many demands.",
+    inPassage:"Martha is not merely busy; she is being pulled away by much service until her service turns into accusation toward both Mary and Jesus.",
+    elsewhere:"This exact verb appears only here in the New Testament, making the narrative details especially important for defining it.",
+    caution:"The word does not condemn multitasking or hospitality by itself. Luke shows distraction becoming spiritually damaging when it removes attention from Jesus and produces resentment."}
+},
+"Luke 8:4–15":{
+  context:"Jesus tells a crowd about seed falling on four kinds of ground, then explains the parable to His disciples. The same seed is heard, but the responses differ: hardness, shallow reception, choking pressures, or persevering fruitfulness.",
+  fit:"Luke has shown varied responses to Jesus. The parable explains why hearing the same word does not produce the same result in every listener.",
+  main:"Fruitfulness requires more than an initial response. The word must be held with an honest and good heart and carried through with endurance despite testing, wealth, worries, and pleasures.",
+  notMean:"The parable is not permission to label other people permanently as a type of soil. Its warning invites every hearer to examine what is resisting or choking the word now.",
+  word:{orig:"συμπνίγω",trans:"sympnigō · soom-PNEE-goh",language:"Greek verb",
+    meaning:"To choke together, crowd out, or suffocate.",
+    range:"It can describe plants being choked by surrounding growth or a person being physically pressed by a crowd.",
+    inPassage:"Worries, riches, and pleasures grow alongside the word until they crowd out maturity. The danger is not only open rejection but competing growth that consumes attention and desire.",
+    elsewhere:"Luke 8:42 uses the related verb for a crowd pressing around Jesus. Matthew 13:22 and Mark 4:19 use it for thorns choking the word.",
+    caution:"The word does not say money or pleasure are inherently evil. It warns that they can become dense competing growth that prevents spiritual fruit."}
+},
+"Luke 9:10–17":{
+  context:"The apostles return from ministry, and Jesus withdraws with them, but crowds follow. Jesus welcomes the people, teaches, and heals. When the disciples focus on scarcity and want the crowd dismissed, Jesus tells them, “You give them something to eat,” receives the available food, blesses it, and involves the disciples in distributing it.",
+  fit:"The feeding occurs after the Twelve have been sent to proclaim and heal. The miracle continues their formation: ministry depends on Jesus’ sufficiency while still requiring their participation.",
+  main:"Jesus’ compassion does not ignore practical need. He receives what is available, gives thanks, provides abundantly, and draws disciples into responsible service.",
+  notMean:"The story is not a formula promising that every limited resource will be multiplied visibly. It reveals Jesus’ identity and provision while calling disciples away from dismissing need too quickly.",
+  word:{orig:"κλάω",trans:"klaō · KLAH-oh",language:"Greek verb",
+    meaning:"To break, especially to break bread.",
+    range:"It can describe the ordinary breaking of bread for a meal and becomes associated with shared meals among Jesus’ followers.",
+    inPassage:"Jesus takes, blesses, breaks, and gives. The sequence emphasizes provision received from Him and distributed through the disciples.",
+    elsewhere:"Luke 22:19 uses it at the Last Supper. Luke 24:30–35 uses it when the risen Jesus is recognized in the breaking of bread. Acts 2:46 uses it for believers sharing meals.",
+    caution:"The verb itself does not secretly mean the Eucharist in every occurrence, though Luke’s repeated pattern invites readers to hear later meal echoes."}
+},
+"Luke 5:1–11":{
+  context:"After an unsuccessful night of fishing, experienced fishermen are cleaning their nets. Jesus teaches from Simon’s boat, then tells him to put out into deep water and lower the nets. Simon voices the failure but acts on Jesus’ word, and the catch overwhelms two boats. Simon responds with awareness of his sin, while Jesus calls him into a new vocation.",
+  fit:"Luke has already shown Jesus’ authority in teaching, healing, and deliverance. This scene brings that authority into Simon’s ordinary work and turns provision into a call to discipleship.",
+  main:"Trust is not pretending the night was successful. Simon names the reality and nevertheless acts because Jesus has spoken. The abundance points beyond financial success to the authority of the One calling him.",
+  notMean:"The passage is not a promise that obedience always produces business prosperity. The catch leads Simon to leave everything, not to build a fishing empire.",
+  word:{orig:"ῥῆμα",trans:"rhēma · RAY-mah",language:"Greek noun",
+    meaning:"A spoken word, statement, saying, or matter.",
+    range:"It can refer to a particular utterance, message, command, or event being spoken about.",
+    inPassage:"Simon says, “at Your word I will let down the nets.” His action rests on Jesus’ specific command despite contrary experience.",
+    elsewhere:"Luke 1 repeatedly uses the word for God’s promise and its fulfillment. Luke 2:19 uses it for the things Mary treasures. Romans 10:17 uses it in relation to hearing Christ’s message.",
+    caution:"Rhēma is often contrasted with logos as though one always means a personal revelation and the other always means written Scripture. Greek usage is not that rigid; context determines the nuance."}
+},
+"Luke 7:36–50":{
+  context:"A Pharisee invites Jesus to eat but withholds customary acts of hospitality. A woman known in the city as sinful enters, weeps, anoints Jesus’ feet, and expresses costly devotion. The host judges both her and Jesus internally. Jesus tells a story about two forgiven debtors and contrasts the woman’s love with the host’s lack of welcome.",
+  fit:"Luke repeatedly shows Jesus receiving outsiders while exposing self-righteousness among respected insiders. The scene connects forgiveness, love, honor, and social shame.",
+  main:"The woman’s love does not purchase forgiveness. Her actions reveal that she has grasped the magnitude of mercy, while the host’s restrained love exposes his limited awareness of need.",
+  notMean:"Jesus does not say sin is unimportant or that emotion earns salvation. He explicitly names forgiveness and faith as the foundation of peace.",
+  word:{orig:"χαρίζομαι",trans:"charizomai · khah-RID-zoh-my",language:"Greek verb",
+    meaning:"To give graciously, forgive, cancel a debt, or grant as a favor.",
+    range:"The word is built from the language of grace and can describe freely giving something or graciously releasing an obligation.",
+    inPassage:"In the miniature parable, the lender freely cancels both debts when neither debtor can pay. The woman’s love responds to grace she could not purchase.",
+    elsewhere:"Luke 7:21 uses it for Jesus graciously granting sight. Romans 8:32 uses it for God graciously giving all things with Christ. Colossians 3:13 uses it for forgiving one another.",
+    caution:"The word’s grace emphasis does not remove the reality of debt. Forgiveness is costly precisely because a real obligation is released."}
+},
+"Luke 18:1–8":{
+  context:"Jesus tells a parable so His disciples will keep praying and not lose heart. A widow repeatedly seeks justice from a judge who neither fears God nor respects people. The judge finally acts because of her persistence, and Jesus argues that God is not like this judge: God hears His chosen ones and will bring justice.",
+  fit:"Luke places this teaching within a section about the coming of God’s kingdom and the need for faithful endurance while justice seems delayed.",
+  main:"Persistent prayer is not overcoming God’s reluctance. It is continuing to trust the just God in a world where answers and vindication can appear delayed.",
+  notMean:"The parable does not compare God’s character to the unjust judge. It is an argument from lesser to greater: if even such a judge eventually responds, how much more will the righteous God act.",
+  word:{orig:"ἐγκακέω",trans:"enkakeō · eng-kah-KEH-oh",language:"Greek verb",
+    meaning:"To lose heart, become discouraged, grow weary, or give up.",
+    range:"The word can describe becoming inwardly exhausted in doing good, suffering, ministry, or prayer.",
+    inPassage:"Jesus gives the parable specifically so disciples will continue praying rather than surrender hope when justice appears delayed.",
+    elsewhere:"Second Corinthians 4:1 and 4:16 use it for not losing heart in ministry and suffering. Galatians 6:9 warns against growing weary in doing good.",
+    caution:"Not losing heart does not mean never feeling exhausted or lamenting delay. The widow’s persistence grows precisely from unresolved injustice."}
+},
+"Luke 22:24–27":{
+  context:"During the final meal before Jesus’ arrest, the disciples argue about which of them should be considered greatest. Jesus contrasts rulers who dominate and seek honor with His own presence among them as one who serves.",
+  fit:"The dispute occurs beside the bread and cup of Jesus’ self-giving covenant. Their pursuit of status is exposed by the kind of kingship Jesus is about to display through suffering.",
+  main:"Kingdom greatness is responsibility shaped by service, not the use of authority for self-exaltation. Jesus Himself is the pattern and source.",
+  notMean:"Servant leadership does not mean leaders avoid decisions, accountability, or courage. It means authority is exercised for another person’s good rather than the leader’s ego.",
+  word:{orig:"διακονέω",trans:"diakoneō · dee-ah-koh-NEH-oh",language:"Greek verb",
+    meaning:"To serve, wait on, minister to, or meet practical needs.",
+    range:"It can describe serving at a table, providing material assistance, or carrying out ministry on behalf of others.",
+    inPassage:"Jesus identifies Himself as the One who serves at the very moment the disciples are competing for rank. His service redefines greatness.",
+    elsewhere:"Luke 8:3 uses the word for women supporting Jesus’ ministry. Acts 6 uses the related noun for practical service. Mark 10:45 says the Son of Man came to serve.",
+    caution:"The word should not be reduced to doing menial tasks while leaving power untouched. In Jesus, service reshapes the entire purpose of authority."}
+},
+"Luke 22:35–38":{
+  context:"Jesus reminds the disciples that when He previously sent them without purse, bag, or sandals, they lacked nothing. He now warns that the coming phase will be hostile and difficult, using urgent language about preparation. The disciples respond literally by producing two swords, and Jesus ends the exchange abruptly.",
+  fit:"The conversation occurs immediately before Gethsemane, arrest, and Peter’s violent use of a sword, which Jesus stops and reverses by healing the wounded man.",
+  main:"The disciples must remember God’s past provision while recognizing that faithfulness is entering a more dangerous season. Jesus prepares them for opposition, not panic.",
+  notMean:"The passage should not be isolated as a simple command for Christians to arm themselves. Luke’s narrative immediately shows Jesus rejecting the disciples’ violent misunderstanding.",
+  word:{orig:"ὑστερέω",trans:"hystereō · hoo-steh-REH-oh",language:"Greek verb",
+    meaning:"To lack, be in need, fall short, or come behind.",
+    range:"It can describe material need, failure to reach a standard, or absence of something necessary.",
+    inPassage:"Jesus asks whether they lacked anything during the earlier mission. Their answer, “Nothing,” becomes a remembered testimony of provision before a harder season.",
+    elsewhere:"Luke 15:14 uses it when the younger son begins to be in need. Romans 3:23 uses it for falling short of God’s glory. Hebrews 12:15 warns against falling short of God’s grace.",
+    caution:"Their earlier lack of need does not promise that disciples will never suffer deprivation. Jesus is reminding them of concrete past faithfulness as they face new conditions."}
+},
+"Luke 24:13–35":{
+  context:"Two disciples leave Jerusalem after Jesus’ crucifixion, speaking from disappointed hope. The risen Jesus joins them, listens to their interpretation of events, corrects their understanding through Moses and the Prophets, and is recognized as He breaks bread.",
+  fit:"The story moves from confusion and failed expectations to Scripture-shaped understanding, hospitality, recognition, and witness. It mirrors the journey from grief to resurrection faith.",
+  main:"Jesus does not merely give comfort. He reinterprets the whole story around the suffering and glory of the Messiah. Recognition grows through Scripture, presence, and shared table.",
+  notMean:"The passage does not promise that every feeling of warmth is direct proof of God’s guidance. Their burning hearts are tied to Jesus opening the Scriptures.",
+  word:{orig:"διερμηνεύω",trans:"diermēneuō · dee-er-may-NYOO-oh",language:"Greek verb",
+    meaning:"To explain, interpret, or translate thoroughly.",
+    range:"It can describe interpreting the meaning of words, translating language, or explaining the significance of texts and events.",
+    inPassage:"Jesus interprets the Scriptures concerning Himself across the biblical story. He does not collect isolated inspirational verses; He shows how the Messiah’s suffering and glory fit God’s purpose.",
+    elsewhere:"Acts 9:36 and 13:8 use related language for translation or explanation of names. First Corinthians 12–14 uses the word family for interpreting languages.",
+    caution:"The verb does not authorize arbitrary hidden meanings. Jesus’ explanation is grounded in the actual witness of Moses and the Prophets."}
+},
+"Luke 24:44–49":{
+  context:"The risen Jesus appears to the gathered disciples and explains that His suffering, resurrection, the proclamation of repentance and forgiveness, and the mission to all nations fulfill the Scriptures. He calls them witnesses but tells them to wait for power from on high.",
+  fit:"This is Luke’s concluding commission and the bridge to Acts. The story moves from promise fulfilled in Jesus to Spirit-empowered witness beginning in Jerusalem.",
+  main:"The disciples’ future does not depend on panic-driven activity. They receive understanding, a message, a mission, and a command to wait for God’s empowering promise.",
+  notMean:"Waiting does not mean permanent passivity, and mission does not mean acting in self-generated strength. Jesus joins patient dependence with eventual obedient action.",
+  word:{orig:"μάρτυς",trans:"martys · MAR-toos",language:"Greek noun",
+    meaning:"Witness, one who testifies to what has been seen or known.",
+    range:"It can refer to a legal witness, a person who gives testimony, and later a believer whose testimony leads to death, which is the source of the English word martyr.",
+    inPassage:"The disciples are witnesses of Jesus’ death, resurrection, and fulfillment of Scripture. Their authority rests in testimony to what God has done, not personal self-promotion.",
+    elsewhere:"Acts 1:8 repeats the commission to be witnesses. Acts 22:20 uses the word of Stephen, whose testimony cost his life. Revelation 1:5 calls Jesus the faithful witness.",
+    caution:"The later meaning “martyr” should not be forced into every occurrence. In Luke 24 the primary sense is commissioned testimony, though suffering will later accompany it."}
+}
 };
 
 const passageStudies = [
@@ -903,26 +1781,21 @@ function getBookName(passage){
 function defaultStudy(passage, theme){
   const book = getBookName(passage);
   const bookContext = bookContexts[book] || "This passage belongs to a larger biblical book with its own historical setting, argument, and purpose.";
-  const isNewTestament = ["Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"].includes(book);
 
   return {
-    context: `${bookContext} Today’s section focuses on “${theme}.” The scene, command, promise, or prayer should first be understood as part of that book before it is applied personally.`,
-    fit: bookContext,
-    notMean: "This passage should not be reduced to a slogan or used to ignore the author’s purpose, human responsibility, wise boundaries, grief, justice, or the rest of Scripture.",
-    word: isNewTestament ? {
-      orig:"πίστις", trans:"pistis · PISS-tiss", language:"Greek noun",
-      meaning:"Faith, trust, belief, faithfulness, or reliability.",
-      range:"Depending on context, it can describe the act of trusting, the content believed, a life of faithfulness, or the quality of being trustworthy.",
-      inPassage:`In this reading, the word is used as a lens for the journey theme “${theme}”: biblical trust is a response to God’s character and action, not denial of reality.`,
-      elsewhere:"Romans 3–4 uses it for trusting God’s saving promise. Galatians 5:22 can use the same word family for faithfulness. James 2 emphasizes that living faith produces action.",
-      caution:"Every possible meaning does not belong in every occurrence. Grammar, sentence, paragraph, and author determine whether “faith,” “faithfulness,” or another shade is intended."
-    } : {
-      orig:"בָּטַח", trans:"bāṭaḥ · bah-TAHKH", language:"Hebrew verb",
-      meaning:"To trust, feel secure, rely on, or place confidence in.",
-      range:"It can describe appropriate trust in God or misplaced confidence in people, power, wealth, or false security.",
-      inPassage:`For this reading, the word highlights that trust has an object. The question is not whether a person relies on something, but whether the object of reliance is faithful.`,
-      elsewhere:"Proverbs 3:5 commands trust in the Lord. Psalm 20 contrasts trust in military power with trust in God’s name. Psalm 56 connects trust with honest fear.",
-      caution:"Hebrew word roots do not contain a complete hidden theology. The surrounding poetic or narrative context identifies what kind of trust is praised or rejected."
+    context:`${bookContext} A full passage-specific explanation for ${passage} has not yet been authored in this prototype. The app will not invent details or attach an unrelated Greek or Hebrew word merely to fill the space.`,
+    fit:`Read ${passage} within the surrounding chapter and the book’s larger purpose. This prototype currently provides book-level orientation here rather than pretending it contains a complete passage commentary.`,
+    main:`The journey theme is “${theme},” but the passage itself must determine the main point. Personal application should come after careful reading, not replace it.`,
+    notMean:"Do not treat the journey title as though it were automatically the biblical author’s main point. This reading needs a completed passage-specific study before it should be used as a finished devotional.",
+    word:{
+      orig:"—",
+      trans:"No word selected",
+      language:"Passage-specific study pending",
+      meaning:"No original-language word is shown because the app has not yet verified a key word that actually occurs in this passage.",
+      range:"A responsible word study begins with the word used in the biblical text, its grammar, and its range in comparable contexts.",
+      inPassage:"This section will remain intentionally incomplete rather than assigning a familiar Greek or Hebrew word that may not appear here.",
+      elsewhere:"No cross-references are supplied until the word is verified.",
+      caution:"This is a content safeguard, not a technical error. It prevents decorative but inaccurate word studies."
     }
   };
 }
@@ -930,18 +1803,29 @@ function defaultStudy(passage, theme){
 function dayContent(j,day){
   const item=j.days[day-1]||j.days[0], passage=item[0], theme=item[1];
   const specific = passageStudies.find(study => study.match(passage));
-  const study = specific || defaultStudy(passage, theme);
+  const base = (typeof lukeMoneyStudies!=="undefined" && lukeMoneyStudies[passage]) || specific || defaultStudy(passage, theme);
+  const daily = j.id==="money" ? moneyJourneyDaily[passage] : null;
+  const curated = Boolean(daily && base && base.word && base.word.orig!=="—");
 
   return {
     passage,
     theme,
-    scripture:`Today’s reading is ${passage}. Read the passage itself first. Then use the explanation below to understand the scene, argument, and key language before moving to personal reflection.`,
-    context:study.context,
-    fit:study.fit,
-    notMean:study.notMean,
-    p1:`What does ${passage} reveal about God, people, or faithful life in its original setting?`,
-    p2:`After understanding the passage, where does “${theme}” meet your life right now?`,
-    word:study.word
+    curated,
+    scripture:`Open your Bible to ${passage} and read the whole section slowly. Do not begin with the explanation. First notice the people, repeated words, contrasts, commands, questions, and the way the passage ends.`,
+    context:base.context,
+    fit:base.fit,
+    main:base.main || `The passage must determine its own main point before it is connected to the journey theme “${theme}.”`,
+    notMean:base.notMean,
+    tension:daily?.tension || "A complete passage-specific tension note has not yet been authored for this day.",
+    observe:daily?.observe || ["Read the passage twice and mark repetition, contrast, commands, questions, and changes in speaker."],
+    movement:daily?.movement || ["A full passage-specific structural outline is still pending."],
+    companions:daily?.companions || [],
+    p1:daily?.p1 || `What specific detail in ${passage} controls how the passage should be understood?`,
+    p2:daily?.p2 || `What response would honor this text without reducing it to the journey theme “${theme}”?`,
+    prayer:daily?.prayer || "Lord, keep me from using this passage before I have listened to it. Give me understanding, honesty, and faithful response.",
+    practice:daily?.practice || "Reread the passage and write one observation before making an application.",
+    boundary:daily?.boundary || "Do not make a major relational, medical, legal, or financial decision from one unfinished devotional entry.",
+    word:base.word
   };
 }
 function renderAll(){
@@ -960,12 +1844,37 @@ function renderAll(){
  document.getElementById("devTitle").textContent=content.theme;
  document.getElementById("devScripture").textContent=content.scripture;
  document.getElementById("devContext").textContent=content.context;
+ const observe=document.getElementById("devObserve");
+ if(observe) observe.innerHTML=content.observe.map(item=>`<li>${item}</li>`).join("");
+ const movement=document.getElementById("devMovement");
+ if(movement) movement.innerHTML=content.movement.map(item=>`<li>${item}</li>`).join("");
+ const tension=document.getElementById("devTension");
+ if(tension) tension.textContent=content.tension;
+ const companions=document.getElementById("devCompanions");
+ if(companions){
+   companions.innerHTML=content.companions.length
+     ? content.companions.map(c=>`<div class="companion-card">
+         <div class="companion-top"><span class="companion-ref">${c.passage}</span><span class="companion-type">${c.category}</span></div>
+         <div class="companion-relation">${c.relation}</div>
+         <p class="muted">${c.reason}</p>
+       </div>`).join("")
+     : `<div class="pending-note">This journey has not yet received its passage-specific companion set. Held will not insert random verses merely to fill the space.</div>`;
+ }
+ const mainPoint=document.getElementById("devMainPoint");
+ if(mainPoint) mainPoint.textContent=content.main;
+ const quality=document.getElementById("studyQuality");
+ if(quality){
+   quality.textContent=content.curated?"✓ Fully authored daily study":"Structure only · passage-specific content pending";
+   quality.style.background=content.curated?"#e8f7f4":"#fff1d9";
+   quality.style.color=content.curated?"var(--teal)":"#8a5a12";
+ }
  document.getElementById("prompt1Label").textContent=content.p1;
  document.getElementById("prompt2Label").textContent=content.p2;
  document.getElementById("prompt1").value=localStorage.getItem(draftKey(j.id,1))||"";
  document.getElementById("prompt2").value=localStorage.getItem(draftKey(j.id,2))||"";
  document.getElementById("moodChoices").innerHTML=p.moods.map(m=>`<button class="choice" onclick="selectMood(this,'${m}')">${m}</button>`).join("");
- document.getElementById("wordTitle").textContent=content.theme;
+ document.getElementById("wordTitle").textContent=
+   content.word.orig==="—" ? "Word study pending" : `${content.word.orig} · ${content.word.meaning.split(",")[0]}`;
  document.getElementById("wordGreek").textContent=content.word.orig;
  document.getElementById("wordTranslit").textContent=content.word.trans;
  document.getElementById("wordMeaning").textContent=content.word.meaning;
@@ -975,15 +1884,20 @@ function renderAll(){
  document.getElementById("wordCaution").textContent=content.word.caution;
  document.getElementById("wordElsewhere").textContent=content.word.elsewhere;
  document.getElementById("contextBeforeAfter").textContent=content.fit;
- document.getElementById("studyWordSummary").textContent=`${content.word.orig} (${content.word.trans}): ${content.word.meaning}`;
- document.getElementById("crossRefs").textContent=j.days.slice(Math.max(0,day-2),Math.min(21,day+2)).map(x=>x[0]).join(" → ");
+ document.getElementById("studyWordSummary").textContent=
+   content.word.orig==="—" ? content.word.meaning : `${content.word.orig} · ${content.word.trans}: ${content.word.inPassage}`;
+ document.getElementById("crossRefs").textContent=content.word.elsewhere;
  document.getElementById("notMean").textContent=content.notMean;
  const before=document.getElementById("devContextBefore");
  const notMean=document.getElementById("devNotMean");
  const prayer=document.getElementById("devPrayer");
  if(before) before.textContent=content.fit;
  if(notMean) notMean.textContent=content.notMean;
- if(prayer) prayer.textContent=heldPrayer();
+ if(prayer) prayer.textContent=content.prayer;
+ const practice=document.getElementById("devPractice");
+ const boundary=document.getElementById("devBoundary");
+ if(practice) practice.textContent=content.practice;
+ if(boundary) boundary.textContent=`Guardrail: ${content.boundary}`;
  setDevTab("read");
  document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
  document.getElementById("progressTitle").textContent=j.title+" · 21-day path";
