@@ -620,10 +620,34 @@ button:disabled{opacity:.55;cursor:not-allowed}
  </div>
 </section>
 
-<section id="study" class="view"><div class="card"><div class="eyebrow">Bible study</div><h3>Study the passage, not just the topic</h3><div class="grid2">
- <div class="journey-card"><h4>How this passage fits</h4><p id="contextBeforeAfter"></p></div><div class="journey-card"><h4>Key word</h4><p id="studyWordSummary"></p></div>
- <div class="journey-card"><h4>Cross-reference trail</h4><p id="crossRefs"></p></div><div class="journey-card"><h4>What this does not mean</h4><p id="notMean"></p></div></div>
- <div class="section-title"><h3>Bible notebook</h3></div><div id="notebookList"></div></div></section>
+<section id="study" class="view">
+ <div class="card">
+  <div class="eyebrow">Bible study</div>
+  <h3>Study the passage, not just the topic</h3>
+
+  <div class="shared" style="margin:14px 0 18px">
+    <strong id="studyPassageHeading">Today’s passage</strong>
+    <p id="studyThemeHeading" class="muted" style="margin-bottom:0"></p>
+    <a id="studyNltLink" class="secondary read-nlt-btn" href="#" target="_blank" rel="noopener noreferrer">Open passage in NLT</a>
+  </div>
+
+  <div class="grid2">
+   <div class="journey-card"><h4>How this passage fits</h4><p id="contextBeforeAfter" class="muted"></p></div>
+   <div class="journey-card"><h4>Key word</h4><p id="studyWordSummary" class="muted"></p></div>
+   <div class="journey-card"><h4>Companion reading trail</h4><div id="crossRefs" class="muted"></div></div>
+   <div class="journey-card"><h4>What this does not mean</h4><p id="notMean" class="muted"></p></div>
+  </div>
+
+  <div class="section-title"><h3>Main point and tension</h3></div>
+  <div class="grid2">
+   <div class="journey-card"><h4>Main point</h4><p id="studyMainPoint" class="muted"></p></div>
+   <div class="journey-card"><h4>What remains difficult</h4><p id="studyTension" class="muted"></p></div>
+  </div>
+
+  <div class="section-title"><h3>Bible notebook</h3></div>
+  <div id="notebookList"></div>
+ </div>
+</section>
 
 <section id="journal" class="view"><div class="card"><div class="eyebrow">Private by default</div><h3 id="journalHeading"></h3><p class="muted">Nothing is shared unless you choose one takeaway.</p>
 <textarea id="journalText" placeholder="Write honestly before God..."></textarea><div class="actions"><button class="primary" onclick="saveJournal()">Save privately</button><button class="secondary" onclick="shareTakeaway()">Share one takeaway</button></div>
@@ -751,8 +775,10 @@ function switchProfile(p){
 }
 function showView(id){
  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+ const target=document.getElementById(id);
+ if(target) target.classList.add("active");
  document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+ if(typeof renderAll==="function") renderAll();
  window.scrollTo({top:0,behavior:"smooth"})
 }
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
@@ -1844,8 +1870,115 @@ function nltUrl(reference){
   return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(reference)}&version=NLT`;
 }
 
+
+function safeText(value, fallback){
+  if(value === null || value === undefined) return fallback;
+  const text = String(value).trim();
+  return text || fallback;
+}
+
+function renderStudyPage(content){
+  const w = content.word || {};
+  const passageHeading = document.getElementById("studyPassageHeading");
+  const themeHeading = document.getElementById("studyThemeHeading");
+  const studyLink = document.getElementById("studyNltLink");
+  const fit = document.getElementById("contextBeforeAfter");
+  const word = document.getElementById("studyWordSummary");
+  const refs = document.getElementById("crossRefs");
+  const notMean = document.getElementById("notMean");
+  const main = document.getElementById("studyMainPoint");
+  const tension = document.getElementById("studyTension");
+
+  if(passageHeading) passageHeading.textContent = `${safeText(content.passage, "Passage pending")} (NLT)`;
+  if(themeHeading) themeHeading.textContent = safeText(content.theme, "Daily theme pending");
+
+  if(studyLink){
+    if(content.passage){
+      studyLink.href = nltUrl(content.passage);
+      studyLink.style.display = "inline-flex";
+    } else {
+      studyLink.style.display = "none";
+    }
+  }
+
+  if(fit) fit.textContent = safeText(
+    content.fit,
+    "A passage-specific explanation of how this reading fits the book is still being written."
+  );
+
+  if(word){
+    word.textContent = w.orig && w.orig !== "—"
+      ? `${safeText(w.orig, "")} · ${safeText(w.trans, "")}: ${safeText(w.inPassage || w.meaning, "Word-study explanation pending.")}`
+      : "No verified original-language word has been selected for this reading yet.";
+  }
+
+  if(refs){
+    if(Array.isArray(content.companions) && content.companions.length){
+      refs.innerHTML = content.companions.map(c => `
+        <div style="margin-bottom:12px">
+          <a href="${nltUrl(c.passage)}" target="_blank" rel="noopener noreferrer">
+            <strong>${c.passage} (NLT)</strong>
+          </a>
+          <div class="muted">${safeText(c.relation, "supporting reading")} · ${safeText(c.reason, "Companion explanation pending.")}</div>
+        </div>
+      `).join("");
+    } else {
+      refs.textContent = "A passage-specific companion set has not yet been written for this day.";
+    }
+  }
+
+  if(notMean) notMean.textContent = safeText(content.notMean, "No specific common misreading has been identified.");
+  if(main) main.textContent = safeText(content.main, "The passage’s main point is still being reviewed.");
+  if(tension) tension.textContent = safeText(content.tension, "A passage-specific tension note is still being written.");
+}
+
+function fillEmptyDynamicSections(){
+  const fallbacks = {
+    heroTitle:"Welcome to Held",
+    heroSubtitle:"Choose a journey and continue where you left off.",
+    todayPassage:"Today’s passage is being prepared.",
+    todayTheme:"Today’s theme is being prepared.",
+    todayContext:"Open a journey to begin.",
+    devMeta:"Daily study",
+    devTitle:"Passage study",
+    devScripture:"Open the referenced passage in NLT.",
+    devContext:"Passage-specific context is being prepared.",
+    devContextBefore:"The literary placement is being prepared.",
+    devMainPoint:"The main point is being reviewed.",
+    devNotMean:"No specific common misreading has been identified.",
+    devTension:"The passage-specific tension is being prepared.",
+    wordTitle:"Original-language study",
+    wordGreek:"—",
+    wordTranslit:"No verified word selected",
+    wordLanguage:"Passage-specific study pending",
+    wordMeaning:"The word-study content is being reviewed.",
+    wordRange:"The semantic range is being reviewed.",
+    wordInPassage:"The meaning in this passage is being reviewed.",
+    wordElsewhere:"Cross-references are being reviewed.",
+    wordCaution:"No lexical caution has been added yet.",
+    contextBeforeAfter:"The passage’s place in the book is being prepared.",
+    studyWordSummary:"No verified original-language word has been selected yet.",
+    notMean:"No specific common misreading has been identified.",
+    studyMainPoint:"The passage’s main point is being reviewed.",
+    studyTension:"The passage-specific tension is being prepared."
+  };
+
+  Object.entries(fallbacks).forEach(([id, fallback]) => {
+    const el = document.getElementById(id);
+    if(el && !String(el.textContent || "").trim()) el.textContent = fallback;
+  });
+
+  ["journeyGrid","dayGrid","notebookList","journalList","sharedTakeaways"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el && !String(el.innerHTML || "").trim()){
+      el.innerHTML = `<div class="pending-note">Nothing has been added here yet.</div>`;
+    }
+  });
+}
+
 function renderAll(){
  const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
+ renderStudyPage(content);
  document.getElementById("pBtn").classList.toggle("active",currentProfile==="patricia");
  document.getElementById("aBtn").classList.toggle("active",currentProfile==="alec");
  document.getElementById("journeyName").textContent=j.title;
@@ -1904,11 +2037,8 @@ function renderAll(){
  document.getElementById("wordInPassage").textContent=content.word.inPassage;
  document.getElementById("wordCaution").textContent=content.word.caution;
  document.getElementById("wordElsewhere").textContent=content.word.elsewhere;
- document.getElementById("contextBeforeAfter").textContent=content.fit;
  document.getElementById("studyWordSummary").textContent=
    content.word.orig==="—" ? content.word.meaning : `${content.word.orig} · ${content.word.trans}: ${content.word.inPassage}`;
- document.getElementById("crossRefs").textContent=content.word.elsewhere;
- document.getElementById("notMean").textContent=content.notMean;
  const before=document.getElementById("devContextBefore");
  const notMean=document.getElementById("devNotMean");
  const prayer=document.getElementById("devPrayer");
@@ -1925,6 +2055,7 @@ function renderAll(){
  document.getElementById("patSharedJourney").textContent=profileData.patricia.journeys.find(x=>x.id===(localStorage.getItem("held_patricia_activeJourney")||profileData.patricia.journeys[0].id)).title;
  document.getElementById("alecSharedJourney").textContent=profileData.alec.journeys.find(x=>x.id===(localStorage.getItem("held_alec_activeJourney")||profileData.alec.journeys[0].id)).title;
  renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared();
+ fillEmptyDynamicSections();
  const togetherField=document.getElementById("togetherAnswer");
  if(togetherField) togetherField.value=localStorage.getItem(`held_${currentProfile}_together_private`)||"";
 }
