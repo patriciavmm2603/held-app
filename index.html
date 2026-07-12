@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260712_v3";
+  const RESET_KEY = "held_cache_reset_20260712_v4";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260712-v3");
+    refreshedUrl.searchParams.set("heldBuild", "20260712-v4");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -2161,8 +2161,12 @@ function renderAll(){
  document.getElementById("wordCaution").textContent=content.word.caution;
  document.getElementById("wordElsewhere").textContent=content.word.elsewhere;
  }
- document.getElementById("studyWordSummary").textContent=
-   content.word.orig==="—" ? content.word.meaning : `${content.word.orig} · ${content.word.trans}: ${content.word.inPassage}`;
+ const studyWordSummary=document.getElementById("studyWordSummary");
+ if(studyWordSummary){
+   studyWordSummary.textContent=content.word
+     ? `${content.word.orig} · ${content.word.trans}: ${content.word.inPassage}`
+     : "This day does not force an original-language word study. Continue with the passage context, structure, and main point.";
+ }
  const before=document.getElementById("devContextBefore");
  const notMean=document.getElementById("devNotMean");
  const prayer=document.getElementById("devPrayer");
@@ -2590,7 +2594,7 @@ window.saveStudyNote = async function(){
       journey_id: j.id,
       day_number: day,
       passage: content.passage,
-      key_word: content.word.trans,
+      key_word: content.word ? content.word.trans : null,
       body: t
     });
     if(error){ alert(error.message); return; }
@@ -2667,6 +2671,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v3</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v4</div>
 </body>
 </html>
