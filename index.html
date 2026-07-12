@@ -244,10 +244,55 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
   .auth-card{padding:22px}
 }
 
+
+.dev-tab-panel{display:none}
+.dev-tab-panel.active{display:block}
+.tab{cursor:pointer}
+.reading-note,.prayer-box{
+  padding:16px;border-radius:15px;border:1px solid var(--line);margin-top:16px
+}
+.reading-note{background:#fff7e8}
+.prayer-box{background:linear-gradient(135deg,#eefaf7,#fff7e8)}
+
+.password-screen{
+  position:fixed;inset:0;z-index:10000;display:none;place-items:center;
+  background:rgba(23,58,61,.34);backdrop-filter:blur(8px);padding:20px
+}
+.password-screen.visible{display:grid}
+.password-card{
+  width:min(440px,100%);background:var(--paper);border:1px solid var(--line);
+  border-radius:26px;padding:26px;box-shadow:0 24px 70px rgba(38,72,70,.22)
+}
+.password-card h3{text-align:center}
+.password-card input{
+  width:100%;padding:13px 14px;border:1px solid var(--line);
+  border-radius:14px;background:white;margin-top:7px
+}
+button:disabled{opacity:.55;cursor:not-allowed}
+.click-feedback{transform:scale(.985)}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+
+<div id="passwordScreen" class="password-screen" aria-hidden="true">
+  <div class="password-card">
+    <img src="assets/held-app-icon.png" class="auth-logo" alt="Held">
+    <h3>Choose a new password</h3>
+    <p class="muted">Enter a new password for your Held account.</p>
+    <label for="newPassword"><strong>New password</strong></label>
+    <input id="newPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+    <label for="confirmNewPassword" style="display:block;margin-top:12px"><strong>Confirm password</strong></label>
+    <input id="confirmNewPassword" type="password" autocomplete="new-password" placeholder="Type it again">
+    <div class="actions">
+      <button id="updatePasswordBtn" class="primary" type="button" onclick="updatePassword()">Update password</button>
+      <button class="ghost" type="button" onclick="closePasswordScreen()">Cancel</button>
+    </div>
+    <div id="passwordMessage" class="auth-message"></div>
+  </div>
+</div>
 
 <div id="authScreen" class="auth-screen">
   <div class="auth-card">
@@ -350,11 +395,45 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <section id="devotional" class="view">
  <div class="study-layout">
-  <div class="card"><div class="eyebrow" id="devMeta"></div><h3 id="devTitle"></h3><div class="tabs"><button class="tab active">Read</button><button class="tab">Understand</button><button class="tab">Reflect</button></div>
-  <div class="scripture" id="devScripture"></div><div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
-  <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div><div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
-  <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
-  <div class="actions"><button class="primary" onclick="completeDay()">Complete today</button><button class="ghost" onclick="saveDraft()">Save draft</button></div></div>
+  <div class="card"><div class="eyebrow" id="devMeta"></div><h3 id="devTitle"></h3><div class="tabs">
+    <button id="readTab" class="tab active" type="button" onclick="setDevTab('read')">Read</button>
+    <button id="understandTab" class="tab" type="button" onclick="setDevTab('understand')">Understand</button>
+    <button id="reflectTab" class="tab" type="button" onclick="setDevTab('reflect')">Reflect</button>
+  </div>
+
+  <div id="readPanel" class="dev-tab-panel active">
+    <div class="scripture" id="devScripture"></div>
+    <div class="reading-note">
+      <strong>Read slowly</strong>
+      <p class="muted" style="margin-bottom:0">Read the verses before and after today’s passage. Notice repeated words, contrasts, commands, promises, and what the text reveals about God.</p>
+    </div>
+    <div class="actions"><button class="primary" type="button" onclick="setDevTab('understand')">Next: Understand</button></div>
+  </div>
+
+  <div id="understandPanel" class="dev-tab-panel">
+    <div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="journey-card"><h4>Context before and after</h4><p id="devContextBefore" class="muted"></p></div>
+      <div class="journey-card"><h4>What this does not mean</h4><p id="devNotMean" class="muted"></p></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" type="button" onclick="setDevTab('read')">Back to Read</button>
+      <button class="primary" type="button" onclick="setDevTab('reflect')">Next: Reflect</button>
+    </div>
+  </div>
+
+  <div id="reflectPanel" class="dev-tab-panel">
+    <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div>
+    <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
+    <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
+    <div class="prayer-box"><strong>Pray the passage</strong><p id="devPrayer" class="muted">Lord, help me receive what is true here and respond faithfully today.</p></div>
+    <div class="actions">
+      <button class="ghost" type="button" onclick="setDevTab('understand')">Back to Understand</button>
+      <button class="primary" onclick="completeDay()">Complete today</button>
+      <button class="ghost" onclick="saveDraft()">Save draft</button>
+    </div>
+  </div>
+ </div>
   <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3><div class="word-card"><div class="word-head"><div><div class="greek" id="wordGreek"></div><strong id="wordTranslit"></strong></div><span class="badge">Word study</span></div>
   <p id="wordMeaning"></p><details><summary>Why context matters</summary><p id="wordCaution" class="muted"></p></details><details><summary>Used elsewhere</summary><p id="wordElsewhere" class="muted"></p></details></div>
   <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div><button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
@@ -372,7 +451,16 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <section id="together" class="view"><div class="card"><div class="eyebrow">Together</div><h3>Walking in faith, side by side</h3>
 <div class="shared"><strong>Patricia’s active journey</strong><p id="patSharedJourney"></p></div><div class="shared" style="margin-top:10px"><strong>Alec’s active journey</strong><p id="alecSharedJourney"></p></div>
-<div class="prompt"><strong>Our shared question</strong><p>What is God inviting each of us to release, receive, or practice this week?</p></div><div id="sharedTakeaways"></div></div></section>
+<div class="prompt">
+  <strong>Our shared question</strong>
+  <p>What is God inviting each of us to release, receive, or practice this week?</p>
+  <textarea id="togetherAnswer" placeholder="Write a private answer first..."></textarea>
+  <div class="actions">
+    <button class="primary" type="button" onclick="saveTogetherPrivately()">Save privately</button>
+    <button class="secondary" type="button" onclick="shareTogetherAnswer()">Share this answer</button>
+  </div>
+</div>
+<div id="sharedTakeaways"></div></div></section>
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
@@ -530,11 +618,20 @@ function renderAll(){
  document.getElementById("studyWordSummary").textContent=`${content.word.orig} (${content.word.trans}): ${content.word.meaning}`;
  document.getElementById("crossRefs").textContent=j.days.slice(Math.max(0,day-2),Math.min(21,day+2)).map(x=>x[0]).join(" → ");
  document.getElementById("notMean").textContent=`This passage should not be used to force a quick emotional result or to ignore wisdom, boundaries, grief, or responsibility.`;
+ const before=document.getElementById("devContextBefore");
+ const notMean=document.getElementById("devNotMean");
+ const prayer=document.getElementById("devPrayer");
+ if(before) before.textContent=`Read the verses immediately before and after ${content.passage}. Ask how this section fits the larger message of ${j.book}.`;
+ if(notMean) notMean.textContent="This passage should not be used to force a quick emotional result or ignore wisdom, boundaries, grief, or responsibility.";
+ if(prayer) prayer.textContent=heldPrayer();
+ setDevTab("read");
  document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
  document.getElementById("progressTitle").textContent=j.title+" · 21-day path";
  document.getElementById("patSharedJourney").textContent=profileData.patricia.journeys.find(x=>x.id===(localStorage.getItem("held_patricia_activeJourney")||profileData.patricia.journeys[0].id)).title;
  document.getElementById("alecSharedJourney").textContent=profileData.alec.journeys.find(x=>x.id===(localStorage.getItem("held_alec_activeJourney")||profileData.alec.journeys[0].id)).title;
- renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared()
+ renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared();
+ const togetherField=document.getElementById("togetherAnswer");
+ if(togetherField) togetherField.value=localStorage.getItem(`held_${currentProfile}_together_private`)||
 }
 function selectMood(btn,m){document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(`held_${currentProfile}_${activeJourney().id}_mood`,m)}
 function saveDraft(){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);alert("Draft saved privately.")}
@@ -551,6 +648,106 @@ function renderShared(){const arr=JSON.parse(localStorage.getItem("held_shared")
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 </script>
 
+<script>
+
+function setDevTab(name){
+  ["read","understand","reflect"].forEach(function(item){
+    const tab=document.getElementById(item+"Tab");
+    const panel=document.getElementById(item+"Panel");
+    if(tab) tab.classList.toggle("active",item===name);
+    if(panel) panel.classList.toggle("active",item===name);
+  });
+}
+function heldPrayer(){
+  return currentProfile==="alec"
+    ? "Jesus, form me into a humble husband, father, and leader. Help me listen before defending, receive Your grace, and love my family faithfully today."
+    : "Father, teach me to trust You without abandoning wisdom. Help me release what I cannot control, receive partnership without fear, and walk in peace today.";
+}
+
+</script>
+<script>
+
+function setPasswordMessage(message,type=""){
+  const el=document.getElementById("passwordMessage");
+  if(!el) return;
+  el.textContent=message;
+  el.className="auth-message"+(type?" "+type:"");
+}
+function openPasswordScreen(){
+  const el=document.getElementById("passwordScreen");
+  if(el){el.classList.add("visible");el.setAttribute("aria-hidden","false");}
+}
+function closePasswordScreen(){
+  const el=document.getElementById("passwordScreen");
+  if(el){el.classList.remove("visible");el.setAttribute("aria-hidden","true");}
+  setPasswordMessage("");
+}
+async function updatePassword(){
+  const first=document.getElementById("newPassword").value;
+  const second=document.getElementById("confirmNewPassword").value;
+  const btn=document.getElementById("updatePasswordBtn");
+  if(first.length<6){setPasswordMessage("Use at least 6 characters.","error");return;}
+  if(first!==second){setPasswordMessage("The passwords do not match.","error");return;}
+  btn.disabled=true;
+  setPasswordMessage("Updating your password...");
+  const {error}=await supabaseClient.auth.updateUser({password:first});
+  btn.disabled=false;
+  if(error){setPasswordMessage(error.message,"error");return;}
+  setPasswordMessage("Password updated. You can continue in Held.","success");
+  setTimeout(closePasswordScreen,900);
+}
+function saveTogetherPrivately(){
+  const field=document.getElementById("togetherAnswer");
+  const value=field.value.trim();
+  if(!value){alert("Write an answer first.");return;}
+  localStorage.setItem(`held_${currentProfile}_together_private`,value);
+  alert("Saved privately. Your spouse cannot see it.");
+}
+async function shareTogetherAnswer(){
+  const field=document.getElementById("togetherAnswer");
+  const value=field.value.trim();
+  if(!value){alert("Write an answer first.");return;}
+  if(!currentUser){alert("Sign in first.");return;}
+  const {data:membership}=await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+  if(!membership?.couple_id){
+    alert("Your accounts are not linked as a couple yet. Save it privately for now.");
+    return;
+  }
+  const {error}=await supabaseClient.from("shared_takeaways").insert({
+    couple_id:membership.couple_id,
+    user_id:currentUser.id,
+    journey_id:activeJourney().id,
+    body:value
+  });
+  if(error){alert(error.message);return;}
+  field.value="";
+  localStorage.removeItem(`held_${currentProfile}_together_private`);
+  await syncSharedTakeawaysFromCloud();
+  renderShared();
+  alert("Shared with your spouse.");
+}
+document.addEventListener("keydown",function(event){
+  const auth=document.getElementById("authScreen");
+  if(event.key==="Enter" && auth && !auth.classList.contains("hidden")){
+    const target=event.target;
+    if(target && ["authEmail","authPassword","authName"].includes(target.id)){
+      event.preventDefault();
+      submitAuth();
+    }
+  }
+});
+document.addEventListener("click",function(event){
+  const button=event.target.closest("button");
+  if(!button || button.disabled) return;
+  button.classList.add("click-feedback");
+  setTimeout(()=>button.classList.remove("click-feedback"),120);
+});
+
+</script>
 <script>
 const SUPABASE_URL = "https://lgxnmbzgnvbrycorkibu.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ECyj7SgdVBD4L4Rx7qN9ng_7ncI88zb";
@@ -582,6 +779,10 @@ async function submitAuth(){
 
   if(!email || !password){
     setAuthMessage("Enter your email and password.", "error");
+    return;
+  }
+  if(password.length < 6){
+    setAuthMessage("Your password must have at least 6 characters.", "error");
     return;
   }
 
@@ -900,6 +1101,12 @@ window.shareTakeaway = async function(){
 };
 
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if(event === "PASSWORD_RECOVERY"){
+    currentUser = session?.user || currentUser;
+    document.getElementById("authScreen").classList.add("hidden");
+    openPasswordScreen();
+    return;
+  }
   if(session?.user){
     if(!currentUser || currentUser.id !== session.user.id){
       await beginSession(session.user);
