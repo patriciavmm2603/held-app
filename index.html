@@ -198,9 +198,137 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
   .login-preview{grid-template-columns:1fr}
 }
 
+
+/* Supabase authentication */
+.auth-screen{
+  position:fixed; inset:0; z-index:9999;
+  display:grid; place-items:center;
+  background:
+    linear-gradient(rgba(255,250,242,.88),rgba(255,250,242,.92)),
+    url("assets/held-sunrise.png") center/cover no-repeat;
+  padding:20px;
+}
+.auth-screen.hidden{display:none}
+.auth-card{
+  width:min(460px,100%);
+  background:rgba(255,253,248,.97);
+  border:1px solid var(--line);
+  border-radius:28px;
+  box-shadow:0 24px 70px rgba(38,72,70,.18);
+  padding:28px;
+}
+.auth-logo{
+  width:88px;height:88px;border-radius:24px;display:block;margin:0 auto 12px;
+  box-shadow:var(--shadow);object-fit:cover
+}
+.auth-card h2{text-align:center;margin:6px 0 6px}
+.auth-sub{text-align:center;color:var(--muted);margin:0 0 22px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--aqua);padding:5px;border-radius:14px;margin-bottom:18px}
+.auth-tabs button{border:0;background:transparent;padding:10px;border-radius:11px;color:var(--teal-dark)}
+.auth-tabs button.active{background:white;box-shadow:0 4px 12px rgba(31,81,80,.08);font-weight:700}
+.auth-field{margin:12px 0}
+.auth-field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.auth-field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:white}
+.auth-actions{display:grid;gap:10px;margin-top:16px}
+.auth-message{min-height:20px;margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
+.auth-message.error{color:#a64646}.auth-message.success{color:var(--teal-dark)}
+.auth-link{border:0;background:transparent;color:var(--teal-dark);text-decoration:underline;padding:6px}
+.user-menu{display:flex;gap:8px;align-items:center}
+.user-email{font-size:13px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.signout-btn{border:1px solid var(--line);background:white;padding:8px 11px;border-radius:12px;color:var(--ink)}
+.sync-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--teal-dark);background:var(--aqua);padding:6px 9px;border-radius:999px}
+@media(max-width:700px){
+  .topbar{gap:10px}
+  .user-email{display:none}
+  .profile-switch{display:none}
+  .auth-card{padding:22px}
+}
+
+
+.dev-tab-panel{display:none}
+.dev-tab-panel.active{display:block}
+.tab{cursor:pointer}
+.reading-note,.prayer-box{
+  padding:16px;border-radius:15px;border:1px solid var(--line);margin-top:16px
+}
+.reading-note{background:#fff7e8}
+.prayer-box{background:linear-gradient(135deg,#eefaf7,#fff7e8)}
+
+.password-screen{
+  position:fixed;inset:0;z-index:10000;display:none;place-items:center;
+  background:rgba(23,58,61,.34);backdrop-filter:blur(8px);padding:20px
+}
+.password-screen.visible{display:grid}
+.password-card{
+  width:min(440px,100%);background:var(--paper);border:1px solid var(--line);
+  border-radius:26px;padding:26px;box-shadow:0 24px 70px rgba(38,72,70,.22)
+}
+.password-card h3{text-align:center}
+.password-card input{
+  width:100%;padding:13px 14px;border:1px solid var(--line);
+  border-radius:14px;background:white;margin-top:7px
+}
+button:disabled{opacity:.55;cursor:not-allowed}
+.click-feedback{transform:scale(.985)}
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+
+<div id="passwordScreen" class="password-screen" aria-hidden="true">
+  <div class="password-card">
+    <img src="assets/held-app-icon.png" class="auth-logo" alt="Held">
+    <h3>Choose a new password</h3>
+    <p class="muted">Enter a new password for your Held account.</p>
+    <label for="newPassword"><strong>New password</strong></label>
+    <input id="newPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+    <label for="confirmNewPassword" style="display:block;margin-top:12px"><strong>Confirm password</strong></label>
+    <input id="confirmNewPassword" type="password" autocomplete="new-password" placeholder="Type it again">
+    <div class="actions">
+      <button id="updatePasswordBtn" class="primary" type="button" onclick="updatePassword()">Update password</button>
+      <button class="ghost" type="button" onclick="closePasswordScreen()">Cancel</button>
+    </div>
+    <div id="passwordMessage" class="auth-message"></div>
+  </div>
+</div>
+
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <img src="assets/held-app-icon.png" class="auth-logo" alt="Held">
+    <h2>Welcome to Held</h2>
+    <p class="auth-sub">You are known. You are loved. You are held.</p>
+
+    <div class="auth-tabs">
+      <button id="signInTab" class="active" type="button" onclick="setAuthMode('signin')">Sign in</button>
+      <button id="signUpTab" type="button" onclick="setAuthMode('signup')">Create account</button>
+    </div>
+
+    <div id="displayNameField" class="auth-field" style="display:none">
+      <label for="authName">Your name</label>
+      <input id="authName" autocomplete="name" placeholder="Patricia or Alec">
+    </div>
+
+    <div class="auth-field">
+      <label for="authEmail">Email</label>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+
+    <div class="auth-field">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+    </div>
+
+    <div class="auth-actions">
+      <button id="authSubmit" class="primary" type="button" onclick="submitAuth()">Sign in</button>
+      <button id="forgotPasswordBtn" class="auth-link" type="button" onclick="resetPassword()">Forgot password?</button>
+    </div>
+
+    <div id="authMessage" class="auth-message"></div>
+  </div>
+</div>
+
 <div class="app">
 <div class="topbar">
  <div class="brand">
@@ -210,7 +338,15 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
         <small>You are known. You are loved. You are held.</small>
       </div>
     </div>
- <div class="profile-switch"><button id="pBtn" class="active" onclick="switchProfile('patricia')">Patricia</button><button id="aBtn" onclick="switchProfile('alec')">Alec</button></div>
+ <div class="user-menu">
+  <span class="sync-badge">☁ Synced</span>
+  <span id="userEmail" class="user-email"></span>
+  <button class="signout-btn" onclick="signOut()">Sign out</button>
+</div>
+<div class="profile-switch" style="display:none">
+  <button id="pBtn" class="active">Patricia</button>
+  <button id="aBtn">Alec</button>
+</div>
 </div>
 
 <div class="layout">
@@ -259,11 +395,45 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <section id="devotional" class="view">
  <div class="study-layout">
-  <div class="card"><div class="eyebrow" id="devMeta"></div><h3 id="devTitle"></h3><div class="tabs"><button class="tab active">Read</button><button class="tab">Understand</button><button class="tab">Reflect</button></div>
-  <div class="scripture" id="devScripture"></div><div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
-  <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div><div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
-  <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
-  <div class="actions"><button class="primary" onclick="completeDay()">Complete today</button><button class="ghost" onclick="saveDraft()">Save draft</button></div></div>
+  <div class="card"><div class="eyebrow" id="devMeta"></div><h3 id="devTitle"></h3><div class="tabs">
+    <button id="readTab" class="tab active" type="button" data-dev-tab="read" aria-selected="true">Read</button>
+    <button id="understandTab" class="tab" type="button" data-dev-tab="understand" aria-selected="false">Understand</button>
+    <button id="reflectTab" class="tab" type="button" data-dev-tab="reflect" aria-selected="false">Reflect</button>
+  </div>
+
+  <div id="readPanel" class="dev-tab-panel active" style="display:block">
+    <div class="scripture" id="devScripture"></div>
+    <div class="reading-note">
+      <strong>Read slowly</strong>
+      <p class="muted" style="margin-bottom:0">Read the verses before and after today’s passage. Notice repeated words, contrasts, commands, promises, and what the text reveals about God.</p>
+    </div>
+    <div class="actions"><button class="primary" type="button" data-dev-tab="understand">Next: Understand</button></div>
+  </div>
+
+  <div id="understandPanel" class="dev-tab-panel" hidden style="display:none">
+    <div class="context"><strong>What’s happening here?</strong><p id="devContext"></p></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="journey-card"><h4>Context before and after</h4><p id="devContextBefore" class="muted"></p></div>
+      <div class="journey-card"><h4>What this does not mean</h4><p id="devNotMean" class="muted"></p></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" type="button" data-dev-tab="read">Back to Read</button>
+      <button class="primary" type="button" data-dev-tab="reflect">Next: Reflect</button>
+    </div>
+  </div>
+
+  <div id="reflectPanel" class="dev-tab-panel" hidden style="display:none">
+    <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div>
+    <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
+    <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
+    <div class="prayer-box"><strong>Pray the passage</strong><p id="devPrayer" class="muted">Lord, help me receive what is true here and respond faithfully today.</p></div>
+    <div class="actions">
+      <button class="ghost" type="button" data-dev-tab="understand">Back to Understand</button>
+      <button class="primary" onclick="completeDay()">Complete today</button>
+      <button class="ghost" onclick="saveDraft()">Save draft</button>
+    </div>
+  </div>
+ </div>
   <div class="card"><div class="eyebrow">Look closer</div><h3 id="wordTitle"></h3><div class="word-card"><div class="word-head"><div><div class="greek" id="wordGreek"></div><strong id="wordTranslit"></strong></div><span class="badge">Word study</span></div>
   <p id="wordMeaning"></p><details><summary>Why context matters</summary><p id="wordCaution" class="muted"></p></details><details><summary>Used elsewhere</summary><p id="wordElsewhere" class="muted"></p></details></div>
   <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div><button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
@@ -281,7 +451,16 @@ details{margin-top:13px}summary{cursor:pointer;font-weight:700}
 
 <section id="together" class="view"><div class="card"><div class="eyebrow">Together</div><h3>Walking in faith, side by side</h3>
 <div class="shared"><strong>Patricia’s active journey</strong><p id="patSharedJourney"></p></div><div class="shared" style="margin-top:10px"><strong>Alec’s active journey</strong><p id="alecSharedJourney"></p></div>
-<div class="prompt"><strong>Our shared question</strong><p>What is God inviting each of us to release, receive, or practice this week?</p></div><div id="sharedTakeaways"></div></div></section>
+<div class="prompt">
+  <strong>Our shared question</strong>
+  <p>What is God inviting each of us to release, receive, or practice this week?</p>
+  <textarea id="togetherAnswer" placeholder="Write a private answer first..."></textarea>
+  <div class="actions">
+    <button class="primary" type="button" onclick="saveTogetherPrivately()">Save privately</button>
+    <button class="secondary" type="button" onclick="shareTogetherAnswer()">Share this answer</button>
+  </div>
+</div>
+<div id="sharedTakeaways"></div></div></section>
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
@@ -341,6 +520,35 @@ alec:{
 };
 
 function makeJourney(id,book,title,description,themes,days){return {id,book,title,description,themes,days}}
+
+
+function setDevTab(name){
+  const valid = ["read","understand","reflect"];
+  if(!valid.includes(name)) return;
+
+  valid.forEach(function(item){
+    const tab = document.getElementById(item + "Tab");
+    const panel = document.getElementById(item + "Panel");
+    const active = item === name;
+
+    if(tab){
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    }
+    if(panel){
+      panel.classList.toggle("active", active);
+      panel.hidden = !active;
+      panel.style.display = active ? "block" : "none";
+    }
+  });
+}
+
+document.addEventListener("click", function(event){
+  const control = event.target.closest("[data-dev-tab]");
+  if(!control) return;
+  event.preventDefault();
+  setDevTab(control.dataset.devTab);
+});
 
 let currentProfile=localStorage.getItem("held_profile")||"patricia";
 let selectedJourneyId=null;
@@ -439,11 +647,20 @@ function renderAll(){
  document.getElementById("studyWordSummary").textContent=`${content.word.orig} (${content.word.trans}): ${content.word.meaning}`;
  document.getElementById("crossRefs").textContent=j.days.slice(Math.max(0,day-2),Math.min(21,day+2)).map(x=>x[0]).join(" → ");
  document.getElementById("notMean").textContent=`This passage should not be used to force a quick emotional result or to ignore wisdom, boundaries, grief, or responsibility.`;
+ const before=document.getElementById("devContextBefore");
+ const notMean=document.getElementById("devNotMean");
+ const prayer=document.getElementById("devPrayer");
+ if(before) before.textContent=`Read the verses immediately before and after ${content.passage}. Ask how this section fits the larger message of ${j.book}.`;
+ if(notMean) notMean.textContent="This passage should not be used to force a quick emotional result or ignore wisdom, boundaries, grief, or responsibility.";
+ if(prayer) prayer.textContent=heldPrayer();
+ setDevTab("read");
  document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
  document.getElementById("progressTitle").textContent=j.title+" · 21-day path";
  document.getElementById("patSharedJourney").textContent=profileData.patricia.journeys.find(x=>x.id===(localStorage.getItem("held_patricia_activeJourney")||profileData.patricia.journeys[0].id)).title;
  document.getElementById("alecSharedJourney").textContent=profileData.alec.journeys.find(x=>x.id===(localStorage.getItem("held_alec_activeJourney")||profileData.alec.journeys[0].id)).title;
- renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared()
+ renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared();
+ const togetherField=document.getElementById("togetherAnswer");
+ if(togetherField) togetherField.value=localStorage.getItem(`held_${currentProfile}_together_private`)||"";
 }
 function selectMood(btn,m){document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(`held_${currentProfile}_${activeJourney().id}_mood`,m)}
 function saveDraft(){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);alert("Draft saved privately.")}
@@ -458,7 +675,476 @@ function shareTakeaway(){const t=document.getElementById("journalText").value.tr
 function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No private entries yet for this journey.</p>`}
 function renderShared(){const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");document.getElementById("sharedTakeaways").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.journey} · ${x.date}</small></div>`).join(""):`<p class="muted">No shared takeaways yet.</p>`}
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-renderAll()
 </script>
+
+<script>
+function heldPrayer(){
+  return currentProfile==="alec"
+    ? "Jesus, form me into a humble husband, father, and leader. Help me listen before defending, receive Your grace, and love my family faithfully today."
+    : "Father, teach me to trust You without abandoning wisdom. Help me release what I cannot control, receive partnership without fear, and walk in peace today.";
+}
+</script>
+<script>
+
+function setPasswordMessage(message,type=""){
+  const el=document.getElementById("passwordMessage");
+  if(!el) return;
+  el.textContent=message;
+  el.className="auth-message"+(type?" "+type:"");
+}
+function openPasswordScreen(){
+  const el=document.getElementById("passwordScreen");
+  if(el){el.classList.add("visible");el.setAttribute("aria-hidden","false");}
+}
+function closePasswordScreen(){
+  const el=document.getElementById("passwordScreen");
+  if(el){el.classList.remove("visible");el.setAttribute("aria-hidden","true");}
+  setPasswordMessage("");
+}
+async function updatePassword(){
+  const first=document.getElementById("newPassword").value;
+  const second=document.getElementById("confirmNewPassword").value;
+  const btn=document.getElementById("updatePasswordBtn");
+  if(first.length<6){setPasswordMessage("Use at least 6 characters.","error");return;}
+  if(first!==second){setPasswordMessage("The passwords do not match.","error");return;}
+  btn.disabled=true;
+  setPasswordMessage("Updating your password...");
+  const {error}=await supabaseClient.auth.updateUser({password:first});
+  btn.disabled=false;
+  if(error){setPasswordMessage(error.message,"error");return;}
+  setPasswordMessage("Password updated. You can continue in Held.","success");
+  setTimeout(closePasswordScreen,900);
+}
+function saveTogetherPrivately(){
+  const field=document.getElementById("togetherAnswer");
+  const value=field.value.trim();
+  if(!value){alert("Write an answer first.");return;}
+  localStorage.setItem(`held_${currentProfile}_together_private`,value);
+  alert("Saved privately. Your spouse cannot see it.");
+}
+async function shareTogetherAnswer(){
+  const field=document.getElementById("togetherAnswer");
+  const value=field.value.trim();
+  if(!value){alert("Write an answer first.");return;}
+  if(!currentUser){alert("Sign in first.");return;}
+  const {data:membership}=await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+  if(!membership?.couple_id){
+    alert("Your accounts are not linked as a couple yet. Save it privately for now.");
+    return;
+  }
+  const {error}=await supabaseClient.from("shared_takeaways").insert({
+    couple_id:membership.couple_id,
+    user_id:currentUser.id,
+    journey_id:activeJourney().id,
+    body:value
+  });
+  if(error){alert(error.message);return;}
+  field.value="";
+  localStorage.removeItem(`held_${currentProfile}_together_private`);
+  await syncSharedTakeawaysFromCloud();
+  renderShared();
+  alert("Shared with your spouse.");
+}
+document.addEventListener("keydown",function(event){
+  const auth=document.getElementById("authScreen");
+  if(event.key==="Enter" && auth && !auth.classList.contains("hidden")){
+    const target=event.target;
+    if(target && ["authEmail","authPassword","authName"].includes(target.id)){
+      event.preventDefault();
+      submitAuth();
+    }
+  }
+});
+document.addEventListener("click",function(event){
+  const button=event.target.closest("button");
+  if(!button || button.disabled) return;
+  button.classList.add("click-feedback");
+  setTimeout(()=>button.classList.remove("click-feedback"),120);
+});
+
+</script>
+<script>
+const SUPABASE_URL = "https://lgxnmbzgnvbrycorkibu.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ECyj7SgdVBD4L4Rx7qN9ng_7ncI88zb";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+let authMode = "signin";
+let currentUser = null;
+
+function setAuthMode(mode){
+  authMode = mode;
+  document.getElementById("signInTab").classList.toggle("active", mode === "signin");
+  document.getElementById("signUpTab").classList.toggle("active", mode === "signup");
+  document.getElementById("displayNameField").style.display = mode === "signup" ? "block" : "none";
+  document.getElementById("authSubmit").textContent = mode === "signup" ? "Create account" : "Sign in";
+  document.getElementById("forgotPasswordBtn").style.display = mode === "signin" ? "block" : "none";
+  setAuthMessage("");
+}
+
+function setAuthMessage(message, type=""){
+  const el = document.getElementById("authMessage");
+  el.textContent = message;
+  el.className = "auth-message" + (type ? " " + type : "");
+}
+
+async function submitAuth(){
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const displayName = document.getElementById("authName").value.trim();
+
+  if(!email || !password){
+    setAuthMessage("Enter your email and password.", "error");
+    return;
+  }
+  if(password.length < 6){
+    setAuthMessage("Your password must have at least 6 characters.", "error");
+    return;
+  }
+
+  document.getElementById("authSubmit").disabled = true;
+  setAuthMessage(authMode === "signup" ? "Creating your account..." : "Signing you in...");
+
+  try {
+    if(authMode === "signup"){
+      if(!displayName){
+        setAuthMessage("Enter your name.", "error");
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName },
+          emailRedirectTo: window.location.origin
+        }
+      });
+      if(error) throw error;
+      if(data.session){
+        await beginSession(data.session.user);
+      } else {
+        setAuthMessage("Check your email and confirm your account, then come back to sign in.", "success");
+        setAuthMode("signin");
+      }
+    } else {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      await beginSession(data.user);
+    }
+  } catch(err){
+    setAuthMessage(err.message || "Something went wrong.", "error");
+  } finally {
+    document.getElementById("authSubmit").disabled = false;
+  }
+}
+
+async function resetPassword(){
+  const email = document.getElementById("authEmail").value.trim();
+  if(!email){
+    setAuthMessage("Enter your email first.", "error");
+    return;
+  }
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+  if(error) setAuthMessage(error.message, "error");
+  else setAuthMessage("Password reset email sent.", "success");
+}
+
+async function signOut(){
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  document.getElementById("authScreen").classList.remove("hidden");
+}
+
+async function beginSession(user){
+  currentUser = user;
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("userEmail").textContent = user.email || "";
+  await loadProfileAndCloudData();
+  renderAll();
+}
+
+async function loadProfileAndCloudData(){
+  if(!currentUser) return;
+
+  const { data: profileRow } = await supabaseClient
+    .from("profiles")
+    .select("display_name")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  const displayName = profileRow?.display_name || currentUser.email?.split("@")[0] || "Friend";
+  const normalized = displayName.toLowerCase();
+  currentProfile = normalized.includes("alec") ? "alec" : "patricia";
+  localStorage.setItem("held_profile", currentProfile);
+
+  await syncJourneysFromCloud();
+  await syncJournalsFromCloud();
+  await syncStudyNotesFromCloud();
+  await syncSharedTakeawaysFromCloud();
+}
+
+async function syncJourneysFromCloud(){
+  const { data, error } = await supabaseClient
+    .from("user_journeys")
+    .select("journey_id,current_day,completed_days,is_active")
+    .eq("user_id", currentUser.id);
+  if(error) return;
+
+  let active = null;
+  for(const row of (data || [])){
+    localStorage.setItem(`held_${currentProfile}_${row.journey_id}_day`, String(row.current_day || 1));
+    localStorage.setItem(`held_${currentProfile}_${row.journey_id}_completed`, JSON.stringify(row.completed_days || []));
+    if(row.is_active) active = row.journey_id;
+  }
+  if(active) localStorage.setItem(`held_${currentProfile}_activeJourney`, active);
+}
+
+async function syncJournalsFromCloud(){
+  const { data, error } = await supabaseClient
+    .from("journal_entries")
+    .select("journey_id,day_number,body,created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending:false });
+  if(error) return;
+
+  const grouped = {};
+  for(const row of (data || [])){
+    grouped[row.journey_id] ||= [];
+    grouped[row.journey_id].push({
+      text: row.body,
+      day: row.day_number,
+      date: new Date(row.created_at).toLocaleDateString()
+    });
+  }
+  for(const [journeyId, rows] of Object.entries(grouped)){
+    localStorage.setItem(`held_${currentProfile}_${journeyId}_journal`, JSON.stringify(rows));
+  }
+}
+
+async function syncStudyNotesFromCloud(){
+  const { data, error } = await supabaseClient
+    .from("study_notes")
+    .select("journey_id,day_number,body,created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending:false });
+  if(error) return;
+
+  const grouped = {};
+  for(const row of (data || [])){
+    grouped[row.journey_id] ||= [];
+    grouped[row.journey_id].push({
+      text: row.body,
+      day: row.day_number,
+      date: new Date(row.created_at).toLocaleDateString()
+    });
+  }
+  for(const [journeyId, rows] of Object.entries(grouped)){
+    localStorage.setItem(`held_${currentProfile}_${journeyId}_notebook`, JSON.stringify(rows));
+  }
+}
+
+async function syncSharedTakeawaysFromCloud(){
+  const { data: membership } = await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if(!membership?.couple_id) return;
+
+  const { data, error } = await supabaseClient
+    .from("shared_takeaways")
+    .select("user_id,journey_id,body,created_at")
+    .eq("couple_id", membership.couple_id)
+    .order("created_at", { ascending:false });
+  if(error) return;
+
+  const mapped = (data || []).map(row => ({
+    from: row.user_id === currentUser.id ? currentProfile : "spouse",
+    text: row.body,
+    date: new Date(row.created_at).toLocaleDateString(),
+    journey: row.journey_id || ""
+  }));
+  localStorage.setItem("held_shared", JSON.stringify(mapped));
+}
+
+const originalStartSelectedJourney = window.startSelectedJourney;
+window.startSelectedJourney = async function(){
+  if(!selectedJourneyId) return;
+  localStorage.setItem(`held_${currentProfile}_activeJourney`, selectedJourneyId);
+
+  if(currentUser){
+    await supabaseClient.from("user_journeys").update({ is_active:false }).eq("user_id", currentUser.id);
+
+    await supabaseClient.from("user_journeys").upsert({
+      user_id: currentUser.id,
+      journey_id: selectedJourneyId,
+      current_day: getDay(selectedJourneyId),
+      completed_days: getCompleted(selectedJourneyId),
+      is_active: true
+    }, { onConflict:"user_id,journey_id" });
+  }
+
+  renderAll();
+  showView("devotional");
+};
+
+const originalCompleteDay = window.completeDay;
+window.completeDay = async function(){
+  const j = activeJourney();
+  saveDraft();
+  let day = getDay(j.id), done = getCompleted(j.id);
+  if(!done.includes(day)) done.push(day);
+  localStorage.setItem(progressKey(j.id), JSON.stringify(done));
+  const nextDay = day < 21 ? day + 1 : day;
+  localStorage.setItem(dayKey(j.id), String(nextDay));
+  localStorage.removeItem(draftKey(j.id,1));
+  localStorage.removeItem(draftKey(j.id,2));
+
+  if(currentUser){
+    await supabaseClient.from("user_journeys").upsert({
+      user_id: currentUser.id,
+      journey_id: j.id,
+      current_day: nextDay,
+      completed_days: done,
+      is_active: true
+    }, { onConflict:"user_id,journey_id" });
+
+    const mood = localStorage.getItem(`held_${currentProfile}_${j.id}_mood`) || null;
+    await supabaseClient.from("daily_checkins").upsert({
+      user_id: currentUser.id,
+      journey_id: j.id,
+      day_number: day,
+      mood,
+      completed_at: new Date().toISOString()
+    }, { onConflict:"user_id,journey_id,day_number" });
+  }
+
+  alert(day===21 ? "Journey complete." : "Today is complete. Your next day is ready.");
+  renderAll();
+  showView("progress");
+};
+
+const originalSaveJournal = window.saveJournal;
+window.saveJournal = async function(){
+  const j = activeJourney();
+  const t = document.getElementById("journalText").value.trim();
+  if(!t){ alert("Write something first."); return; }
+
+  if(currentUser){
+    const { error } = await supabaseClient.from("journal_entries").insert({
+      user_id: currentUser.id,
+      journey_id: j.id,
+      day_number: getDay(j.id),
+      body: t
+    });
+    if(error){ alert(error.message); return; }
+  }
+
+  const arr = JSON.parse(localStorage.getItem(journalKey(j.id)) || "[]");
+  arr.unshift({ text:t, date:new Date().toLocaleDateString(), day:getDay(j.id) });
+  localStorage.setItem(journalKey(j.id), JSON.stringify(arr));
+  document.getElementById("journalText").value = "";
+  renderJournal();
+  alert("Saved privately.");
+};
+
+const originalSaveStudyNote = window.saveStudyNote;
+window.saveStudyNote = async function(){
+  const j = activeJourney();
+  const t = document.getElementById("studyNote").value.trim();
+  if(!t){ alert("Write a note first."); return; }
+
+  const day = getDay(j.id);
+  const content = dayContent(j, day);
+
+  if(currentUser){
+    const { error } = await supabaseClient.from("study_notes").insert({
+      user_id: currentUser.id,
+      journey_id: j.id,
+      day_number: day,
+      passage: content.passage,
+      key_word: content.word.trans,
+      body: t
+    });
+    if(error){ alert(error.message); return; }
+  }
+
+  const arr = JSON.parse(localStorage.getItem(notebookKey(j.id)) || "[]");
+  arr.unshift({ text:t, date:new Date().toLocaleDateString(), day });
+  localStorage.setItem(notebookKey(j.id), JSON.stringify(arr));
+  document.getElementById("studyNote").value = "";
+  renderNotebook();
+  alert("Added to your Bible notebook.");
+};
+
+const originalShareTakeaway = window.shareTakeaway;
+window.shareTakeaway = async function(){
+  const t = document.getElementById("journalText").value.trim();
+  if(!t){ alert("Write something first."); return; }
+  const takeaway = prompt("What one sentence do you want to share?");
+  if(!takeaway) return;
+
+  if(!currentUser){
+    alert("Sign in first.");
+    return;
+  }
+
+  const { data: membership } = await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if(!membership?.couple_id){
+    alert("Your accounts are not linked as a couple yet. Save this privately for now.");
+    return;
+  }
+
+  const { error } = await supabaseClient.from("shared_takeaways").insert({
+    couple_id: membership.couple_id,
+    user_id: currentUser.id,
+    journey_id: activeJourney().id,
+    body: takeaway
+  });
+  if(error){ alert(error.message); return; }
+
+  await syncSharedTakeawaysFromCloud();
+  renderShared();
+  alert("Only that takeaway was shared.");
+};
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if(event === "PASSWORD_RECOVERY"){
+    currentUser = session?.user || currentUser;
+    document.getElementById("authScreen").classList.add("hidden");
+    openPasswordScreen();
+    return;
+  }
+  if(session?.user){
+    if(!currentUser || currentUser.id !== session.user.id){
+      await beginSession(session.user);
+    }
+  } else {
+    currentUser = null;
+    document.getElementById("authScreen").classList.remove("hidden");
+  }
+});
+
+(async function boot(){
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session?.user){
+    await beginSession(data.session.user);
+  } else {
+    document.getElementById("authScreen").classList.remove("hidden");
+  }
+})();
+</script>
+
 </body>
 </html>
