@@ -354,6 +354,16 @@ button:disabled{opacity:.55;cursor:not-allowed}
   color:#744a0a;margin-top:12px
 }
 
+
+.nlt-ref{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.78rem;font-weight:800;color:var(--teal);
+  background:#e8f7f4;border-radius:999px;padding:5px 9px
+}
+.read-nlt-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;margin-top:12px
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -486,9 +496,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
   <div id="readPanel" class="dev-tab-panel active" style="display:block">
     <div class="scripture" id="devScripture"></div>
+    <a id="readNltLink" class="secondary read-nlt-btn" href="#" target="_blank" rel="noopener noreferrer">Open passage in NLT</a>
     <div class="reading-note">
       <strong>Read slowly</strong>
-      <p class="muted" style="margin-bottom:0">Read the biblical passage first. Then move to Understand for an explanation of the scene, the author’s point, the book context, and the key original-language word.</p>
+      <p class="muted" style="margin-bottom:0">Open the linked passage and read it in the New Living Translation (NLT) first. Held references the NLT but does not reproduce the full copyrighted passage inside the app.</p>
     </div>
     <div class="study-section" style="margin-top:16px">
       <div class="word-label">Companion reading set</div>
@@ -1828,6 +1839,11 @@ function dayContent(j,day){
     word:base.word
   };
 }
+
+function nltUrl(reference){
+  return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(reference)}&version=NLT`;
+}
+
 function renderAll(){
  const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
  document.getElementById("pBtn").classList.toggle("active",currentProfile==="patricia");
@@ -1837,12 +1853,14 @@ function renderAll(){
  document.getElementById("journeyProgress").style.width=`${Math.round(done.length/21*100)}%`;
  document.getElementById("homeTitle").textContent=p.homeTitle;
  document.getElementById("homeText").textContent=p.homeText;
- document.getElementById("todayPassage").textContent=content.passage;
+ document.getElementById("todayPassage").textContent=`${content.passage} (NLT)`;
  document.getElementById("todayFocus").textContent=content.theme;
  renderJourneyCards("homeJourneyCards");renderJourneyCards("libraryCards");
- document.getElementById("devMeta").textContent=`Day ${day} · ${content.passage}`;
+ document.getElementById("devMeta").textContent=`Day ${day} · ${content.passage} (NLT)`;
  document.getElementById("devTitle").textContent=content.theme;
- document.getElementById("devScripture").textContent=content.scripture;
+ document.getElementById("devScripture").textContent=`Read ${content.passage} in the New Living Translation (NLT).`;
+ const readNltLink=document.getElementById("readNltLink");
+ if(readNltLink) readNltLink.href=nltUrl(content.passage);
  document.getElementById("devContext").textContent=content.context;
  const observe=document.getElementById("devObserve");
  if(observe) observe.innerHTML=content.observe.map(item=>`<li>${item}</li>`).join("");
@@ -1854,7 +1872,10 @@ function renderAll(){
  if(companions){
    companions.innerHTML=content.companions.length
      ? content.companions.map(c=>`<div class="companion-card">
-         <div class="companion-top"><span class="companion-ref">${c.passage}</span><span class="companion-type">${c.category}</span></div>
+         <div class="companion-top">
+           <a class="companion-ref" href="${nltUrl(c.passage)}" target="_blank" rel="noopener noreferrer">${c.passage} (NLT)</a>
+           <span class="companion-type">${c.category}</span>
+         </div>
          <div class="companion-relation">${c.relation}</div>
          <p class="muted">${c.reason}</p>
        </div>`).join("")
