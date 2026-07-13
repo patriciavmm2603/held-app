@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260712_v5";
+  const RESET_KEY = "held_cache_reset_20260712_v6";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260712-v5");
+    refreshedUrl.searchParams.set("heldBuild", "20260712-v6");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -395,6 +395,67 @@ button:disabled{opacity:.55;cursor:not-allowed}
   display:inline-flex;align-items:center;justify-content:center;
   text-decoration:none;margin-top:12px
 }
+
+.bible-passage{
+  margin-top:14px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.76);
+  line-height:1.75;
+}
+.bible-passage-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+  font-weight:800;
+  color:var(--ink);
+}
+.translation-badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:4px 9px;
+  background:#e8f7f4;
+  color:var(--teal);
+  font-size:.75rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+.bible-verse{
+  display:inline;
+  color:var(--ink);
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:1.06rem;
+}
+.verse-number{
+  color:var(--teal);
+  font-family:inherit;
+  font-size:.72em;
+  font-weight:800;
+  vertical-align:super;
+  margin-right:3px;
+}
+.verse-loading,.verse-error{
+  color:var(--muted);
+  font-style:italic;
+}
+.companion-card .bible-passage{
+  margin-top:12px;
+  padding:14px;
+  border-radius:14px;
+}
+.companion-card .bible-verse{
+  font-size:.98rem;
+}
+.web-source-note{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:.78rem;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -530,7 +591,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <div class="word-label">Step 1</div>
       <h4>Read the main Bible passage</h4>
       <div class="scripture" id="devScripture"></div>
-      <a id="readNltLink" class="primary read-nlt-btn" href="#" target="_blank" rel="noopener noreferrer">Read main passage in NLT</a>
+      <div id="mainWebPassage" class="bible-passage" aria-live="polite">
+        <div class="verse-loading">Loading the Bible passage…</div>
+      </div>
+      <div class="web-source-note">Bible text: World English Bible (WEB), public domain.</div>
       <p class="muted" style="margin-top:12px">
         Read the whole passage before opening the explanation. Notice the people, repeated words, contrasts, commands, questions, and how the passage ends.
       </p>
@@ -671,7 +735,9 @@ button:disabled{opacity:.55;cursor:not-allowed}
   <div class="shared" style="margin:14px 0 18px">
     <strong id="studyPassageHeading">Today’s passage</strong>
     <p id="studyThemeHeading" class="muted" style="margin-bottom:0"></p>
-    <a id="studyNltLink" class="secondary read-nlt-btn" href="#" target="_blank" rel="noopener noreferrer">Open passage in NLT</a>
+    <div id="studyWebPassage" class="bible-passage" aria-live="polite">
+      <div class="verse-loading">Loading the Bible passage…</div>
+    </div>
   </div>
 
   <div class="grid2">
@@ -711,7 +777,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
-<div class="footer">Held · You are known. You are loved. You are held. · Private notes sync when signed in · selected shared takeaways are visible to your spouse</div>
+<div class="footer">Held · You are known. You are loved. You are held. · Bible text: World English Bible (WEB), public domain · Private notes sync when signed in</div>
 </main>
 </div>
 
@@ -847,7 +913,7 @@ function openJourney(id){
  document.getElementById("overviewTitle").textContent=j.title;
  document.getElementById("overviewDescription").textContent=j.description;
  document.getElementById("overviewThemes").innerHTML=j.themes.map(t=>`<div class="journey-card"><h4>${t}</h4><p class="muted">A core theme in this path.</p></div>`).join("");
- document.getElementById("overviewDays").innerHTML=j.days.map((d,i)=>`<div class="list-item"><strong>Day ${i+1}: ${d[1]}</strong><div class="muted">${d[0]} (NLT)</div></div>`).join("");
+ document.getElementById("overviewDays").innerHTML=j.days.map((d,i)=>`<div class="list-item"><strong>Day ${i+1}: ${d[1]}</strong><div class="muted">${d[0]} (WEB)</div></div>`).join("");
  const done=getCompleted(id).length;
  document.getElementById("startJourneyBtn").textContent=done?"Continue this journey":"Start this journey";
  showView("overview")
@@ -2058,7 +2124,7 @@ function heldGeneratedStudy(j,day){
 
  return {
   passage,theme,genre,curated:true,
-  scripture:`Read ${passage} in the New Living Translation (NLT) before opening the explanation.`,
+  scripture:`Read ${passage} in the World English Bible (WEB) before opening the explanation.`,
   context,fit,main,notMean,tension,observe,movement,companions,p1,p2,prayer,practice,boundary,
   word:heldWordStudies[passage]||null
  };
@@ -2074,7 +2140,7 @@ function dayContent(j,day){
    if(daily){
      return {
        passage,theme,genre:heldGenre(passage),curated:true,
-       scripture:`Read ${passage} in the New Living Translation (NLT) before opening the explanation.`,
+       scripture:`Read ${passage} in the World English Bible (WEB) before opening the explanation.`,
        context:base.context,fit:base.fit,main:base.main||daily.main||`The passage addresses ${theme.toLowerCase()}.`,
        notMean:base.notMean,tension:daily.tension,observe:daily.observe,movement:daily.movement,
        companions:daily.companions,p1:daily.p1,p2:daily.p2,prayer:daily.prayer,
@@ -2094,9 +2160,154 @@ function dayContent(j,day){
  return generated;
 }
 
-function nltUrl(reference){
-  return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(reference)}&version=NLT`;
+
+const webPassageRequests=new Map();
+
+function normalizeWebReference(reference){
+  return String(reference || "")
+    .replace(/[–—]/g,"-")
+    .replace(/\s+/g," ")
+    .trim();
 }
+
+function webPassageCacheKey(reference){
+  return `held_web_passage_v1_${normalizeWebReference(reference).toLowerCase()}`;
+}
+
+async function fetchWebPassage(reference){
+  const normalized=normalizeWebReference(reference);
+  const cacheKey=webPassageCacheKey(normalized);
+
+  try{
+    const cached=localStorage.getItem(cacheKey);
+    if(cached){
+      const parsed=JSON.parse(cached);
+      if(parsed && Array.isArray(parsed.verses)) return parsed;
+    }
+  }catch(error){
+    console.warn("Could not read cached WEB passage:",error);
+  }
+
+  if(webPassageRequests.has(normalized)){
+    return webPassageRequests.get(normalized);
+  }
+
+  const request=(async()=>{
+    const url=`https://bible-api.com/${encodeURIComponent(normalized)}?translation=web`;
+    const response=await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!response.ok) throw new Error(`Bible request failed with status ${response.status}`);
+
+    const data=await response.json();
+    if(!data || !Array.isArray(data.verses) || !data.verses.length){
+      throw new Error("No verses were returned for this reference.");
+    }
+
+    const compact={
+      reference:data.reference || normalized,
+      translation_name:data.translation_name || "World English Bible",
+      translation_id:data.translation_id || "web",
+      verses:data.verses.map(v=>({
+        book_name:v.book_name,
+        chapter:v.chapter,
+        verse:v.verse,
+        text:String(v.text || "").trim()
+      }))
+    };
+
+    try{
+      localStorage.setItem(cacheKey,JSON.stringify(compact));
+    }catch(error){
+      console.warn("Could not cache WEB passage:",error);
+    }
+
+    return compact;
+  })();
+
+  webPassageRequests.set(normalized,request);
+
+  try{
+    return await request;
+  }finally{
+    webPassageRequests.delete(normalized);
+  }
+}
+
+function buildWebPassageContent(data,reference){
+  const fragment=document.createDocumentFragment();
+
+  const title=document.createElement("div");
+  title.className="bible-passage-title";
+
+  const ref=document.createElement("span");
+  ref.textContent=data.reference || reference;
+
+  const badge=document.createElement("span");
+  badge.className="translation-badge";
+  badge.textContent="WEB";
+
+  title.append(ref,badge);
+  fragment.appendChild(title);
+
+  const text=document.createElement("div");
+  data.verses.forEach((verse,index)=>{
+    const span=document.createElement("span");
+    span.className="bible-verse";
+
+    const number=document.createElement("sup");
+    number.className="verse-number";
+    number.textContent=verse.verse;
+
+    span.appendChild(number);
+    span.appendChild(document.createTextNode(verse.text));
+
+    if(index < data.verses.length-1){
+      span.appendChild(document.createTextNode(" "));
+    }
+    text.appendChild(span);
+  });
+
+  fragment.appendChild(text);
+  return fragment;
+}
+
+async function renderWebPassage(element,reference){
+  if(!element || !reference) return;
+
+  const token=normalizeWebReference(reference);
+  element.dataset.webReference=token;
+  element.innerHTML='<div class="verse-loading">Loading the Bible passage…</div>';
+
+  try{
+    const data=await fetchWebPassage(reference);
+    if(element.dataset.webReference!==token) return;
+
+    element.innerHTML="";
+    element.appendChild(buildWebPassageContent(data,reference));
+  }catch(error){
+    console.error("WEB passage error:",reference,error);
+    if(element.dataset.webReference!==token) return;
+
+    element.innerHTML="";
+    const message=document.createElement("div");
+    message.className="verse-error";
+    message.textContent=`The WEB passage could not load right now. Please check your internet connection and try opening this day again.`;
+    element.appendChild(message);
+  }
+}
+
+function renderAllWebPassages(content){
+  renderWebPassage(document.getElementById("mainWebPassage"),content.passage);
+  renderWebPassage(document.getElementById("studyWebPassage"),content.passage);
+
+  document.querySelectorAll("[data-companion-web-reference]").forEach(element=>{
+    renderWebPassage(element,element.dataset.companionWebReference);
+  });
+
+  document.querySelectorAll("[data-study-web-reference]").forEach(element=>{
+    renderWebPassage(element,element.dataset.studyWebReference);
+  });
+}
+
 
 function safeText(value, fallback){
   if(value === null || value === undefined) return fallback;
@@ -2107,7 +2318,7 @@ function safeText(value, fallback){
 function renderStudyPage(content){
   const passageHeading=document.getElementById("studyPassageHeading");
   const themeHeading=document.getElementById("studyThemeHeading");
-  const studyLink=document.getElementById("studyNltLink");
+
   const fit=document.getElementById("contextBeforeAfter");
   const word=document.getElementById("studyWordSummary");
   const refs=document.getElementById("crossRefs");
@@ -2115,17 +2326,8 @@ function renderStudyPage(content){
   const main=document.getElementById("studyMainPoint");
   const tension=document.getElementById("studyTension");
 
-  if(passageHeading) passageHeading.textContent=`${safeText(content.passage,"Passage")} (NLT)`;
+  if(passageHeading) passageHeading.textContent=`${safeText(content.passage,"Passage")} (WEB)`;
   if(themeHeading) themeHeading.textContent=safeText(content.theme,"Today’s study");
-
-  if(studyLink){
-    if(content.passage){
-      studyLink.href=nltUrl(content.passage);
-      studyLink.style.display="inline-flex";
-    }else{
-      studyLink.style.display="none";
-    }
-  }
 
   if(fit) fit.textContent=safeText(
     content.fit,
@@ -2141,11 +2343,12 @@ function renderStudyPage(content){
   if(refs){
     if(Array.isArray(content.companions) && content.companions.length){
       refs.innerHTML=content.companions.map(c=>`
-        <div style="margin-bottom:12px">
-          <a href="${nltUrl(c.passage)}" target="_blank" rel="noopener noreferrer">
-            <strong>${c.passage} (NLT)</strong>
-          </a>
+        <div style="margin-bottom:18px">
+          <strong>${c.passage} (WEB)</strong>
           <div class="muted">${safeText(c.relation,"supporting reading")} · ${safeText(c.reason,"Read this alongside the main passage.")}</div>
+          <div class="bible-passage" data-study-web-reference="${c.passage.replace(/"/g,"&quot;")}">
+            <div class="verse-loading">Loading the Bible passage…</div>
+          </div>
         </div>
       `).join("");
     }else{
@@ -2200,14 +2403,12 @@ function renderAll(){
  document.getElementById("journeyProgress").style.width=`${Math.round(done.length/21*100)}%`;
  document.getElementById("homeTitle").textContent=p.homeTitle;
  document.getElementById("homeText").textContent=p.homeText;
- document.getElementById("todayPassage").textContent=`${content.passage} (NLT)`;
+ document.getElementById("todayPassage").textContent=`${content.passage} (WEB)`;
  document.getElementById("todayFocus").textContent=content.theme;
  renderJourneyCards("homeJourneyCards");renderJourneyCards("libraryCards");
- document.getElementById("devMeta").textContent=`Day ${day} · ${content.passage} (NLT)`;
+ document.getElementById("devMeta").textContent=`Day ${day} · ${content.passage} (WEB)`;
  document.getElementById("devTitle").textContent=content.theme;
- document.getElementById("devScripture").textContent=`Read ${content.passage} in the New Living Translation (NLT).`;
- const readNltLink=document.getElementById("readNltLink");
- if(readNltLink) readNltLink.href=nltUrl(content.passage);
+ document.getElementById("devScripture").textContent=`${content.passage} · World English Bible (WEB)`;
  document.getElementById("devContext").textContent=content.context;
  const observe=document.getElementById("devObserve");
  if(observe) observe.innerHTML=content.observe.map(item=>`<li>${item}</li>`).join("");
@@ -2220,14 +2421,18 @@ function renderAll(){
    companions.innerHTML=content.companions.length
      ? content.companions.map(c=>`<div class="companion-card">
          <div class="companion-top">
-           <a class="companion-ref" href="${nltUrl(c.passage)}" target="_blank" rel="noopener noreferrer">${c.passage} (NLT)</a>
+           <span class="companion-ref">${c.passage} (WEB)</span>
            <span class="companion-type">${c.category}</span>
          </div>
          <div class="companion-relation">${c.relation}</div>
          <p class="muted">${c.reason}</p>
+         <div class="bible-passage" data-companion-web-reference="${c.passage.replace(/"/g,"&quot;")}">
+           <div class="verse-loading">Loading the Bible passage…</div>
+         </div>
        </div>`).join("")
      : `<div class="pending-note">Open the day’s reading and continue through Read, Understand, and Reflect.</div>`;
  }
+ renderAllWebPassages(content);
  const mainPoint=document.getElementById("devMainPoint");
  if(mainPoint) mainPoint.textContent=content.main;
  const quality=document.getElementById("studyQuality");
@@ -2768,6 +2973,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v5</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v6</div>
 </body>
 </html>
