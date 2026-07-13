@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260712_v4";
+  const RESET_KEY = "held_cache_reset_20260712_v5";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260712-v4");
+    refreshedUrl.searchParams.set("heldBuild", "20260712-v5");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -2093,6 +2093,103 @@ function dayContent(j,day){
  }
  return generated;
 }
+
+function nltUrl(reference){
+  return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(reference)}&version=NLT`;
+}
+
+function safeText(value, fallback){
+  if(value === null || value === undefined) return fallback;
+  const text=String(value).trim();
+  return text || fallback;
+}
+
+function renderStudyPage(content){
+  const passageHeading=document.getElementById("studyPassageHeading");
+  const themeHeading=document.getElementById("studyThemeHeading");
+  const studyLink=document.getElementById("studyNltLink");
+  const fit=document.getElementById("contextBeforeAfter");
+  const word=document.getElementById("studyWordSummary");
+  const refs=document.getElementById("crossRefs");
+  const notMean=document.getElementById("notMean");
+  const main=document.getElementById("studyMainPoint");
+  const tension=document.getElementById("studyTension");
+
+  if(passageHeading) passageHeading.textContent=`${safeText(content.passage,"Passage")} (NLT)`;
+  if(themeHeading) themeHeading.textContent=safeText(content.theme,"Today’s study");
+
+  if(studyLink){
+    if(content.passage){
+      studyLink.href=nltUrl(content.passage);
+      studyLink.style.display="inline-flex";
+    }else{
+      studyLink.style.display="none";
+    }
+  }
+
+  if(fit) fit.textContent=safeText(
+    content.fit,
+    "Read the full passage and notice how it fits the argument, story, prayer, or teaching around it."
+  );
+
+  if(word){
+    word.textContent=content.word
+      ? `${safeText(content.word.orig,"")} · ${safeText(content.word.trans,"")}: ${safeText(content.word.inPassage || content.word.meaning,"")}`
+      : "This day does not force an original-language word study. Focus on the passage’s context, structure, and main point.";
+  }
+
+  if(refs){
+    if(Array.isArray(content.companions) && content.companions.length){
+      refs.innerHTML=content.companions.map(c=>`
+        <div style="margin-bottom:12px">
+          <a href="${nltUrl(c.passage)}" target="_blank" rel="noopener noreferrer">
+            <strong>${c.passage} (NLT)</strong>
+          </a>
+          <div class="muted">${safeText(c.relation,"supporting reading")} · ${safeText(c.reason,"Read this alongside the main passage.")}</div>
+        </div>
+      `).join("");
+    }else{
+      refs.textContent="No companion passages are attached to this day.";
+    }
+  }
+
+  if(notMean) notMean.textContent=safeText(
+    content.notMean,
+    "Do not isolate this passage from its paragraph, book, or the rest of Scripture."
+  );
+  if(main) main.textContent=safeText(
+    content.main,
+    "Read the passage closely to identify its main claim, command, promise, warning, or invitation."
+  );
+  if(tension) tension.textContent=safeText(
+    content.tension,
+    "Faithful obedience may still involve waiting, uncertainty, grief, or costly change."
+  );
+}
+
+function fillEmptyDynamicSections(){
+  const fallbacks={
+    homeTitle:"Your journey is ready",
+    homeText:"Open a journey, read the passage, understand its context, and reflect on your response.",
+    journeyName:"Choose a journey",
+    journeyDay:"Day 1 of 21",
+    todayPassage:"Today’s passage",
+    todayFocus:"Choose a journey to begin."
+  };
+
+  Object.entries(fallbacks).forEach(([id,value])=>{
+    const el=document.getElementById(id);
+    if(el && !String(el.textContent || "").trim()) el.textContent=value;
+  });
+
+  ["homeJourneyCards","libraryCards"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && !String(el.innerHTML || "").trim()){
+      renderJourneyCards(id);
+    }
+  });
+}
+
 function renderAll(){
  const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
  renderStudyPage(content);
@@ -2671,6 +2768,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v4</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v5</div>
 </body>
 </html>
