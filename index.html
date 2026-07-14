@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260714_v9";
+  const RESET_KEY = "held_cache_reset_20260714_v10";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260714-v9");
+    refreshedUrl.searchParams.set("heldBuild", "20260714-v10");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -583,7 +583,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
    <div class="overview-art"></div>
   </div>
   <div class="section-title"><h3>What you’ll walk through</h3></div><div id="overviewThemes" class="grid3"></div>
-  <div class="section-title"><h3>21-day outline</h3></div><div id="overviewDays" class="list"></div>
+  <div class="section-title"><h3>21-day outline</h3></div><p id="overviewOutlineIntro" class="muted"></p><div id="overviewDays" class="list"></div>
  </div>
 </section>
 
@@ -927,14 +927,127 @@ function renderJourneyCards(containerId){
   </div>`
  }).join("")
 }
+const heldJourneyCopy = {
+  "survival": {
+    "intro": "This journey helps you notice where survival mode is shaping your marriage, decisions, and ability to receive support. You will practice wise dependence without losing your voice, dignity, or responsibility.",
+    "outline": "Each day begins with Scripture, helps you understand the passage in context, and ends with one practical step toward trust, partnership, and healthy strength.",
+    "themes": {
+      "Receiving support": "Learn to accept trustworthy help without feeling weak, controlled, or indebted.",
+      "Shared responsibility": "Explore how partnership can carry real responsibility without leaving everything on your shoulders.",
+      "Strength without isolation": "Practice courage and wisdom without treating self-protection as the only safe way to live."
+    }
+  },
+  "anxiety": {
+    "intro": "This journey helps you bring anxious thoughts, physical tension, and uncertainty honestly before God. It combines trust with practical responsibility instead of asking you to ignore real concerns.",
+    "outline": "Each day guides you through Scripture, context, reflection, and one grounded practice for responding to anxiety with truth, prayer, and wise action.",
+    "themes": {
+      "Fear and trust": "Identify what fear is predicting and compare it with what the passage reveals about God.",
+      "Peace in uncertainty": "Learn to live faithfully without needing every outcome to be settled first.",
+      "Prayer and presence": "Practice bringing your body, thoughts, and immediate concerns into God’s presence."
+    }
+  },
+  "money": {
+    "intro": "This journey helps you examine what money reveals about trust, fear, generosity, and security. You will practice responsible stewardship without letting finances control your peace or identity.",
+    "outline": "Each day begins with Scripture, explains the passage in context, and ends with reflection and one practical financial or spiritual response.",
+    "themes": {
+      "Scarcity and trust": "Notice how fear of not having enough shapes your choices, then practice security in God alongside wise planning.",
+      "Generosity": "Explore generosity as a heart posture that loosens fear, comparison, and the need to hold everything tightly.",
+      "Stewardship and contentment": "Manage what God has entrusted to you with wisdom, gratitude, and responsibility without letting money define your peace."
+    }
+  },
+  "control": {
+    "intro": "This journey helps you separate faithful responsibility from the exhausting belief that everything depends on you. You will learn what to carry, what to communicate, and what to release.",
+    "outline": "Each day uses Scripture to clarify the difference between obedience, planning, control, trust, and surrender in ordinary life.",
+    "themes": {
+      "Responsibility and surrender": "Learn to act faithfully without treating yourself as responsible for every result.",
+      "Trusting others": "Practice honest communication and wise partnership instead of managing people through fear.",
+      "Releasing outcomes": "Identify what you can influence, what you cannot guarantee, and how to remain faithful in the uncertainty."
+    }
+  },
+  "identity": {
+    "intro": "This journey helps you recognize where approval, performance, appearance, or past mistakes are defining your worth. You will return to an identity received from God rather than earned from people.",
+    "outline": "Each day connects Scripture to one identity pressure and invites a concrete response rooted in grace, truth, and belonging.",
+    "themes": {
+      "Known by God": "Receive the security of being fully seen without needing to perform for love.",
+      "Freedom from comparison": "Notice where comparison distorts your value and learn to honor the life God has given you.",
+      "Grace and belonging": "Practice living from acceptance in Christ rather than trying to prove that you deserve it."
+    }
+  },
+  "grief": {
+    "intro": "This journey makes room for grief without rushing you toward easy answers. You will learn to lament honestly, receive comfort, remember faithfully, and carry sorrow with God and others.",
+    "outline": "Each day offers Scripture, context, reflection, and a gentle practice for grief, remembrance, support, or rest.",
+    "themes": {
+      "Honest lament": "Bring pain, anger, confusion, and unanswered questions to God without pretending.",
+      "Comfort and presence": "Recognize comfort that stays near suffering instead of minimizing or explaining it away.",
+      "Hope without denial": "Hold Christian hope without using it to silence grief or skip the work of mourning."
+    }
+  },
+  "redeemed": {
+    "intro": "This journey helps Alec face the past honestly without allowing shame to become his permanent identity. It holds repentance, consequences, grace, repair, and renewed purpose together.",
+    "outline": "Each day uses Scripture to distinguish condemnation from conviction and to identify one faithful step toward repair, courage, or hope.",
+    "themes": {
+      "Grace after failure": "Receive grace without minimizing what happened or avoiding responsibility.",
+      "Repentance and repair": "Practice confession, apology, restitution, boundaries, and change where they are genuinely needed.",
+      "Purpose after brokenness": "Move forward without pretending the past disappeared or believing it disqualifies you forever."
+    }
+  },
+  "leader": {
+    "intro": "This journey helps Alec grow into servant leadership marked by courage, humility, listening, responsibility, and sacrifice. Leadership is treated as faithful presence, not control.",
+    "outline": "Each day connects Scripture to one practical leadership choice in marriage, family, work, or spiritual life.",
+    "themes": {
+      "Servant leadership": "Lead by taking responsibility, serving others, and using strength for their good.",
+      "Courage and humility": "Make clear decisions while remaining teachable, honest, and willing to admit weakness.",
+      "Consistency and example": "Recognize that repeated actions, tone, and character often teach more than instructions."
+    }
+  },
+  "forgiveness": {
+    "intro": "This journey helps Alec understand forgiveness without confusing it with denial, instant trust, unlimited access, or the absence of consequences. It makes room for truth, grief, boundaries, and release.",
+    "outline": "Each day uses Scripture to clarify one part of forgiveness, reconciliation, justice, resentment, or repair.",
+    "themes": {
+      "Truth before release": "Name the wrong honestly so forgiveness does not become pretending or minimizing.",
+      "Forgiveness and boundaries": "Distinguish releasing personal vengeance from rebuilding trust or restoring access.",
+      "Freedom from resentment": "Practice surrendering the demand to keep collecting the debt, even when repair is incomplete."
+    }
+  },
+  "empathy": {
+    "intro": "This journey helps Alec listen for another person’s experience before defending, fixing, comparing, or correcting. Empathy becomes a practiced form of patience, curiosity, and love.",
+    "outline": "Each day pairs Scripture with one concrete listening, validation, or relationship practice.",
+    "themes": {
+      "Listening before answering": "Slow down enough to understand what the other person is actually saying and feeling.",
+      "Validation without agreement": "Acknowledge someone’s experience without pretending every conclusion is correct.",
+      "Presence before solutions": "Learn when care requires staying near the pain instead of immediately trying to solve it."
+    }
+  },
+  "father": {
+    "intro": "This journey helps Alec grow as a father and stepfather through presence, consistency, protection, correction, encouragement, and example. It focuses on the five girls seeing faithful love practiced.",
+    "outline": "Each day connects Scripture to one concrete act of fatherhood, family leadership, repair, or encouragement.",
+    "themes": {
+      "Presence and attention": "Offer focused time, listening, and emotional availability rather than only provision or instruction.",
+      "Correction with dignity": "Set limits and address problems without humiliation, anger, or fear.",
+      "Modeling covenant love": "Show the girls how a godly man treats their mother, keeps his word, apologizes, and serves."
+    }
+  },
+  "provision": {
+    "intro": "This journey helps Alec approach provision as faithful work, planning, partnership, and trust rather than as a measure of his worth. It makes room for responsibility without panic or isolation.",
+    "outline": "Each day uses Scripture to connect provision with diligence, contentment, communication, rest, and dependence on God.",
+    "themes": {
+      "Work without panic": "Practice diligence without treating every financial pressure as a verdict on your value.",
+      "Provision as partnership": "Carry responsibility honestly with your wife instead of silently bearing or controlling everything alone.",
+      "Contentment and faithfulness": "Pursue wise goals while receiving today’s provision with gratitude and restraint."
+    }
+  }
+};
+function journeyCopyFor(id){return heldJourneyCopy[id]||{intro:"This journey uses Scripture to help you understand the topic in context and respond with one faithful step at a time.",outline:"Each day begins with Scripture, explains the passage in context, and ends with reflection and a practical response.",themes:{}};}
 function openJourney(id){
  selectedJourneyId=id;
  const j=profile().journeys.find(x=>x.id===id);
  if(!j) return;
  document.getElementById("overviewBook").textContent=j.book;
  document.getElementById("overviewTitle").textContent=j.title;
- document.getElementById("overviewDescription").textContent=j.description;
- document.getElementById("overviewThemes").innerHTML=j.themes.map(t=>`<div class="journey-card"><h4>${t}</h4><p class="muted">A core theme in this path.</p></div>`).join("");
+ const copy=journeyCopyFor(id);
+ document.getElementById("overviewDescription").textContent=copy.intro||j.description;
+ document.getElementById("overviewThemes").innerHTML=j.themes.map(t=>`<div class="journey-card"><h4>${t}</h4><p class="muted">${copy.themes[t]||"A meaningful part of this journey."}</p></div>`).join("");
+ const outlineIntro=document.getElementById("overviewOutlineIntro");if(outlineIntro)outlineIntro.textContent=copy.outline;
  document.getElementById("overviewDays").innerHTML=j.days.map((d,i)=>`<div class="list-item"><strong>Day ${i+1}: ${d[1]}</strong><div class="muted">${d[0]} (WEB)</div></div>`).join("");
  const done=getCompleted(id).length;
  document.getElementById("startJourneyBtn").textContent=done?"Continue this journey":"Start this journey";
@@ -4141,6 +4254,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260714-v9</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260714-v10</div>
 </body>
 </html>
