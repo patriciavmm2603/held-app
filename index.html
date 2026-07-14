@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260712_v6";
+  const RESET_KEY = "held_cache_reset_20260714_v9";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260712-v6");
+    refreshedUrl.searchParams.set("heldBuild", "20260714-v9");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -456,6 +456,15 @@ button:disabled{opacity:.55;cursor:not-allowed}
   font-size:.78rem;
 }
 
+
+.dev-sticky-nav{position:sticky;bottom:12px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 6px;padding:10px;border:1px solid var(--line);border-radius:18px;background:rgba(255,252,246,.96);box-shadow:0 12px 34px rgba(35,67,64,.14);backdrop-filter:blur(10px)}
+.dev-sticky-nav .nav-group{display:flex;gap:8px;flex-wrap:wrap}.dev-sticky-nav button{min-height:42px}
+.reflection-save-note{margin:8px 0 14px;padding:12px 14px;border-radius:14px;background:#eef9f6;color:var(--ink);font-size:.9rem}
+.saved-reflection{border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;background:rgba(255,255,255,.7)}
+.saved-reflection h4{margin:6px 0 10px}.saved-reflection .answer{margin:10px 0;padding:10px 12px;border-left:3px solid var(--teal);background:rgba(238,249,246,.7);border-radius:0 12px 12px 0}
+.mood-history{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#f4eee4;font-size:.8rem;font-weight:700}
+.day-complete-note{font-size:.88rem;color:var(--muted);margin-top:8px}
+@media(max-width:720px){.dev-sticky-nav{bottom:8px;align-items:stretch;flex-direction:column}.dev-sticky-nav .nav-group{width:100%}.dev-sticky-nav button{flex:1}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -668,11 +677,12 @@ button:disabled{opacity:.55;cursor:not-allowed}
     <div class="study-section">
       <div class="word-label">Step 3</div>
       <h4>Reflect and respond</h4>
-      <p class="muted">Answer from the passage, not from what you think a “good Christian answer” should sound like.</p>
+      <p class="muted">Each question includes the passage and today’s focus so you know exactly what you are responding to.</p>
     </div>
-    <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1"></textarea></div>
-    <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2"></textarea></div>
-    <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
+    <div class="reflection-save-note">Your answers and selected feeling are private. When saved, they appear under <strong>Journal → Day reflections</strong>.</div>
+    <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1" placeholder="Write what you noticed in the passage..."></textarea></div>
+    <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2" placeholder="Write how this connects to your life today..."></textarea></div>
+    <div class="prompt"><strong>How are you arriving today?</strong><p class="muted">Choose the feeling that best describes you. It is saved with this day’s reflection so you can notice patterns over time.</p><div class="choice-row" id="moodChoices"></div></div>
     <div class="prayer-box"><strong>Pray the passage</strong><p id="devPrayer" class="muted">Lord, help me receive what is true here and respond faithfully today.</p></div>
     <div class="practice-card">
       <div class="word-label">Practice the passage</div>
@@ -682,9 +692,14 @@ button:disabled{opacity:.55;cursor:not-allowed}
     </div>
     <div class="actions">
       <button class="ghost" type="button" data-dev-tab="understand">Back to Understand</button>
-      <button class="primary" onclick="completeDay()">Complete today</button>
-      <button class="ghost" onclick="saveDraft()">Save draft</button>
+      <button class="secondary" onclick="saveReflection()">Save reflection</button>
+      <button class="primary" id="completeDayBtn" onclick="completeDay()">Save and complete today</button>
     </div>
+    <div class="day-complete-note">Completing the day saves your answers and feeling, marks the day complete, and opens the next day.</div>
+  </div>
+  <div class="dev-sticky-nav" aria-label="Daily study navigation">
+    <div class="nav-group"><button class="ghost" type="button" onclick="setDevTab('read')">Read</button><button class="ghost" type="button" onclick="setDevTab('understand')">Understand</button><button class="ghost" type="button" onclick="setDevTab('reflect')">Reflect</button></div>
+    <div class="nav-group"><button class="secondary" type="button" onclick="saveReflection()">Save</button><button class="primary" type="button" onclick="completeDay()">Complete day</button></div>
   </div>
  </div>
   <div class="card"><div class="eyebrow">Original-language study</div><h3 id="wordTitle"></h3>
@@ -760,7 +775,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 <section id="journal" class="view"><div class="card"><div class="eyebrow">Private by default</div><h3 id="journalHeading"></h3><p class="muted">Nothing is shared unless you choose one takeaway.</p>
 <textarea id="journalText" placeholder="Write honestly before God..."></textarea><div class="actions"><button class="primary" onclick="saveJournal()">Save privately</button><button class="secondary" onclick="shareTakeaway()">Share one takeaway</button></div>
-<div class="section-title"><h3>Recent entries</h3></div><div id="journalEntries"></div></div></section>
+<div class="section-title"><h3>Day reflections</h3></div><p class="muted">These are the answers and feelings saved from the Reflect tab.</p><div id="dayReflectionEntries"></div>
+<div class="section-title"><h3>Other journal entries</h3></div><div id="journalEntries"></div></div></section>
 
 <section id="together" class="view"><div class="card"><div class="eyebrow">Together</div><h3>Walking in faith, side by side</h3>
 <div class="shared"><strong>Patricia’s active journey</strong><p id="patSharedJourney"></p></div><div class="shared" style="margin-top:10px"><strong>Alec’s active journey</strong><p id="alecSharedJourney"></p></div>
@@ -872,7 +888,9 @@ function progressKey(jid){return `held_${currentProfile}_${jid}_completed`}
 function dayKey(jid){return `held_${currentProfile}_${jid}_day`}
 function journalKey(jid){return `held_${currentProfile}_${jid}_journal`}
 function notebookKey(jid){return `held_${currentProfile}_${jid}_notebook`}
-function draftKey(jid,n){return `held_${currentProfile}_${jid}_draft${n}`}
+function draftKey(jid,n){return `held_${currentProfile}_${jid}_day${getDay(jid)}_draft${n}`}
+function reflectionKey(jid){return `held_${currentProfile}_${jid}_reflections`}
+function moodKey(jid,day){return `held_${currentProfile}_${jid}_day${day}_mood`}
 function getCompleted(jid){return JSON.parse(localStorage.getItem(progressKey(jid))||"[]")}
 function getDay(jid){return parseInt(localStorage.getItem(dayKey(jid))||"1")}
 
@@ -888,6 +906,10 @@ function showView(id){
  if(target) target.classList.add("active");
  document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
  if(typeof renderAll==="function") renderAll();
+ if(id==="study"){
+   const j=activeJourney(),day=getDay(j.id),content=dayContent(j,day);
+   renderStudyWebPassages(content);
+ }
  window.scrollTo({top:0,behavior:"smooth"})
 }
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
@@ -2114,8 +2136,8 @@ function heldGeneratedStudy(j,day){
 
  const tension=`The text offers real direction without promising that obedience removes every difficulty immediately. Faithful response may still include waiting, grief, consequences, uncertainty, costly repair, or dependence on other people.`;
 
- const p1=`What repeated word, contrast, command, or turning point in ${passage} most clearly controls how the passage should be understood?`;
- const p2=`Where does “${theme}” expose a belief, habit, relationship pattern, or responsibility that needs a more faithful response?`;
+ const p1="";
+ const p2="";
 
  const prayer=`God, help me receive ${passage} as Your word rather than use it to confirm what I already want. Show me what is true about You, what is exposed in me, and what faithful response is actually mine. Give me courage for obedience, patience for what remains unresolved, and wisdom not to over-apply one passage.`;
 
@@ -2130,7 +2152,1053 @@ function heldGeneratedStudy(j,day){
  };
 }
 
-function dayContent(j,day){
+
+const heldReflectionQuestions = {
+  "survival": [
+    {
+      "p1": "As you read Matthew 6:19–24, identify the moment when Jesus’ words or actions most clearly address “Where your treasure rests.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a decision you are carrying alone because depending on someone feels unsafe. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Where your treasure rests,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 6:25–34, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “The Father knows what you need,” and what detail in the passage supports your answer?",
+      "p2": "Bring the passage into one real situation: a marriage conversation where protecting yourself keeps you from receiving partnership. What are you afraid will happen, what truth from Matthew 6:25–34 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “The Father knows what you need” remains specific."
+    },
+    {
+      "p1": "Read Matthew 7:7–11 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Learning to ask and receive,” and what replaces that assumption?",
+      "p2": "Consider a boundary that protects your dignity without shutting out trustworthy support. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 7:7–11 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Learning to ask and receive” today."
+    },
+    {
+      "p1": "In Matthew 5:3–10, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Strength that looks different” more carefully?",
+      "p2": "Apply “Strength that looks different” to a responsibility that is wise but has quietly become fear-driven control. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Strength that looks different,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 6:5–13 that controls the rest of the scene. Why is that element central to understanding “Prayer before control”?",
+      "p2": "Think about a financial or household task you believe will fall apart unless you manage every detail. What are you tempted to demand from yourself or another person? Based on Matthew 6:5–13, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Prayer before control” remains specific."
+    },
+    {
+      "p1": "As you read Matthew 6:14–15, identify the moment when Jesus’ words or actions most clearly address “Release and forgiveness.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a decision you are carrying alone because depending on someone feels unsafe. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Release and forgiveness” today."
+    },
+    {
+      "p1": "In Matthew 7:24–27, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Building on the rock,” and what detail in the passage supports your answer?",
+      "p2": "Bring the passage into one real situation: a marriage conversation where protecting yourself keeps you from receiving partnership. What are you afraid will happen, what truth from Matthew 7:24–27 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Building on the rock,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Matthew 5:21–26 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Repair before resentment,” and what replaces that assumption?",
+      "p2": "Consider a boundary that protects your dignity without shutting out trustworthy support. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 5:21–26 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Repair before resentment” remains specific."
+    },
+    {
+      "p1": "In Matthew 5:38–48, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Responding without retaliation” more carefully?",
+      "p2": "Apply “Responding without retaliation” to a responsibility that is wise but has quietly become fear-driven control. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Responding without retaliation” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 6:1–4 that controls the rest of the scene. Why is that element central to understanding “Giving without performance”?",
+      "p2": "Think about a financial or household task you believe will fall apart unless you manage every detail. What are you tempted to demand from yourself or another person? Based on Matthew 6:1–4, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Giving without performance,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Matthew 6:16–18, identify the moment when Jesus’ words or actions most clearly address “Private faithfulness.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a decision you are carrying alone because depending on someone feels unsafe. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Private faithfulness” remains specific."
+    },
+    {
+      "p1": "In Matthew 7:1–5, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Seeing clearly,” and what detail in the passage supports your answer?",
+      "p2": "Bring the passage into one real situation: a marriage conversation where protecting yourself keeps you from receiving partnership. What are you afraid will happen, what truth from Matthew 7:1–5 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Seeing clearly” today."
+    },
+    {
+      "p1": "Read Matthew 7:6 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Wisdom and boundaries,” and what replaces that assumption?",
+      "p2": "Consider a boundary that protects your dignity without shutting out trustworthy support. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 7:6 invite a different response? Write your answer in relation to the day’s focus, “Wisdom and boundaries,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 7:12, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Living the way of love” more carefully?",
+      "p2": "Apply “Living the way of love” to a responsibility that is wise but has quietly become fear-driven control. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Living the way of love” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 5:13–16 that controls the rest of the scene. Why is that element central to understanding “Faith that becomes visible”?",
+      "p2": "Think about a financial or household task you believe will fall apart unless you manage every detail. What are you tempted to demand from yourself or another person? Based on Matthew 5:13–16, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Faith that becomes visible” today."
+    },
+    {
+      "p1": "As you read Matthew 5:17–20, identify the moment when Jesus’ words or actions most clearly address “Obedience from the heart.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a decision you are carrying alone because depending on someone feels unsafe. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Obedience from the heart,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 6:22–23, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “What shapes your vision,” and what detail in the passage supports your answer?",
+      "p2": "Bring the passage into one real situation: a marriage conversation where protecting yourself keeps you from receiving partnership. What are you afraid will happen, what truth from Matthew 6:22–23 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “What shapes your vision” remains specific."
+    },
+    {
+      "p1": "Read Matthew 6:24 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “One true master,” and what replaces that assumption?",
+      "p2": "Consider a boundary that protects your dignity without shutting out trustworthy support. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 6:24 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “One true master” today."
+    },
+    {
+      "p1": "In Matthew 7:13–14, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Choosing the narrow way” more carefully?",
+      "p2": "Apply “Choosing the narrow way” to a responsibility that is wise but has quietly become fear-driven control. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Choosing the narrow way,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 7:15–20 that controls the rest of the scene. Why is that element central to understanding “Looking for fruit”?",
+      "p2": "Think about a financial or household task you believe will fall apart unless you manage every detail. What are you tempted to demand from yourself or another person? Based on Matthew 7:15–20, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Looking for fruit” remains specific."
+    },
+    {
+      "p1": "As you read Matthew 7:28–29, identify the moment when Jesus’ words or actions most clearly address “Living under Jesus’ authority.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a decision you are carrying alone because depending on someone feels unsafe. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Living under Jesus’ authority” today."
+    }
+  ],
+  "anxiety": [
+    {
+      "p1": "In Matthew 6:25–27, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “What worry cannot add,” and what detail in the passage supports your answer?",
+      "p2": "Consider a situation where your body is reacting as though danger is present even when the outcome is not known. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 6:25–27 invite a different response? Write your answer in relation to the day’s focus, “What worry cannot add,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Matthew 6:28–30 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “The God who clothes the flowers,” and what replaces that assumption?",
+      "p2": "Apply “The God who clothes the flowers” to a fear that has become larger in your imagination than God’s character in the passage. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “The God who clothes the flowers” remains specific."
+    },
+    {
+      "p1": "In Matthew 6:31–34, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Today has enough trouble” more carefully?",
+      "p2": "Think about a specific thought you keep rehearsing because uncertainty feels intolerable. What are you tempted to demand from yourself or another person? Based on Matthew 6:31–34, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Today has enough trouble” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 7:7–11 that controls the rest of the scene. Why is that element central to understanding “The Father gives good gifts”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a responsibility you can act on today and a future outcome you cannot control. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “The Father gives good gifts,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Matthew 6:9–13, identify the moment when Jesus’ words or actions most clearly address “Daily bread.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: a practice of prayer, rest, planning, or asking for help that would express trust without denying the concern. What are you afraid will happen, what truth from Matthew 6:9–13 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Daily bread” remains specific."
+    },
+    {
+      "p1": "In Matthew 5:1–12, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Blessed in the middle of need,” and what detail in the passage supports your answer?",
+      "p2": "Consider a situation where your body is reacting as though danger is present even when the outcome is not known. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 5:1–12 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Blessed in the middle of need” today."
+    },
+    {
+      "p1": "Read Matthew 6:19–21 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Treasure and anxiety,” and what replaces that assumption?",
+      "p2": "Apply “Treasure and anxiety” to a fear that has become larger in your imagination than God’s character in the passage. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Treasure and anxiety,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 6:22–23, compare what the people expect with what Jesus teaches or does. How does that contrast help define “A clear eye” more carefully?",
+      "p2": "Think about a specific thought you keep rehearsing because uncertainty feels intolerable. What are you tempted to demand from yourself or another person? Based on Matthew 6:22–23, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “A clear eye” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 6:24 that controls the rest of the scene. Why is that element central to understanding “Divided loyalty”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a responsibility you can act on today and a future outcome you cannot control. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Divided loyalty” today."
+    },
+    {
+      "p1": "As you read Matthew 5:44–48, identify the moment when Jesus’ words or actions most clearly address “Love beyond fear.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: a practice of prayer, rest, planning, or asking for help that would express trust without denying the concern. What are you afraid will happen, what truth from Matthew 5:44–48 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Love beyond fear,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 7:24–27, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “A foundation for storms,” and what detail in the passage supports your answer?",
+      "p2": "Consider a situation where your body is reacting as though danger is present even when the outcome is not known. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 7:24–27 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “A foundation for storms” remains specific."
+    },
+    {
+      "p1": "Read Matthew 5:13–16 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Light in anxious places,” and what replaces that assumption?",
+      "p2": "Apply “Light in anxious places” to a fear that has become larger in your imagination than God’s character in the passage. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Light in anxious places” today."
+    },
+    {
+      "p1": "In Matthew 6:5–8, compare what the people expect with what Jesus teaches or does. How does that contrast help define “The Father already knows” more carefully?",
+      "p2": "Think about a specific thought you keep rehearsing because uncertainty feels intolerable. What are you tempted to demand from yourself or another person? Based on Matthew 6:5–8, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “The Father already knows,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 6:16–18 that controls the rest of the scene. Why is that element central to understanding “Hidden faithfulness”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a responsibility you can act on today and a future outcome you cannot control. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Hidden faithfulness” remains specific."
+    },
+    {
+      "p1": "As you read Matthew 7:1–5, identify the moment when Jesus’ words or actions most clearly address “Anxiety and judgment.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: a practice of prayer, rest, planning, or asking for help that would express trust without denying the concern. What are you afraid will happen, what truth from Matthew 7:1–5 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Anxiety and judgment” today."
+    },
+    {
+      "p1": "In Matthew 7:12, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “The next loving step,” and what detail in the passage supports your answer?",
+      "p2": "Consider a situation where your body is reacting as though danger is present even when the outcome is not known. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 7:12 invite a different response? Write your answer in relation to the day’s focus, “The next loving step,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Matthew 5:38–42 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Releasing the need to control others,” and what replaces that assumption?",
+      "p2": "Apply “Releasing the need to control others” to a fear that has become larger in your imagination than God’s character in the passage. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Releasing the need to control others” remains specific."
+    },
+    {
+      "p1": "In Matthew 5:43–48, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Trusting God with enemies” more carefully?",
+      "p2": "Think about a specific thought you keep rehearsing because uncertainty feels intolerable. What are you tempted to demand from yourself or another person? Based on Matthew 5:43–48, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Trusting God with enemies” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 7:13–14 that controls the rest of the scene. Why is that element central to understanding “A narrow but steady path”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a responsibility you can act on today and a future outcome you cannot control. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “A narrow but steady path,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Matthew 7:15–20, identify the moment when Jesus’ words or actions most clearly address “Fruit over fear.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: a practice of prayer, rest, planning, or asking for help that would express trust without denying the concern. What are you afraid will happen, what truth from Matthew 7:15–20 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Fruit over fear” remains specific."
+    },
+    {
+      "p1": "In Matthew 7:28–29, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Resting in Jesus’ authority,” and what detail in the passage supports your answer?",
+      "p2": "Consider a situation where your body is reacting as though danger is present even when the outcome is not known. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 7:28–29 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Resting in Jesus’ authority” today."
+    }
+  ],
+  "money": [
+    {
+      "p1": "Read Luke 12:13–21 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “The rich fool,” and what replaces that assumption?",
+      "p2": "Think about a conversation about money where transparency would be more faithful than control or avoidance. What are you tempted to demand from yourself or another person? Based on Luke 12:13–21, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “The rich fool,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Luke 12:22–34, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Do not be afraid, little flock” more carefully?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a place where generosity, contentment, planning, or restraint would better reflect the passage. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Do not be afraid, little flock” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 16:1–13 that controls the rest of the scene. Why is that element central to understanding “Faithful with little”?",
+      "p2": "Bring the passage into one real situation: a purchase, debt, savings goal, or household decision that reveals what you are trusting. What are you afraid will happen, what truth from Luke 16:1–13 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Faithful with little” today."
+    },
+    {
+      "p1": "As you read Luke 18:18–30, identify the moment when Jesus’ words or actions most clearly address “The rich ruler.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Consider one responsible financial action that belongs to today rather than carrying the whole future at once. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 18:18–30 invite a different response? Write your answer in relation to the day’s focus, “The rich ruler,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Luke 19:1–10, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Zacchaeus and changed stewardship,” and what detail in the passage supports your answer?",
+      "p2": "Apply “Zacchaeus and changed stewardship” to a financial concern where planning has crossed into repeated worry or false security. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Zacchaeus and changed stewardship” remains specific."
+    },
+    {
+      "p1": "Read Luke 21:1–4 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “The widow’s offering,” and what replaces that assumption?",
+      "p2": "Think about a conversation about money where transparency would be more faithful than control or avoidance. What are you tempted to demand from yourself or another person? Based on Luke 21:1–4, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “The widow’s offering” today."
+    },
+    {
+      "p1": "In Luke 6:27–38, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Generosity and mercy” more carefully?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a place where generosity, contentment, planning, or restraint would better reflect the passage. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Generosity and mercy,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 11:1–13 that controls the rest of the scene. Why is that element central to understanding “Daily bread and asking”?",
+      "p2": "Bring the passage into one real situation: a purchase, debt, savings goal, or household decision that reveals what you are trusting. What are you afraid will happen, what truth from Luke 11:1–13 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Daily bread and asking” remains specific."
+    },
+    {
+      "p1": "As you read Luke 14:25–33, identify the moment when Jesus’ words or actions most clearly address “Counting the cost.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Consider one responsible financial action that belongs to today rather than carrying the whole future at once. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 14:25–33 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Counting the cost” today."
+    },
+    {
+      "p1": "In Luke 15:11–32, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “The Father’s abundance,” and what detail in the passage supports your answer?",
+      "p2": "Apply “The Father’s abundance” to a financial concern where planning has crossed into repeated worry or false security. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “The Father’s abundance,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Luke 10:25–37 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Generosity as neighbor love,” and what replaces that assumption?",
+      "p2": "Think about a conversation about money where transparency would be more faithful than control or avoidance. What are you tempted to demand from yourself or another person? Based on Luke 10:25–37, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Generosity as neighbor love” remains specific."
+    },
+    {
+      "p1": "In Luke 10:38–42, compare what the people expect with what Jesus teaches or does. How does that contrast help define “One thing needed” more carefully?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a place where generosity, contentment, planning, or restraint would better reflect the passage. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “One thing needed” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 8:4–15 that controls the rest of the scene. Why is that element central to understanding “What chokes the word”?",
+      "p2": "Bring the passage into one real situation: a purchase, debt, savings goal, or household decision that reveals what you are trusting. What are you afraid will happen, what truth from Luke 8:4–15 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “What chokes the word,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Luke 9:10–17, identify the moment when Jesus’ words or actions most clearly address “Jesus feeds the crowd.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Consider one responsible financial action that belongs to today rather than carrying the whole future at once. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 9:10–17 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Jesus feeds the crowd” remains specific."
+    },
+    {
+      "p1": "In Luke 5:1–11, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Trust beyond what you can see,” and what detail in the passage supports your answer?",
+      "p2": "Apply “Trust beyond what you can see” to a financial concern where planning has crossed into repeated worry or false security. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Trust beyond what you can see” today."
+    },
+    {
+      "p1": "Read Luke 7:36–50 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Love flowing from forgiveness,” and what replaces that assumption?",
+      "p2": "Think about a conversation about money where transparency would be more faithful than control or avoidance. What are you tempted to demand from yourself or another person? Based on Luke 7:36–50, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Love flowing from forgiveness,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Luke 18:1–8, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Persistent trust” more carefully?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a place where generosity, contentment, planning, or restraint would better reflect the passage. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Persistent trust” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 22:24–27 that controls the rest of the scene. Why is that element central to understanding “Greatness through service”?",
+      "p2": "Bring the passage into one real situation: a purchase, debt, savings goal, or household decision that reveals what you are trusting. What are you afraid will happen, what truth from Luke 22:24–27 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Greatness through service” today."
+    },
+    {
+      "p1": "As you read Luke 22:35–38, identify the moment when Jesus’ words or actions most clearly address “Remembering provision.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Consider one responsible financial action that belongs to today rather than carrying the whole future at once. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 22:35–38 invite a different response? Write your answer in relation to the day’s focus, “Remembering provision,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Luke 24:13–35, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Recognizing Jesus in the journey,” and what detail in the passage supports your answer?",
+      "p2": "Apply “Recognizing Jesus in the journey” to a financial concern where planning has crossed into repeated worry or false security. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Recognizing Jesus in the journey” remains specific."
+    },
+    {
+      "p1": "Read Luke 24:44–49 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Living from promise, not panic,” and what replaces that assumption?",
+      "p2": "Think about a conversation about money where transparency would be more faithful than control or avoidance. What are you tempted to demand from yourself or another person? Based on Luke 24:44–49, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Living from promise, not panic” today."
+    }
+  ],
+  "control": [
+    {
+      "p1": "Trace the sequence of events in Exodus 3:1–12. Which moment functions as the turning point, and what does the outcome reveal about “God meets Moses”?",
+      "p2": "Bring the passage into one real situation: a fear underneath your need to plan, check, fix, or manage everything. What are you afraid will happen, what truth from Exodus 3:1–12 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “God meets Moses,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Exodus 4:1–17, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “Fear and excuses”?",
+      "p2": "Consider one outcome you are trying to guarantee even though it depends on God, time, or another person. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Exodus 4:1–17 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Fear and excuses” remains specific."
+    },
+    {
+      "p1": "In Exodus 13:17–22, identify the central decision, conflict, encounter, or act of God. What changes because of it, and how does that change illuminate “The long way with God”?",
+      "p2": "Apply “The long way with God” to a relationship where control is replacing honest communication, boundaries, or trust. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “The long way with God” today."
+    },
+    {
+      "p1": "Read Exodus 14:10–18 as a story rather than as a list of commands. Which action is described, which action is evaluated, and what evidence helps you decide what the reader is meant to learn about “Stand firm and move forward”?",
+      "p2": "Think about one specific thing to release and one responsibility that still remains yours. What are you tempted to demand from yourself or another person? Based on Exodus 14:10–18, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Stand firm and move forward,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Exodus 15:22–27. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “Bitter water”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a task you need to do faithfully without treating yourself as responsible for every result. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Bitter water” remains specific."
+    },
+    {
+      "p1": "Trace the sequence of events in Exodus 16:1–12. Which moment functions as the turning point, and what does the outcome reveal about “Complaining and provision”?",
+      "p2": "Bring the passage into one real situation: a fear underneath your need to plan, check, fix, or manage everything. What are you afraid will happen, what truth from Exodus 16:1–12 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Complaining and provision” today."
+    },
+    {
+      "p1": "In Exodus 16:13–21, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “Daily manna”?",
+      "p2": "Consider one outcome you are trying to guarantee even though it depends on God, time, or another person. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Exodus 16:13–21 invite a different response? Write your answer in relation to the day’s focus, “Daily manna,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Exodus 16:22–30, identify the central decision, conflict, encounter, or act of God. What changes because of it, and how does that change illuminate “Learning Sabbath”?",
+      "p2": "Apply “Learning Sabbath” to a relationship where control is replacing honest communication, boundaries, or trust. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Learning Sabbath” remains specific."
+    },
+    {
+      "p1": "Read Exodus 17:1–7 as a story rather than as a list of commands. Which action is described, which action is evaluated, and what evidence helps you decide what the reader is meant to learn about “Testing God in thirst”?",
+      "p2": "Think about one specific thing to release and one responsibility that still remains yours. What are you tempted to demand from yourself or another person? Based on Exodus 17:1–7, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Testing God in thirst” today."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Exodus 17:8–16. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “Receiving help”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a task you need to do faithfully without treating yourself as responsible for every result. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Receiving help,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Trace the sequence of events in Exodus 18:13–27. Which moment functions as the turning point, and what does the outcome reveal about “You cannot carry this alone”?",
+      "p2": "Bring the passage into one real situation: a fear underneath your need to plan, check, fix, or manage everything. What are you afraid will happen, what truth from Exodus 18:13–27 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “You cannot carry this alone” remains specific."
+    },
+    {
+      "p1": "In Exodus 19:1–8, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “A treasured people”?",
+      "p2": "Consider one outcome you are trying to guarantee even though it depends on God, time, or another person. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Exodus 19:1–8 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “A treasured people” today."
+    },
+    {
+      "p1": "In Exodus 20:1–17, identify the central decision, conflict, encounter, or act of God. What changes because of it, and how does that change illuminate “Freedom with boundaries”?",
+      "p2": "Apply “Freedom with boundaries” to a relationship where control is replacing honest communication, boundaries, or trust. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Freedom with boundaries,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Exodus 24:1–18 as a story rather than as a list of commands. Which action is described, which action is evaluated, and what evidence helps you decide what the reader is meant to learn about “Covenant and presence”?",
+      "p2": "Think about one specific thing to release and one responsibility that still remains yours. What are you tempted to demand from yourself or another person? Based on Exodus 24:1–18, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Covenant and presence” remains specific."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Exodus 32:1–14. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “Control and the golden calf”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a task you need to do faithfully without treating yourself as responsible for every result. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Control and the golden calf” today."
+    },
+    {
+      "p1": "Trace the sequence of events in Exodus 33:12–23. Which moment functions as the turning point, and what does the outcome reveal about “If Your presence does not go”?",
+      "p2": "Bring the passage into one real situation: a fear underneath your need to plan, check, fix, or manage everything. What are you afraid will happen, what truth from Exodus 33:12–23 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “If Your presence does not go,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Exodus 34:1–9, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “The character of God”?",
+      "p2": "Consider one outcome you are trying to guarantee even though it depends on God, time, or another person. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Exodus 34:1–9 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “The character of God” remains specific."
+    },
+    {
+      "p1": "In Exodus 35:20–29, identify the central decision, conflict, encounter, or act of God. What changes because of it, and how does that change illuminate “Willing hearts”?",
+      "p2": "Apply “Willing hearts” to a relationship where control is replacing honest communication, boundaries, or trust. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Willing hearts” today."
+    },
+    {
+      "p1": "Read Exodus 36:1–7 as a story rather than as a list of commands. Which action is described, which action is evaluated, and what evidence helps you decide what the reader is meant to learn about “Enough and more than enough”?",
+      "p2": "Think about one specific thing to release and one responsibility that still remains yours. What are you tempted to demand from yourself or another person? Based on Exodus 36:1–7, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Enough and more than enough,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Exodus 40:34–38. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “The glory fills the tabernacle”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a task you need to do faithfully without treating yourself as responsible for every result. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “The glory fills the tabernacle” remains specific."
+    },
+    {
+      "p1": "Trace the sequence of events in Deuteronomy 8:2–10. Which moment functions as the turning point, and what does the outcome reveal about “Remembering the wilderness”?",
+      "p2": "Bring the passage into one real situation: a fear underneath your need to plan, check, fix, or manage everything. What are you afraid will happen, what truth from Deuteronomy 8:2–10 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Remembering the wilderness” today."
+    }
+  ],
+  "identity": [
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Ephesians 1:1–6? Explain what comes before and after it and how that connection clarifies “Chosen in love.”",
+      "p2": "Apply “Chosen in love” to one way to act from a received identity rather than trying to earn one. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Chosen in love,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ephesians 1:7–10, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Redeemed and forgiven”?",
+      "p2": "Think about a mistake or limitation you are treating as the truest thing about you. What are you tempted to demand from yourself or another person? Based on Ephesians 1:7–10, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Redeemed and forgiven” remains specific."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 1:11–14: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Sealed with the Spirit.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a comparison that makes you forget what God has already said about belonging and grace. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Sealed with the Spirit” today."
+    },
+    {
+      "p1": "In Ephesians 1:15–23, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Eyes of the heart,” and why?",
+      "p2": "Bring the passage into one real situation: a place where your value rises or falls with productivity, approval, appearance, or performance. What are you afraid will happen, what truth from Ephesians 1:15–23 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Eyes of the heart,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Ephesians 2:1–10? How does that original concern keep the teaching about “Saved by grace” from becoming vague advice?",
+      "p2": "Consider a responsibility you can carry without using success or failure to define your worth. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Ephesians 2:1–10 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Saved by grace” remains specific."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Ephesians 2:11–18? Explain what comes before and after it and how that connection clarifies “Brought near.”",
+      "p2": "Apply “Brought near” to one way to act from a received identity rather than trying to earn one. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Brought near” today."
+    },
+    {
+      "p1": "In Ephesians 2:19–22, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “A place to belong”?",
+      "p2": "Think about a mistake or limitation you are treating as the truest thing about you. What are you tempted to demand from yourself or another person? Based on Ephesians 2:19–22, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “A place to belong,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 3:1–6: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “The mystery revealed.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a comparison that makes you forget what God has already said about belonging and grace. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “The mystery revealed” remains specific."
+    },
+    {
+      "p1": "In Ephesians 3:7–13, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Grace for calling,” and why?",
+      "p2": "Bring the passage into one real situation: a place where your value rises or falls with productivity, approval, appearance, or performance. What are you afraid will happen, what truth from Ephesians 3:7–13 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Grace for calling” today."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Ephesians 3:14–21? How does that original concern keep the teaching about “Rooted in love” from becoming vague advice?",
+      "p2": "Consider a responsibility you can carry without using success or failure to define your worth. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Ephesians 3:14–21 invite a different response? Write your answer in relation to the day’s focus, “Rooted in love,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Ephesians 4:1–6? Explain what comes before and after it and how that connection clarifies “Walk worthy.”",
+      "p2": "Apply “Walk worthy” to one way to act from a received identity rather than trying to earn one. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Walk worthy” remains specific."
+    },
+    {
+      "p1": "In Ephesians 4:7–16, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Growing into maturity”?",
+      "p2": "Think about a mistake or limitation you are treating as the truest thing about you. What are you tempted to demand from yourself or another person? Based on Ephesians 4:7–16, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Growing into maturity” today."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 4:17–24: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “The new self.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a comparison that makes you forget what God has already said about belonging and grace. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “The new self,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ephesians 4:25–32, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Truthful and tender,” and why?",
+      "p2": "Bring the passage into one real situation: a place where your value rises or falls with productivity, approval, appearance, or performance. What are you afraid will happen, what truth from Ephesians 4:25–32 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Truthful and tender” remains specific."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Ephesians 5:1–2? How does that original concern keep the teaching about “Walk in love” from becoming vague advice?",
+      "p2": "Consider a responsibility you can carry without using success or failure to define your worth. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Ephesians 5:1–2 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Walk in love” today."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Ephesians 5:8–14? Explain what comes before and after it and how that connection clarifies “Walk as light.”",
+      "p2": "Apply “Walk as light” to one way to act from a received identity rather than trying to earn one. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Walk as light,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ephesians 5:15–20, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Walk wisely”?",
+      "p2": "Think about a mistake or limitation you are treating as the truest thing about you. What are you tempted to demand from yourself or another person? Based on Ephesians 5:15–20, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Walk wisely” remains specific."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 5:21–33: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Mutual honor in marriage.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a comparison that makes you forget what God has already said about belonging and grace. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Mutual honor in marriage” today."
+    },
+    {
+      "p1": "In Ephesians 6:1–4, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Family and formation,” and why?",
+      "p2": "Bring the passage into one real situation: a place where your value rises or falls with productivity, approval, appearance, or performance. What are you afraid will happen, what truth from Ephesians 6:1–4 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Family and formation,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Ephesians 6:10–18? How does that original concern keep the teaching about “Strength in the Lord” from becoming vague advice?",
+      "p2": "Consider a responsibility you can carry without using success or failure to define your worth. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Ephesians 6:10–18 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Strength in the Lord” remains specific."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Ephesians 6:19–24? Explain what comes before and after it and how that connection clarifies “Grace and peace.”",
+      "p2": "Apply “Grace and peace” to one way to act from a received identity rather than trying to earn one. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Grace and peace” today."
+    }
+  ],
+  "grief": [
+    {
+      "p1": "In Psalm 13, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “How long, Lord?”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a loss you are tempted to minimize because you think faithful people should be stronger. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “How long, Lord?,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Psalm 22 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Why have You forsaken me?.”",
+      "p2": "Bring the passage into one real situation: a memory, absence, or unanswered question that still carries pain. What are you afraid will happen, what truth from Psalm 22 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Why have You forsaken me?” remains specific."
+    },
+    {
+      "p1": "In Psalm 23, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “The Shepherd in the valley,” and why?",
+      "p2": "Consider one gentle practice of lament, remembrance, community, or rest that fits this day. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Psalm 23 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “The Shepherd in the valley” today."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 27. How do they move the reader toward a faithful response to “Waiting with courage”?",
+      "p2": "Apply “Waiting with courage” to an emotion you need to bring honestly before God instead of explaining it away. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Waiting with courage,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What tension remains unresolved in Psalm 31, and what reason does the psalmist still have for trust? Explain how both the tension and the trust matter for “Into Your hands.”",
+      "p2": "Think about a form of comfort that acknowledges suffering without offering shallow certainty. What are you tempted to demand from yourself or another person? Based on Psalm 31, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Into Your hands” remains specific."
+    },
+    {
+      "p1": "In Psalm 34, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “Near to the brokenhearted”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a loss you are tempted to minimize because you think faithful people should be stronger. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Near to the brokenhearted” today."
+    },
+    {
+      "p1": "Read Psalm 42 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Why are you downcast?.”",
+      "p2": "Bring the passage into one real situation: a memory, absence, or unanswered question that still carries pain. What are you afraid will happen, what truth from Psalm 42 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Why are you downcast?,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Psalm 46, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “A very present help,” and why?",
+      "p2": "Consider one gentle practice of lament, remembrance, community, or rest that fits this day. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Psalm 46 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “A very present help” remains specific."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 55. How do they move the reader toward a faithful response to “Cast your burden”?",
+      "p2": "Apply “Cast your burden” to an emotion you need to bring honestly before God instead of explaining it away. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Cast your burden” today."
+    },
+    {
+      "p1": "What tension remains unresolved in Psalm 56, and what reason does the psalmist still have for trust? Explain how both the tension and the trust matter for “When I am afraid.”",
+      "p2": "Think about a form of comfort that acknowledges suffering without offering shallow certainty. What are you tempted to demand from yourself or another person? Based on Psalm 56, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “When I am afraid,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Psalm 61, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “Lead me to the rock”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a loss you are tempted to minimize because you think faithful people should be stronger. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Lead me to the rock” remains specific."
+    },
+    {
+      "p1": "Read Psalm 62 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Quiet trust.”",
+      "p2": "Bring the passage into one real situation: a memory, absence, or unanswered question that still carries pain. What are you afraid will happen, what truth from Psalm 62 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Quiet trust” today."
+    },
+    {
+      "p1": "In Psalm 69, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “Deep waters,” and why?",
+      "p2": "Consider one gentle practice of lament, remembrance, community, or rest that fits this day. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Psalm 69 invite a different response? Write your answer in relation to the day’s focus, “Deep waters,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 73. How do they move the reader toward a faithful response to “When life feels unfair”?",
+      "p2": "Apply “When life feels unfair” to an emotion you need to bring honestly before God instead of explaining it away. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “When life feels unfair” remains specific."
+    },
+    {
+      "p1": "What tension remains unresolved in Psalm 77, and what reason does the psalmist still have for trust? Explain how both the tension and the trust matter for “Remembering in the dark.”",
+      "p2": "Think about a form of comfort that acknowledges suffering without offering shallow certainty. What are you tempted to demand from yourself or another person? Based on Psalm 77, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Remembering in the dark” today."
+    },
+    {
+      "p1": "In Psalm 84, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “Strength for the journey”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a loss you are tempted to minimize because you think faithful people should be stronger. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Strength for the journey,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Psalm 88 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “A prayer without a neat ending.”",
+      "p2": "Bring the passage into one real situation: a memory, absence, or unanswered question that still carries pain. What are you afraid will happen, what truth from Psalm 88 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “A prayer without a neat ending” remains specific."
+    },
+    {
+      "p1": "In Psalm 103, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “Remember His benefits,” and why?",
+      "p2": "Consider one gentle practice of lament, remembrance, community, or rest that fits this day. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Psalm 103 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Remember His benefits” today."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 121. How do they move the reader toward a faithful response to “Where help comes from”?",
+      "p2": "Apply “Where help comes from” to an emotion you need to bring honestly before God instead of explaining it away. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Where help comes from,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What tension remains unresolved in Psalm 130, and what reason does the psalmist still have for trust? Explain how both the tension and the trust matter for “Waiting for the Lord.”",
+      "p2": "Think about a form of comfort that acknowledges suffering without offering shallow certainty. What are you tempted to demand from yourself or another person? Based on Psalm 130, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Waiting for the Lord” remains specific."
+    },
+    {
+      "p1": "In Psalm 139, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “Known and held”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a loss you are tempted to minimize because you think faithful people should be stronger. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Known and held” today."
+    }
+  ],
+  "redeemed": [
+    {
+      "p1": "In John 21:1–14, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Jesus meets Peter again,” and what detail in the passage supports your answer?",
+      "p2": "Consider a consequence that should be faced honestly without turning it into permanent condemnation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does John 21:1–14 invite a different response? Write your answer in relation to the day’s focus, “Jesus meets Peter again,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read John 21:15–17 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Do you love Me?,” and what replaces that assumption?",
+      "p2": "Apply “Do you love Me?” to a place where shame is keeping you passive even though grace calls you forward. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Do you love Me?” remains specific."
+    },
+    {
+      "p1": "In John 21:18–19, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Follow Me again” more carefully?",
+      "p2": "Think about a past failure you keep using as proof that God cannot still work through you. What are you tempted to demand from yourself or another person? Based on John 21:18–19, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Follow Me again” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 22:54–62 that controls the rest of the scene. Why is that element central to understanding “Peter’s failure”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an apology, repair, confession, or boundary that redemption requires rather than avoids. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Peter’s failure,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Luke 22:31–34, identify the moment when Jesus’ words or actions most clearly address “Jesus prayed for Peter.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: one faithful action that reflects repentance and hope at the same time. What are you afraid will happen, what truth from Luke 22:31–34 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Jesus prayed for Peter” remains specific."
+    },
+    {
+      "p1": "Trace the logic of 2 Corinthians 7:8–11: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Godly sorrow.”",
+      "p2": "Consider a consequence that should be faced honestly without turning it into permanent condemnation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does 2 Corinthians 7:8–11 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Godly sorrow” today."
+    },
+    {
+      "p1": "In Romans 8:1–4, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “No condemnation,” and why?",
+      "p2": "Apply “No condemnation” to a place where shame is keeping you passive even though grace calls you forward. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “No condemnation,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Romans 8:18–28? How does that original concern keep the teaching about “God at work in suffering” from becoming vague advice?",
+      "p2": "Think about a past failure you keep using as proof that God cannot still work through you. What are you tempted to demand from yourself or another person? Based on Romans 8:18–28, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “God at work in suffering” remains specific."
+    },
+    {
+      "p1": "What tension remains unresolved in Psalm 51, and what reason does the psalmist still have for trust? Explain how both the tension and the trust matter for “A broken and contrite heart.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an apology, repair, confession, or boundary that redemption requires rather than avoids. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “A broken and contrite heart” today."
+    },
+    {
+      "p1": "In Psalm 32, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “The relief of confession”?",
+      "p2": "Bring the passage into one real situation: one faithful action that reflects repentance and hope at the same time. What are you afraid will happen, what truth from Psalm 32 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “The relief of confession,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What false security, injustice, fear, or unfaithfulness is exposed in Micah 7:8–9? Which description of God provides the passage’s answer to that problem and clarifies “Though I fall, I will rise”?",
+      "p2": "Consider a consequence that should be faced honestly without turning it into permanent condemnation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Micah 7:8–9 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Though I fall, I will rise” remains specific."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Genesis 50:15–21. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “God’s redemption without denial”?",
+      "p2": "Apply “God’s redemption without denial” to a place where shame is keeping you passive even though grace calls you forward. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “God’s redemption without denial” today."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in 1 Timothy 1:12–17? How does that original concern keep the teaching about “Mercy for an example” from becoming vague advice?",
+      "p2": "Think about a past failure you keep using as proof that God cannot still work through you. What are you tempted to demand from yourself or another person? Based on 1 Timothy 1:12–17, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Mercy for an example,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Philippians 3:12–14? Explain what comes before and after it and how that connection clarifies “Pressing forward.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an apology, repair, confession, or boundary that redemption requires rather than avoids. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Pressing forward” remains specific."
+    },
+    {
+      "p1": "In Isaiah 43:18–19, identify what God confronts and what He promises, invites, or restores. How do those two movements together address “A new thing”?",
+      "p2": "Bring the passage into one real situation: one faithful action that reflects repentance and hope at the same time. What are you afraid will happen, what truth from Isaiah 43:18–19 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “A new thing” today."
+    },
+    {
+      "p1": "What false security, injustice, fear, or unfaithfulness is exposed in Joel 2:25–27? Which description of God provides the passage’s answer to that problem and clarifies “Restoration after loss”?",
+      "p2": "Consider a consequence that should be faced honestly without turning it into permanent condemnation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Joel 2:25–27 invite a different response? Write your answer in relation to the day’s focus, “Restoration after loss,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ephesians 2:1–10, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Grace and good works,” and why?",
+      "p2": "Apply “Grace and good works” to a place where shame is keeping you passive even though grace calls you forward. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Grace and good works” remains specific."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in 1 Peter 5:1–4? How does that original concern keep the teaching about “Shepherd without domineering” from becoming vague advice?",
+      "p2": "Think about a past failure you keep using as proof that God cannot still work through you. What are you tempted to demand from yourself or another person? Based on 1 Peter 5:1–4, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Shepherd without domineering” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Mark 10:42–45 that controls the rest of the scene. Why is that element central to understanding “Leadership through service”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an apology, repair, confession, or boundary that redemption requires rather than avoids. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Leadership through service,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read John 13:1–17, identify the moment when Jesus’ words or actions most clearly address “Love that washes feet.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Bring the passage into one real situation: one faithful action that reflects repentance and hope at the same time. What are you afraid will happen, what truth from John 13:1–17 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Love that washes feet” remains specific."
+    },
+    {
+      "p1": "In John 21:20–22, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Follow Me, not comparison,” and what detail in the passage supports your answer?",
+      "p2": "Consider a consequence that should be faced honestly without turning it into permanent condemnation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does John 21:20–22 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Follow Me, not comparison” today."
+    }
+  ],
+  "leader": [
+    {
+      "p1": "Read Mark 10:35–45 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Greatness through service,” and what replaces that assumption?",
+      "p2": "Think about a person who needs clarity and care rather than pressure. What are you tempted to demand from yourself or another person? Based on Mark 10:35–45, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Greatness through service,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In John 13:1–17, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Washing feet” more carefully?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about one concrete way to lead through example, prayer, preparation, or protection today. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Washing feet” remains specific."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Philippians 2:1–11? Explain what comes before and after it and how that connection clarifies “The mind of Christ.”",
+      "p2": "Bring the passage into one real situation: a decision that requires courage, humility, listening, and responsibility together. What are you afraid will happen, what truth from Philippians 2:1–11 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “The mind of Christ” today."
+    },
+    {
+      "p1": "In 1 Peter 5:1–4, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Not domineering”?",
+      "p2": "Consider a weakness you must acknowledge without using it as an excuse to withdraw. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does 1 Peter 5:1–4 invite a different response? Write your answer in relation to the day’s focus, “Not domineering,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Trace the logic of James 1:19–20: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Quick to listen.”",
+      "p2": "Apply “Quick to listen” to a leadership moment where serving would be more faithful than controlling or proving yourself. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Quick to listen” remains specific."
+    },
+    {
+      "p1": "What two paths, attitudes, outcomes, or voices are contrasted in Proverbs 15:1–4? How does that contrast sharpen your understanding of “A gentle answer”?",
+      "p2": "Think about a person who needs clarity and care rather than pressure. What are you tempted to demand from yourself or another person? Based on Proverbs 15:1–4, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “A gentle answer” today."
+    },
+    {
+      "p1": "In Proverbs 11:14, what ordinary behavior reveals a deeper condition of the heart? Explain how the passage connects that behavior to “Receiving counsel.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about one concrete way to lead through example, prayer, preparation, or protection today. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Receiving counsel,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which phrase in Proverbs 16:9 would be easiest to quote without its surrounding wisdom? Read the whole section and explain how the context makes its teaching about “Planning under God” more responsible.",
+      "p2": "Bring the passage into one real situation: a decision that requires courage, humility, listening, and responsibility together. What are you afraid will happen, what truth from Proverbs 16:9 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Planning under God” remains specific."
+    },
+    {
+      "p1": "In Micah 6:8, identify what God confronts and what He promises, invites, or restores. How do those two movements together address “Walking humbly”?",
+      "p2": "Consider a weakness you must acknowledge without using it as an excuse to withdraw. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Micah 6:8 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Walking humbly” today."
+    },
+    {
+      "p1": "Read Joshua 1:1–9 as a story rather than as a list of commands. Which action is described, which action is evaluated, and what evidence helps you decide what the reader is meant to learn about “Courage rooted in God”?",
+      "p2": "Apply “Courage rooted in God” to a leadership moment where serving would be more faithful than controlling or proving yourself. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Courage rooted in God,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Nehemiah 1:1–11. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “Leadership begins in prayer”?",
+      "p2": "Think about a person who needs clarity and care rather than pressure. What are you tempted to demand from yourself or another person? Based on Nehemiah 1:1–11, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Leadership begins in prayer” remains specific."
+    },
+    {
+      "p1": "Trace the sequence of events in Nehemiah 2:11–18. Which moment functions as the turning point, and what does the outcome reveal about “Seeing and acting wisely”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about one concrete way to lead through example, prayer, preparation, or protection today. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Seeing and acting wisely” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 20:20–28 that controls the rest of the scene. Why is that element central to understanding “The cup and the servant”?",
+      "p2": "Bring the passage into one real situation: a decision that requires courage, humility, listening, and responsibility together. What are you afraid will happen, what truth from Matthew 20:20–28 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “The cup and the servant,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read Luke 22:24–27, identify the moment when Jesus’ words or actions most clearly address “Jesus among us as one who serves.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Consider a weakness you must acknowledge without using it as an excuse to withdraw. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 22:24–27 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Jesus among us as one who serves” remains specific."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 5:21–33: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Love that sacrifices.”",
+      "p2": "Apply “Love that sacrifices” to a leadership moment where serving would be more faithful than controlling or proving yourself. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Love that sacrifices” today."
+    },
+    {
+      "p1": "In Colossians 3:12–17, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Compassion and patience,” and why?",
+      "p2": "Think about a person who needs clarity and care rather than pressure. What are you tempted to demand from yourself or another person? Based on Colossians 3:12–17, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Compassion and patience,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in 1 Corinthians 13:1–7? How does that original concern keep the teaching about “Love before achievement” from becoming vague advice?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about one concrete way to lead through example, prayer, preparation, or protection today. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Love before achievement” remains specific."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in 2 Timothy 2:1–7? Explain what comes before and after it and how that connection clarifies “Strength through grace.”",
+      "p2": "Bring the passage into one real situation: a decision that requires courage, humility, listening, and responsibility together. What are you afraid will happen, what truth from 2 Timothy 2:1–7 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Strength through grace” today."
+    },
+    {
+      "p1": "In Titus 1:7–9, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Character before authority”?",
+      "p2": "Consider a weakness you must acknowledge without using it as an excuse to withdraw. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Titus 1:7–9 invite a different response? Write your answer in relation to the day’s focus, “Character before authority,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Psalm 78:70–72 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Integrity and skill.”",
+      "p2": "Apply “Integrity and skill” to a leadership moment where serving would be more faithful than controlling or proving yourself. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Integrity and skill” remains specific."
+    },
+    {
+      "p1": "Read John 15:1–17 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “Leadership that abides,” and what replaces that assumption?",
+      "p2": "Think about a person who needs clarity and care rather than pressure. What are you tempted to demand from yourself or another person? Based on John 15:1–17, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Leadership that abides” today."
+    }
+  ],
+  "forgiveness": [
+    {
+      "p1": "In Matthew 18:21–35, compare what the people expect with what Jesus teaches or does. How does that contrast help define “The unforgiving servant” more carefully?",
+      "p2": "Bring the passage into one real situation: resentment that is harming you even though the other person may never repair what happened. What are you afraid will happen, what truth from Matthew 18:21–35 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “The unforgiving servant,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Matthew 5:21–26 that controls the rest of the scene. Why is that element central to understanding “Repair quickly”?",
+      "p2": "Consider a wrong you need to name truthfully before deciding what forgiveness and boundaries require. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 5:21–26 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Repair quickly” remains specific."
+    },
+    {
+      "p1": "As you read Matthew 5:38–48, identify the moment when Jesus’ words or actions most clearly address “Love beyond retaliation.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Apply “Love beyond retaliation” to a situation where forgiveness, reconciliation, access, and consequences need to be distinguished. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Love beyond retaliation” today."
+    },
+    {
+      "p1": "In Luke 17:1–4, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Rebuke and forgive,” and what detail in the passage supports your answer?",
+      "p2": "Think about one safe and truthful step toward release, lament, prayer, counsel, or repair. What are you tempted to demand from yourself or another person? Based on Luke 17:1–4, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Rebuke and forgive,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ephesians 4:25–32, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Tenderhearted forgiveness,” and why?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a debt you are being invited to release without pretending trust has already been rebuilt. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Tenderhearted forgiveness” remains specific."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Colossians 3:12–15? How does that original concern keep the teaching about “Bear with one another” from becoming vague advice?",
+      "p2": "Bring the passage into one real situation: resentment that is harming you even though the other person may never repair what happened. What are you afraid will happen, what truth from Colossians 3:12–15 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Bear with one another” today."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Romans 12:17–21? Explain what comes before and after it and how that connection clarifies “Overcome evil with good.”",
+      "p2": "Consider a wrong you need to name truthfully before deciding what forgiveness and boundaries require. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Romans 12:17–21 invite a different response? Write your answer in relation to the day’s focus, “Overcome evil with good,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Genesis 50:15–21, identify the central decision, conflict, encounter, or act of God. What changes because of it, and how does that change illuminate “Naming harm and seeing redemption”?",
+      "p2": "Apply “Naming harm and seeing redemption” to a situation where forgiveness, reconciliation, access, and consequences need to be distinguished. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Naming harm and seeing redemption” remains specific."
+    },
+    {
+      "p1": "Read Psalm 55 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Betrayal brought to God.”",
+      "p2": "Think about one safe and truthful step toward release, lament, prayer, counsel, or repair. What are you tempted to demand from yourself or another person? Based on Psalm 55, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Betrayal brought to God” today."
+    },
+    {
+      "p1": "In Psalm 73, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “When bitterness takes root,” and why?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a debt you are being invited to release without pretending trust has already been rebuilt. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “When bitterness takes root,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Hebrews 12:14–15? How does that original concern keep the teaching about “The root of bitterness” from becoming vague advice?",
+      "p2": "Bring the passage into one real situation: resentment that is harming you even though the other person may never repair what happened. What are you afraid will happen, what truth from Hebrews 12:14–15 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “The root of bitterness” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Mark 11:20–25 that controls the rest of the scene. Why is that element central to understanding “Forgiveness and prayer”?",
+      "p2": "Consider a wrong you need to name truthfully before deciding what forgiveness and boundaries require. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Mark 11:20–25 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Forgiveness and prayer” today."
+    },
+    {
+      "p1": "In 2 Corinthians 2:5–11, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Restoration after discipline”?",
+      "p2": "Apply “Restoration after discipline” to a situation where forgiveness, reconciliation, access, and consequences need to be distinguished. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Restoration after discipline,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Trace the logic of Philemon 8–21: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Appeal, dignity, and reconciliation.”",
+      "p2": "Think about one safe and truthful step toward release, lament, prayer, counsel, or repair. What are you tempted to demand from yourself or another person? Based on Philemon 8–21, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Appeal, dignity, and reconciliation” remains specific."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in 1 Samuel 24. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “David refuses revenge”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a debt you are being invited to release without pretending trust has already been rebuilt. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “David refuses revenge” today."
+    },
+    {
+      "p1": "Trace the sequence of events in 1 Samuel 26. Which moment functions as the turning point, and what does the outcome reveal about “Restraint a second time”?",
+      "p2": "Bring the passage into one real situation: resentment that is harming you even though the other person may never repair what happened. What are you afraid will happen, what truth from 1 Samuel 26 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Restraint a second time,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which phrase in Proverbs 19:11 would be easiest to quote without its surrounding wisdom? Read the whole section and explain how the context makes its teaching about “Glory in overlooking offense” more responsible.",
+      "p2": "Consider a wrong you need to name truthfully before deciding what forgiveness and boundaries require. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Proverbs 19:11 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Glory in overlooking offense” remains specific."
+    },
+    {
+      "p1": "In Proverbs 27:5–6, identify the comparison, warning, pattern, or consequence connected to “Faithful wounds.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "Apply “Faithful wounds” to a situation where forgiveness, reconciliation, access, and consequences need to be distinguished. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Faithful wounds” today."
+    },
+    {
+      "p1": "In Matthew 7:1–5, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Judgment and self-examination,” and what detail in the passage supports your answer?",
+      "p2": "Think about one safe and truthful step toward release, lament, prayer, counsel, or repair. What are you tempted to demand from yourself or another person? Based on Matthew 7:1–5, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Judgment and self-examination,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Galatians 6:1–2, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Restore gently,” and why?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a debt you are being invited to release without pretending trust has already been rebuilt. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Restore gently” remains specific."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Romans 5:6–11? How does that original concern keep the teaching about “Forgiven people become forgiving people” from becoming vague advice?",
+      "p2": "Bring the passage into one real situation: resentment that is harming you even though the other person may never repair what happened. What are you afraid will happen, what truth from Romans 5:6–11 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Forgiven people become forgiving people” today."
+    }
+  ],
+  "empathy": [
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in James 1:19–20? Explain what comes before and after it and how that connection clarifies “Quick to listen.”",
+      "p2": "Apply “Quick to listen” to one listening question, validating sentence, or patient pause you can practice today. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Quick to listen,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Proverbs 18:13, identify the comparison, warning, pattern, or consequence connected to “Answering before listening.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "Think about a person whose pain you are tempted to correct, compare, solve, or dismiss. What are you tempted to demand from yourself or another person? Based on Proverbs 18:13, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Answering before listening” remains specific."
+    },
+    {
+      "p1": "Read Proverbs 20:5 as wisdom rather than as an automatic guarantee. Which pattern does it present about “Drawing out the heart,” and what would be lost if the saying were treated as a promise that has no exceptions?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an emotion you need to acknowledge before discussing facts or solutions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Drawing out the heart” today."
+    },
+    {
+      "p1": "In Romans 12:15, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Weep with those who weep,” and why?",
+      "p2": "Bring the passage into one real situation: a conversation where you are preparing your defense instead of listening for the other person’s experience. What are you afraid will happen, what truth from Romans 12:15 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Weep with those who weep,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Colossians 3:12–14? How does that original concern keep the teaching about “Clothe yourself with compassion” from becoming vague advice?",
+      "p2": "Consider a moment when curiosity would communicate more care than a quick answer. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Colossians 3:12–14 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Clothe yourself with compassion” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 10:25–37 that controls the rest of the scene. Why is that element central to understanding “Seeing and moving toward pain”?",
+      "p2": "Apply “Seeing and moving toward pain” to one listening question, validating sentence, or patient pause you can practice today. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Seeing and moving toward pain” today."
+    },
+    {
+      "p1": "As you read John 11:28–36, identify the moment when Jesus’ words or actions most clearly address “Jesus wept.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Think about a person whose pain you are tempted to correct, compare, solve, or dismiss. What are you tempted to demand from yourself or another person? Based on John 11:28–36, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Jesus wept,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Mark 10:46–52, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “What do you want Me to do?,” and what detail in the passage supports your answer?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an emotion you need to acknowledge before discussing facts or solutions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “What do you want Me to do?” remains specific."
+    },
+    {
+      "p1": "In 1 Peter 3:7–9, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Living with understanding,” and why?",
+      "p2": "Bring the passage into one real situation: a conversation where you are preparing your defense instead of listening for the other person’s experience. What are you afraid will happen, what truth from 1 Peter 3:7–9 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Living with understanding” today."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in Philippians 2:1–4? How does that original concern keep the teaching about “Looking to others’ interests” from becoming vague advice?",
+      "p2": "Consider a moment when curiosity would communicate more care than a quick answer. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Philippians 2:1–4 invite a different response? Write your answer in relation to the day’s focus, “Looking to others’ interests,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which phrase in Proverbs 15:1 would be easiest to quote without its surrounding wisdom? Read the whole section and explain how the context makes its teaching about “A gentle answer” more responsible.",
+      "p2": "Apply “A gentle answer” to one listening question, validating sentence, or patient pause you can practice today. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “A gentle answer” remains specific."
+    },
+    {
+      "p1": "In Proverbs 12:18, identify the comparison, warning, pattern, or consequence connected to “Words that heal.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "Think about a person whose pain you are tempted to correct, compare, solve, or dismiss. What are you tempted to demand from yourself or another person? Based on Proverbs 12:18, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Words that heal” today."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 4:29: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Words that build up.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an emotion you need to acknowledge before discussing facts or solutions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Words that build up,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What two paths, attitudes, outcomes, or voices are contrasted in Job 2:11–13? How does that contrast sharpen your understanding of “Sitting in silence”?",
+      "p2": "Bring the passage into one real situation: a conversation where you are preparing your defense instead of listening for the other person’s experience. What are you afraid will happen, what truth from Job 2:11–13 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Sitting in silence” remains specific."
+    },
+    {
+      "p1": "In Job 16:1–5, what ordinary behavior reveals a deeper condition of the heart? Explain how the passage connects that behavior to “Miserable comforters.”",
+      "p2": "Consider a moment when curiosity would communicate more care than a quick answer. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Job 16:1–5 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Miserable comforters” today."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in Luke 24:13–35 that controls the rest of the scene. Why is that element central to understanding “Walking and listening”?",
+      "p2": "Apply “Walking and listening” to one listening question, validating sentence, or patient pause you can practice today. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Walking and listening,” rather than answering only in general terms."
+    },
+    {
+      "p1": "As you read John 4:4–26, identify the moment when Jesus’ words or actions most clearly address “Truth with dignity.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "Think about a person whose pain you are tempted to correct, compare, solve, or dismiss. What are you tempted to demand from yourself or another person? Based on John 4:4–26, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Truth with dignity” remains specific."
+    },
+    {
+      "p1": "Trace the logic of Galatians 6:2: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Bearing burdens.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about an emotion you need to acknowledge before discussing facts or solutions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Bearing burdens” today."
+    },
+    {
+      "p1": "In 1 Corinthians 12:21–26, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “When one suffers,” and why?",
+      "p2": "Bring the passage into one real situation: a conversation where you are preparing your defense instead of listening for the other person’s experience. What are you afraid will happen, what truth from 1 Corinthians 12:21–26 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “When one suffers,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Matthew 9:35–38, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Compassion that sees” more carefully?",
+      "p2": "Consider a moment when curiosity would communicate more care than a quick answer. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Matthew 9:35–38 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Compassion that sees” remains specific."
+    },
+    {
+      "p1": "Look for a command, question, image, promise, or warning in John 13:34–35 that controls the rest of the scene. Why is that element central to understanding “Love as the mark of discipleship”?",
+      "p2": "Apply “Love as the mark of discipleship” to one listening question, validating sentence, or patient pause you can practice today. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Love as the mark of discipleship” today."
+    }
+  ],
+  "father": [
+    {
+      "p1": "In Ephesians 5:21–33, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Love that gives itself”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a moment when the girls are learning from your tone and example more than from your instructions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Love that gives itself,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Trace the logic of Ephesians 6:1–4: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Do not provoke your children.”",
+      "p2": "Bring the passage into one real situation: a correction that needs firmness without humiliation or anger. What are you afraid will happen, what truth from Ephesians 6:1–4 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Do not provoke your children” remains specific."
+    },
+    {
+      "p1": "In Colossians 3:18–21, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Tender authority,” and why?",
+      "p2": "Consider one act of attention, apology, protection, encouragement, or consistency you can offer today. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Colossians 3:18–21 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Tender authority” today."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 78:1–8. How do they move the reader toward a faithful response to “Tell the next generation”?",
+      "p2": "Apply “Tell the next generation” to a family responsibility where presence matters more than perfection. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Tell the next generation,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Deuteronomy 6:4–9, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “Faith in everyday life”?",
+      "p2": "Think about a way to honor your wife and help the children see covenant love practiced. What are you tempted to demand from yourself or another person? Based on Deuteronomy 6:4–9, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Faith in everyday life” remains specific."
+    },
+    {
+      "p1": "In Proverbs 20:7, identify the comparison, warning, pattern, or consequence connected to “The legacy of integrity.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a moment when the girls are learning from your tone and example more than from your instructions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “The legacy of integrity” today."
+    },
+    {
+      "p1": "In Mark 10:13–16, notice how Jesus responds to the people, question, fear, conflict, or need in front of Him. Which response reveals the most about “Welcoming children,” and what detail in the passage supports your answer?",
+      "p2": "Bring the passage into one real situation: a correction that needs firmness without humiliation or anger. What are you afraid will happen, what truth from Mark 10:13–16 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Welcoming children,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Luke 15:11–24 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “A father who runs,” and what replaces that assumption?",
+      "p2": "Consider one act of attention, apology, protection, encouragement, or consistency you can offer today. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Luke 15:11–24 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “A father who runs” remains specific."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in 1 Thessalonians 2:7–12? How does that original concern keep the teaching about “Gentle and encouraging” from becoming vague advice?",
+      "p2": "Apply “Gentle and encouraging” to a family responsibility where presence matters more than perfection. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “Gentle and encouraging” today."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in James 3:13–18? Explain what comes before and after it and how that connection clarifies “Wisdom that is gentle.”",
+      "p2": "Think about a way to honor your wife and help the children see covenant love practiced. What are you tempted to demand from yourself or another person? Based on James 3:13–18, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Wisdom that is gentle,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Proverbs 15:1–4, identify the comparison, warning, pattern, or consequence connected to “Words that give life.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a moment when the girls are learning from your tone and example more than from your instructions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Words that give life” remains specific."
+    },
+    {
+      "p1": "Read Proverbs 27:17 as wisdom rather than as an automatic guarantee. Which pattern does it present about “Growth through relationship,” and what would be lost if the saying were treated as a promise that has no exceptions?",
+      "p2": "Bring the passage into one real situation: a correction that needs firmness without humiliation or anger. What are you afraid will happen, what truth from Proverbs 27:17 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Growth through relationship” today."
+    },
+    {
+      "p1": "Trace the movement in Micah 6:8 from warning or grief to hope or response. Where does the change occur, and what does that turning point teach about “Justice, mercy, humility”?",
+      "p2": "Consider one act of attention, apology, protection, encouragement, or consistency you can offer today. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Micah 6:8 invite a different response? Write your answer in relation to the day’s focus, “Justice, mercy, humility,” rather than answering only in general terms."
+    },
+    {
+      "p1": "What problem, misunderstanding, pressure, or relationship is the writer addressing in 1 Corinthians 13:4–7? How does that original concern keep the teaching about “The shape of love” from becoming vague advice?",
+      "p2": "Apply “The shape of love” to a family responsibility where presence matters more than perfection. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “The shape of love” remains specific."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Romans 12:9–18? Explain what comes before and after it and how that connection clarifies “Honor and peace.”",
+      "p2": "Think about a way to honor your wife and help the children see covenant love practiced. What are you tempted to demand from yourself or another person? Based on Romans 12:9–18, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Honor and peace” today."
+    },
+    {
+      "p1": "In Ephesians 4:25–32, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Repair and forgiveness”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a moment when the girls are learning from your tone and example more than from your instructions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Repair and forgiveness,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Psalm 103:8–14 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “Compassion like a father.”",
+      "p2": "Bring the passage into one real situation: a correction that needs firmness without humiliation or anger. What are you afraid will happen, what truth from Psalm 103:8–14 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Compassion like a father” remains specific."
+    },
+    {
+      "p1": "Notice what the main person knows, fears, says, and does in Joshua 24:14–15. Where is the gap between human perspective and God’s perspective, and how does that gap relate to “As for me and my house”?",
+      "p2": "Consider one act of attention, apology, protection, encouragement, or consistency you can offer today. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Joshua 24:14–15 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “As for me and my house” today."
+    },
+    {
+      "p1": "Trace the sequence of events in Genesis 33:1–11. Which moment functions as the turning point, and what does the outcome reveal about “Reunion and humility”?",
+      "p2": "Apply “Reunion and humility” to a family responsibility where presence matters more than perfection. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Reunion and humility,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Ruth 1:16–17, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “Covenant love in blended family”?",
+      "p2": "Think about a way to honor your wife and help the children see covenant love practiced. What are you tempted to demand from yourself or another person? Based on Ruth 1:16–17, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Covenant love in blended family” remains specific."
+    },
+    {
+      "p1": "As you read John 13:34–35, identify the moment when Jesus’ words or actions most clearly address “Let them see love.” What happens immediately before and after that moment, and how does that surrounding context shape its meaning?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a moment when the girls are learning from your tone and example more than from your instructions. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Let them see love” today."
+    }
+  ],
+  "provision": [
+    {
+      "p1": "Read Psalm 23 as a prayer. What does the writer say honestly about the present situation, and what truth about God prevents that honesty from becoming hopelessness? Connect both parts to “The Lord is my shepherd.”",
+      "p2": "Consider a work or money decision that needs diligence without panic or isolation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Psalm 23 invite a different response? Write your answer in relation to the day’s focus, “The Lord is my shepherd,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Psalm 37:1–7, list what the psalmist fears, needs, remembers, or praises. Which description of God speaks most directly to “Trust and do good,” and why?",
+      "p2": "Apply “Trust and do good” to a place where contentment and responsibility must be practiced together. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Trust and do good” remains specific."
+    },
+    {
+      "p1": "Notice the repeated images, names for God, or changes in tone in Psalm 127. How do they move the reader toward a faithful response to “Unless the Lord builds”?",
+      "p2": "Think about a pressure you are carrying as though your worth as a man depends on controlling every financial outcome. What are you tempted to demand from yourself or another person? Based on Psalm 127, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Unless the Lord builds” today."
+    },
+    {
+      "p1": "Which phrase in Proverbs 3:5–10 would be easiest to quote without its surrounding wisdom? Read the whole section and explain how the context makes its teaching about “Trust and honor God” more responsible.",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a provision concern you need to discuss honestly with your wife rather than carrying alone. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Trust and honor God,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Proverbs 6:6–11, identify the comparison, warning, pattern, or consequence connected to “Diligence without panic.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "Bring the passage into one real situation: one concrete act of work, planning, prayer, rest, or asking for help that reflects faithful provision. What are you afraid will happen, what truth from Proverbs 6:6–11 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Diligence without panic” remains specific."
+    },
+    {
+      "p1": "Read Proverbs 10:22 as wisdom rather than as an automatic guarantee. Which pattern does it present about “The blessing of the Lord,” and what would be lost if the saying were treated as a promise that has no exceptions?",
+      "p2": "Consider a work or money decision that needs diligence without panic or isolation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Proverbs 10:22 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “The blessing of the Lord” today."
+    },
+    {
+      "p1": "What two paths, attitudes, outcomes, or voices are contrasted in Proverbs 11:24–28? How does that contrast sharpen your understanding of “Generosity and trust”?",
+      "p2": "Apply “Generosity and trust” to a place where contentment and responsibility must be practiced together. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Write your answer in relation to the day’s focus, “Generosity and trust,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Proverbs 13:11, what ordinary behavior reveals a deeper condition of the heart? Explain how the passage connects that behavior to “Patient growth.”",
+      "p2": "Think about a pressure you are carrying as though your worth as a man depends on controlling every financial outcome. What are you tempted to demand from yourself or another person? Based on Proverbs 13:11, what can you release, what must you still do faithfully, and what may require patience or support? Name the person, decision, responsibility, or circumstance involved so your response to “Patient growth” remains specific."
+    },
+    {
+      "p1": "Which phrase in Proverbs 15:16–17 would be easiest to quote without its surrounding wisdom? Read the whole section and explain how the context makes its teaching about “Better with love” more responsible.",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a provision concern you need to discuss honestly with your wife rather than carrying alone. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Finish by writing the exact sentence, action, or boundary that would embody “Better with love” today."
+    },
+    {
+      "p1": "In Proverbs 16:1–9, identify the comparison, warning, pattern, or consequence connected to “Plans under God.” What kind of person or choice is being described, and what does the text invite you to value instead?",
+      "p2": "Bring the passage into one real situation: one concrete act of work, planning, prayer, rest, or asking for help that reflects faithful provision. What are you afraid will happen, what truth from Proverbs 16:1–9 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Write your answer in relation to the day’s focus, “Plans under God,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Read Proverbs 21:5 as wisdom rather than as an automatic guarantee. Which pattern does it present about “Diligent planning,” and what would be lost if the saying were treated as a promise that has no exceptions?",
+      "p2": "Consider a work or money decision that needs diligence without panic or isolation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Proverbs 21:5 invite a different response? Name the person, decision, responsibility, or circumstance involved so your response to “Diligent planning” remains specific."
+    },
+    {
+      "p1": "Read Matthew 6:25–34 slowly and trace the movement from the opening situation to Jesus’ final word or action. Where does the passage challenge an assumption connected to “The Father knows,” and what replaces that assumption?",
+      "p2": "Apply “The Father knows” to a place where contentment and responsibility must be practiced together. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Finish by writing the exact sentence, action, or boundary that would embody “The Father knows” today."
+    },
+    {
+      "p1": "In Luke 12:13–34, compare what the people expect with what Jesus teaches or does. How does that contrast help define “Rich toward God” more carefully?",
+      "p2": "Think about a pressure you are carrying as though your worth as a man depends on controlling every financial outcome. What are you tempted to demand from yourself or another person? Based on Luke 12:13–34, what can you release, what must you still do faithfully, and what may require patience or support? Write your answer in relation to the day’s focus, “Rich toward God,” rather than answering only in general terms."
+    },
+    {
+      "p1": "Which word such as therefore, because, but, so that, or instead helps you follow the argument in Philippians 4:10–20? Explain what comes before and after it and how that connection clarifies “Contentment and provision.”",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a provision concern you need to discuss honestly with your wife rather than carrying alone. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Name the person, decision, responsibility, or circumstance involved so your response to “Contentment and provision” remains specific."
+    },
+    {
+      "p1": "In 1 Timothy 6:6–10, identify the main command or claim and then find the reason the writer gives for it. How does that reason shape a Christian understanding of “Godliness with contentment”?",
+      "p2": "Bring the passage into one real situation: one concrete act of work, planning, prayer, rest, or asking for help that reflects faithful provision. What are you afraid will happen, what truth from 1 Timothy 6:6–10 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Finish by writing the exact sentence, action, or boundary that would embody “Godliness with contentment” today."
+    },
+    {
+      "p1": "Trace the logic of 1 Timothy 6:17–19: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Hope in God, not wealth.”",
+      "p2": "Consider a work or money decision that needs diligence without panic or isolation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does 1 Timothy 6:17–19 invite a different response? Write your answer in relation to the day’s focus, “Hope in God, not wealth,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In 2 Thessalonians 3:6–13, look for a contrast between an old way and a new way, flesh and Spirit, self and others, or fear and faith. Which contrast speaks most directly to “Faithful work,” and why?",
+      "p2": "Apply “Faithful work” to a place where contentment and responsibility must be practiced together. What would an honest, concrete response look like today—not an ideal answer, but one action, conversation, boundary, prayer, or request for help you can actually complete? Name the person, decision, responsibility, or circumstance involved so your response to “Faithful work” remains specific."
+    },
+    {
+      "p1": "Trace the sequence of events in Deuteronomy 8:10–18. Which moment functions as the turning point, and what does the outcome reveal about “Remember who gives power”?",
+      "p2": "Think about a pressure you are carrying as though your worth as a man depends on controlling every financial outcome. What are you tempted to demand from yourself or another person? Based on Deuteronomy 8:10–18, what can you release, what must you still do faithfully, and what may require patience or support? Finish by writing the exact sentence, action, or boundary that would embody “Remember who gives power” today."
+    },
+    {
+      "p1": "In Exodus 16, what does God initiate, provide, command, permit, or correct? How should that divine action shape the way the story is applied to “Daily bread”?",
+      "p2": "The passage does not ask you to solve every part of this today. Think about a provision concern you need to discuss honestly with your wife rather than carrying alone. What belief is driving your current response, what part is genuinely your responsibility, and what is one faithful next step you can take within the next twenty-four hours? Write your answer in relation to the day’s focus, “Daily bread,” rather than answering only in general terms."
+    },
+    {
+      "p1": "In Psalm 90:12–17, trace the psalmist’s movement from the opening emotion or situation to the closing posture toward God. Which word or image marks the turning point, and what does it teach about “Establish the work of our hands”?",
+      "p2": "Bring the passage into one real situation: one concrete act of work, planning, prayer, rest, or asking for help that reflects faithful provision. What are you afraid will happen, what truth from Psalm 90:12–17 speaks to that fear, and what action would demonstrate trust without avoiding wisdom or responsibility? Name the person, decision, responsibility, or circumstance involved so your response to “Establish the work of our hands” remains specific."
+    },
+    {
+      "p1": "Trace the logic of Hebrews 13:5–6: what is true because of God or Christ, and what response follows from that truth? Explain how both parts belong together when thinking about “Content and unafraid.”",
+      "p2": "Consider a work or money decision that needs diligence without panic or isolation. Where are fear, pride, shame, control, performance, resentment, or avoidance influencing you? Which one is most present, and how does Hebrews 13:5–6 invite a different response? Finish by writing the exact sentence, action, or boundary that would embody “Content and unafraid” today."
+    }
+  ]
+};
+
+function reflectionQuestionsFor(journeyId, day, content){
+  const journeyQuestions=heldReflectionQuestions[journeyId];
+  const selected=journeyQuestions && journeyQuestions[day-1];
+  if(selected) return selected;
+  return {
+    p1:`In ${content.passage}, what detail most clearly helps you understand “${content.theme},” and how does the surrounding context support that reading?`,
+    p2:`Where is “${content.theme}” present in one concrete situation in your life, and what faithful response does ${content.passage} invite today?`
+  };
+}
+
+function dayContentBase(j,day){
  const item=j.days[day-1]||j.days[0], passage=item[0], theme=item[1];
 
  if(j.id==="money"){
@@ -2161,7 +3229,10 @@ function dayContent(j,day){
 }
 
 
+
 const webPassageRequests=new Map();
+const webRequestQueue=[];
+let webRequestRunning=false;
 
 function normalizeWebReference(reference){
   return String(reference || "")
@@ -2172,6 +3243,79 @@ function normalizeWebReference(reference){
 
 function webPassageCacheKey(reference){
   return `held_web_passage_v1_${normalizeWebReference(reference).toLowerCase()}`;
+}
+
+function wait(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+function enqueueWebRequest(task){
+  return new Promise((resolve,reject)=>{
+    webRequestQueue.push({task,resolve,reject});
+    runNextWebRequest();
+  });
+}
+
+async function runNextWebRequest(){
+  if(webRequestRunning || !webRequestQueue.length) return;
+  webRequestRunning=true;
+
+  const item=webRequestQueue.shift();
+  try{
+    const result=await item.task();
+    item.resolve(result);
+  }catch(error){
+    item.reject(error);
+  }finally{
+    // Keep a small gap between requests so the public Bible service is not flooded.
+    await wait(450);
+    webRequestRunning=false;
+    runNextWebRequest();
+  }
+}
+
+async function requestWebPassageWithRetry(normalized,maxAttempts=4){
+  let lastError;
+
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    try{
+      const url=`https://bible-api.com/${encodeURIComponent(normalized)}?translation=web`;
+      const response=await fetch(url,{headers:{"Accept":"application/json"}});
+
+      if(response.status===429){
+        throw new Error("Bible service is temporarily busy.");
+      }
+
+      if(!response.ok){
+        let detail="";
+        try{
+          const body=await response.json();
+          detail=body?.message || body?.error || "";
+        }catch(_){}
+        throw new Error(detail || `Bible request failed with status ${response.status}`);
+      }
+
+      const data=await response.json();
+
+      if(data?.error_code==="throttled" || data?.code==="throttled"){
+        throw new Error("Bible service is temporarily busy.");
+      }
+
+      if(!data || !Array.isArray(data.verses) || !data.verses.length){
+        throw new Error("No verses were returned for this reference.");
+      }
+
+      return data;
+    }catch(error){
+      lastError=error;
+      if(attempt<maxAttempts){
+        // Gradually wait longer before trying again.
+        await wait(900*attempt);
+      }
+    }
+  }
+
+  throw lastError || new Error("The Bible passage could not be loaded.");
 }
 
 async function fetchWebPassage(reference){
@@ -2192,15 +3336,8 @@ async function fetchWebPassage(reference){
     return webPassageRequests.get(normalized);
   }
 
-  const request=(async()=>{
-    const url=`https://bible-api.com/${encodeURIComponent(normalized)}?translation=web`;
-    const response=await fetch(url,{headers:{"Accept":"application/json"}});
-    if(!response.ok) throw new Error(`Bible request failed with status ${response.status}`);
-
-    const data=await response.json();
-    if(!data || !Array.isArray(data.verses) || !data.verses.length){
-      throw new Error("No verses were returned for this reference.");
-    }
+  const request=enqueueWebRequest(async()=>{
+    const data=await requestWebPassageWithRetry(normalized);
 
     const compact={
       reference:data.reference || normalized,
@@ -2221,7 +3358,7 @@ async function fetchWebPassage(reference){
     }
 
     return compact;
-  })();
+  });
 
   webPassageRequests.set(normalized,request);
 
@@ -2274,7 +3411,13 @@ async function renderWebPassage(element,reference){
   if(!element || !reference) return;
 
   const token=normalizeWebReference(reference);
+
+  // Do not erase a passage that is already showing for the same reference.
+  if(element.dataset.webLoaded==="true" && element.dataset.webReference===token) return;
+
   element.dataset.webReference=token;
+  element.dataset.webLoaded="false";
+
   element.innerHTML='<div class="verse-loading">Loading the Bible passage…</div>';
 
   try{
@@ -2283,6 +3426,7 @@ async function renderWebPassage(element,reference){
 
     element.innerHTML="";
     element.appendChild(buildWebPassageContent(data,reference));
+    element.dataset.webLoaded="true";
   }catch(error){
     console.error("WEB passage error:",reference,error);
     if(element.dataset.webReference!==token) return;
@@ -2290,24 +3434,38 @@ async function renderWebPassage(element,reference){
     element.innerHTML="";
     const message=document.createElement("div");
     message.className="verse-error";
-    message.textContent=`The WEB passage could not load right now. Please check your internet connection and try opening this day again.`;
+    message.innerHTML=`The Bible service is temporarily busy. <button class="ghost" type="button">Try again</button>`;
+    const button=message.querySelector("button");
+    if(button) button.addEventListener("click",()=>renderWebPassage(element,reference));
     element.appendChild(message);
   }
 }
 
-function renderAllWebPassages(content){
-  renderWebPassage(document.getElementById("mainWebPassage"),content.passage);
-  renderWebPassage(document.getElementById("studyWebPassage"),content.passage);
+async function renderReadWebPassages(content){
+  // Always load the main passage first.
+  await renderWebPassage(document.getElementById("mainWebPassage"),content.passage);
 
-  document.querySelectorAll("[data-companion-web-reference]").forEach(element=>{
-    renderWebPassage(element,element.dataset.companionWebReference);
-  });
-
-  document.querySelectorAll("[data-study-web-reference]").forEach(element=>{
-    renderWebPassage(element,element.dataset.studyWebReference);
-  });
+  // Companion passages are intentionally queued one at a time.
+  const companions=[...document.querySelectorAll("[data-companion-web-reference]")];
+  for(const element of companions){
+    await renderWebPassage(element,element.dataset.companionWebReference);
+  }
 }
 
+async function renderStudyWebPassages(content){
+  await renderWebPassage(document.getElementById("studyWebPassage"),content.passage);
+
+  const companions=[...document.querySelectorAll("[data-study-web-reference]")];
+  for(const element of companions){
+    await renderWebPassage(element,element.dataset.studyWebReference);
+  }
+}
+
+function renderAllWebPassages(content){
+  // The Read tab is the only content loaded during the normal day render.
+  // The separate Bible Study page loads only when the user opens that page.
+  renderReadWebPassages(content);
+}
 
 function safeText(value, fallback){
   if(value === null || value === undefined) return fallback;
@@ -2393,6 +3551,12 @@ function fillEmptyDynamicSections(){
   });
 }
 
+function dayContent(j,day){
+  const content=dayContentBase(j,day);
+  const questions=reflectionQuestionsFor(j.id,day,content);
+  return {...content,p1:questions.p1,p2:questions.p2};
+}
+
 function renderAll(){
  const p=profile(),j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id),content=dayContent(j,day);
  renderStudyPage(content);
@@ -2445,7 +3609,9 @@ function renderAll(){
  document.getElementById("prompt2Label").textContent=content.p2;
  document.getElementById("prompt1").value=localStorage.getItem(draftKey(j.id,1))||"";
  document.getElementById("prompt2").value=localStorage.getItem(draftKey(j.id,2))||"";
- document.getElementById("moodChoices").innerHTML=p.moods.map(m=>`<button class="choice" onclick="selectMood(this,'${m}')">${m}</button>`).join("");
+ const savedMood=localStorage.getItem(moodKey(j.id,day))||"";
+ document.getElementById("moodChoices").innerHTML=p.moods.map(m=>`<button class="choice ${m===savedMood?"selected":""}" onclick="selectMood(this,'${m}')">${m}</button>`).join("");
+ const completeButton=document.getElementById("completeDayBtn");if(completeButton)completeButton.textContent=day===21?"Save reflection and finish journey":`Save reflection and complete Day ${day}`;
  const wordCard=document.getElementById("wordTitle")?.closest(".card");
  if(!content.word){
    if(wordCard) wordCard.style.display="none";
@@ -2489,9 +3655,10 @@ function renderAll(){
  const togetherField=document.getElementById("togetherAnswer");
  if(togetherField) togetherField.value=localStorage.getItem(`held_${currentProfile}_together_private`)||"";
 }
-function selectMood(btn,m){document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(`held_${currentProfile}_${activeJourney().id}_mood`,m)}
-function saveDraft(){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);alert("Draft saved privately.")}
-function completeDay(){const j=activeJourney();saveDraft();let day=getDay(j.id),done=getCompleted(j.id);if(!done.includes(day))done.push(day);localStorage.setItem(progressKey(j.id),JSON.stringify(done));if(day<21)localStorage.setItem(dayKey(j.id),String(day+1));localStorage.removeItem(draftKey(j.id,1));localStorage.removeItem(draftKey(j.id,2));alert(day===21?"Journey complete.":"Today is complete. Your next day is ready.");renderAll();showView("progress")}
+function selectMood(btn,m){const j=activeJourney(),day=getDay(j.id);document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(moodKey(j.id,day),m)}
+function saveDraft(showMessage=true){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);if(showMessage)alert("Your answers are saved privately for this day.")}
+function saveReflection(showMessage=true){const j=activeJourney(),day=getDay(j.id),content=dayContent(j,day);const answer1=document.getElementById("prompt1").value.trim(),answer2=document.getElementById("prompt2").value.trim(),mood=localStorage.getItem(moodKey(j.id,day))||"";if(!answer1&&!answer2&&!mood){if(showMessage)alert("Write an answer or choose how you are feeling before saving.");return false}const entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]");const entry={day,passage:content.passage,theme:content.theme,question1:content.p1,answer1,question2:content.p2,answer2,mood,date:new Date().toLocaleDateString()};const i=entries.findIndex(x=>x.day===day);if(i>=0)entries[i]=entry;else entries.unshift(entry);localStorage.setItem(reflectionKey(j.id),JSON.stringify(entries));saveDraft(false);renderDayReflections();if(showMessage)alert("Reflection saved privately under Journal → Day reflections.");return true}
+function completeDay(){const j=activeJourney();let day=getDay(j.id),done=getCompleted(j.id);saveReflection(false);if(!done.includes(day))done.push(day);localStorage.setItem(progressKey(j.id),JSON.stringify(done));if(day<21){localStorage.setItem(dayKey(j.id),String(day+1));alert(`Day ${day} is complete. Day ${day+1} is ready.`);renderAll();showView("devotional");setDevTab("read")}else{alert("Journey complete.");renderAll();showView("progress")}}
 function renderDayGrid(){const j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id);document.getElementById("dayGrid").innerHTML=j.days.map((d,i)=>{const n=i+1;let c="day";if(done.includes(n))c+=" done";if(n===day)c+=" current";if(n>day&&!done.includes(n))c+=" locked";return `<button class="${c}" onclick="jumpToDay(${n})"><strong>${done.includes(n)?"✓ Day "+n:"Day "+n}</strong><small>${d[1]}</small></button>`}).join("")}
 function jumpToDay(n){const j=activeJourney(),done=getCompleted(j.id),day=getDay(j.id);if(n>day&&!done.includes(n)){alert("Complete the earlier days first.");return}localStorage.setItem(dayKey(j.id),String(n));renderAll();showView("devotional");setDevTab("read")}
 function renderAllProgress(){document.getElementById("allProgress").innerHTML=profile().journeys.map(j=>{const done=getCompleted(j.id).length;return `<div class="journey-card clickable" onclick="openJourney('${j.id}')"><span class="tag">${j.book}</span><h4>${j.title}</h4><p class="muted">${done} of 21 days completed</p><div class="progress"><span style="width:${Math.round(done/21*100)}%"></span></div></div>`}).join("")}
@@ -2499,7 +3666,8 @@ function saveStudyNote(){const j=activeJourney(),t=document.getElementById("stud
 function renderNotebook(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");document.getElementById("notebookList").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${j.title} · Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No study notes yet for this journey.</p>`}
 function saveJournal(){const j=activeJourney(),t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(journalKey(j.id),JSON.stringify(arr));document.getElementById("journalText").value="";renderJournal();alert("Saved privately.")}
 function shareTakeaway(){const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const takeaway=prompt("What one sentence do you want to share?");if(!takeaway)return;const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString(),journey:activeJourney().title});localStorage.setItem("held_shared",JSON.stringify(arr));renderShared();alert("Only that takeaway was shared.")}
-function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No private entries yet for this journey.</p>`}
+function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No other private entries yet for this journey.</p>`;renderDayReflections()}
+function renderDayReflections(){const container=document.getElementById("dayReflectionEntries");if(!container)return;const j=activeJourney(),entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]").sort((a,b)=>b.day-a.day);container.innerHTML=entries.length?entries.map(x=>`<div class="saved-reflection"><span class="badge">Private</span>${x.mood?`<span class="mood-history">${escapeHtml(x.mood)}</span>`:""}<h4>Day ${x.day}: ${escapeHtml(x.theme||"Reflection")}</h4><div class="muted">${escapeHtml(x.passage||"")} · ${escapeHtml(x.date||"")}</div>${x.answer1?`<div class="answer"><strong>${escapeHtml(x.question1||"Question 1")}</strong><p>${escapeHtml(x.answer1)}</p></div>`:""}${x.answer2?`<div class="answer"><strong>${escapeHtml(x.question2||"Question 2")}</strong><p>${escapeHtml(x.answer2)}</p></div>`:""}</div>`).join(""):`<p class="muted">No saved day reflections yet. Save your answers from the Reflect tab and they will appear here.</p>`}
 function renderShared(){const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");document.getElementById("sharedTakeaways").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.journey} · ${x.date}</small></div>`).join(""):`<p class="muted">No shared takeaways yet.</p>`}
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 </script>
@@ -2973,6 +4141,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260712-v6</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260714-v9</div>
 </body>
 </html>
