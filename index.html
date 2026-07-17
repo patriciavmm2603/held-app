@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260716_v12";
+  const RESET_KEY = "held_cache_reset_20260717_v13";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260716-v12");
+    refreshedUrl.searchParams.set("heldBuild", "20260717-v13");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -604,15 +604,11 @@ button:disabled{opacity:.55;cursor:not-allowed}
         <div class="verse-loading">Loading the Bible passage…</div>
       </div>
       <div class="web-source-note">Bible text: World English Bible (WEB), public domain.</div>
-      <p class="muted" style="margin-top:12px">
-        Read the whole passage before opening the explanation. Notice the people, repeated words, contrasts, commands, questions, and how the passage ends.
-      </p>
     </div>
 
     <div class="study-section" style="margin-top:16px">
       <div class="word-label">Step 2</div>
-      <h4>Read the companion passages</h4>
-      <p class="muted">Each companion reinforces, contrasts, develops, or helps you pray the main passage.</p>
+      <h4>Read companion passages</h4>
       <div id="devCompanions" class="companion-grid"></div>
     </div>
 
@@ -677,13 +673,11 @@ button:disabled{opacity:.55;cursor:not-allowed}
     <div class="study-section">
       <div class="word-label">Step 3</div>
       <h4>Reflect and respond</h4>
-      <p class="muted">Answer three simple questions: what the passage is saying, where it connects to your life, and one response for today.</p>
     </div>
-    <div class="reflection-save-note">Your answers and selected feeling are private. When saved, they appear under <strong>Journal → Day reflections</strong>.</div>
     <div class="prompt"><strong id="prompt1Label"></strong><textarea id="prompt1" placeholder="Write a simple answer from the passage..."></textarea></div>
     <div class="prompt"><strong id="prompt2Label"></strong><textarea id="prompt2" placeholder="Write where this connects to your life..."></textarea></div>
     <div class="prompt"><strong id="prompt3Label"></strong><textarea id="prompt3" placeholder="Write one small response for today..."></textarea></div>
-    <div class="prompt"><strong>How are you arriving today?</strong><p class="muted">Choose the feeling that best describes you. It is saved with this day’s reflection so you can notice patterns over time.</p><div class="choice-row" id="moodChoices"></div></div>
+    <div class="prompt"><strong>How are you arriving today?</strong><div class="choice-row" id="moodChoices"></div></div>
     <div class="prayer-box"><strong>Pray the passage</strong><p id="devPrayer" class="muted">Lord, help me receive what is true here and respond faithfully today.</p></div>
     <div class="practice-card">
       <div class="word-label">Practice the passage</div>
@@ -696,7 +690,6 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <button class="secondary" onclick="saveReflection()">Save reflection</button>
       <button class="primary" id="completeDayBtn" onclick="completeDay()">Save and complete today</button>
     </div>
-    <div class="day-complete-note">Completing the day saves your answers and feeling, marks the day complete, and opens the next day.</div>
   </div>
   <div class="dev-sticky-nav" aria-label="Daily study navigation">
     <div class="nav-group"><button class="ghost" type="button" onclick="setDevTab('read')">Read</button><button class="ghost" type="button" onclick="setDevTab('understand')">Understand</button><button class="ghost" type="button" onclick="setDevTab('reflect')">Reflect</button></div>
@@ -4514,6 +4507,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260716-v12</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260717-v13</div>
 </body>
 </html>
