@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260717_v13";
+  const RESET_KEY = "held_cache_reset_20260728_v14";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260717-v13");
+    refreshedUrl.searchParams.set("heldBuild", "20260728-v14");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -903,6 +903,10 @@ function showView(id){
  if(id==="study"){
    const j=activeJourney(),day=getDay(j.id),content=dayContent(j,day);
    renderStudyWebPassages(content);
+ }
+ if(id==="together" && currentUser){
+   syncTogetherJourneysFromCloud();
+   syncSharedTakeawaysFromCloud().then(renderShared);
  }
  window.scrollTo({top:0,behavior:"smooth"})
 }
@@ -4014,8 +4018,7 @@ function renderAll(){
  setDevTab("read");
  document.getElementById("journalHeading").textContent=(currentProfile==="patricia"?"Patricia’s":"Alec’s")+" private journal";
  document.getElementById("progressTitle").textContent=j.title+" · 21-day path";
- document.getElementById("patSharedJourney").textContent=profileData.patricia.journeys.find(x=>x.id===(localStorage.getItem("held_patricia_activeJourney")||profileData.patricia.journeys[0].id)).title;
- document.getElementById("alecSharedJourney").textContent=profileData.alec.journeys.find(x=>x.id===(localStorage.getItem("held_alec_activeJourney")||profileData.alec.journeys[0].id)).title;
+ renderTogetherJourneyNames();
  renderDayGrid();renderAllProgress();renderNotebook();renderJournal();renderShared();
  fillEmptyDynamicSections();
  const togetherField=document.getElementById("togetherAnswer");
@@ -4034,7 +4037,16 @@ function saveJournal(){const j=activeJourney(),t=document.getElementById("journa
 function shareTakeaway(){const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const takeaway=prompt("What one sentence do you want to share?");if(!takeaway)return;const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString(),journey:activeJourney().title});localStorage.setItem("held_shared",JSON.stringify(arr));renderShared();alert("Only that takeaway was shared.")}
 function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No other private entries yet for this journey.</p>`;renderDayReflections()}
 function renderDayReflections(){const container=document.getElementById("dayReflectionEntries");if(!container)return;const j=activeJourney(),entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]").sort((a,b)=>b.day-a.day);container.innerHTML=entries.length?entries.map(x=>`<div class="saved-reflection"><span class="badge">Private</span>${x.mood?`<span class="mood-history">${escapeHtml(x.mood)}</span>`:""}<h4>Day ${x.day}: ${escapeHtml(x.theme||"Reflection")}</h4><div class="muted">${escapeHtml(x.passage||"")} · ${escapeHtml(x.date||"")}</div>${x.answer1?`<div class="answer"><strong>${escapeHtml(x.question1||"Question 1")}</strong><p>${escapeHtml(x.answer1)}</p></div>`:""}${x.answer2?`<div class="answer"><strong>${escapeHtml(x.question2||"Question 2")}</strong><p>${escapeHtml(x.answer2)}</p></div>`:""}${x.answer3?`<div class="answer"><strong>${escapeHtml(x.question3||"Question 3")}</strong><p>${escapeHtml(x.answer3)}</p></div>`:""}</div>`).join(""):`<p class="muted">No saved day reflections yet. Save your answers from the Reflect tab and they will appear here.</p>`}
-function renderShared(){const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");document.getElementById("sharedTakeaways").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.journey} · ${x.date}</small></div>`).join(""):`<p class="muted">No shared takeaways yet.</p>`}
+function sharedJourneyTitle(journeyId){
+  const allJourneys=[...profileData.patricia.journeys,...profileData.alec.journeys];
+  return allJourneys.find(journey=>journey.id===journeyId)?.title || journeyId || "Shared reflection";
+}
+function renderShared(){
+  const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");
+  document.getElementById("sharedTakeaways").innerHTML=arr.length
+    ? arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${escapeHtml(sharedJourneyTitle(x.journey))} · ${x.date}</small></div>`).join("")
+    : `<p class="muted">No shared takeaways yet.</p>`;
+}
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 </script>
 
@@ -4239,13 +4251,23 @@ async function loadProfileAndCloudData(){
     .maybeSingle();
 
   const displayName = profileRow?.display_name || currentUser.email?.split("@")[0] || "Friend";
-  const normalized = displayName.toLowerCase();
-  currentProfile = normalized.includes("alec") ? "alec" : "patricia";
+  const normalizedEmail = String(currentUser.email || "").toLowerCase();
+  const normalizedName = String(displayName || "").toLowerCase();
+
+  if(normalizedEmail === "alec.remi@gmail.com"){
+    currentProfile = "alec";
+  }else if(normalizedEmail === "munoz.pat@outlook.com"){
+    currentProfile = "patricia";
+  }else{
+    currentProfile = normalizedName.includes("alec") ? "alec" : "patricia";
+  }
+
   localStorage.setItem("held_profile", currentProfile);
 
   await syncJourneysFromCloud();
   await syncJournalsFromCloud();
   await syncStudyNotesFromCloud();
+  await syncTogetherJourneysFromCloud();
   await syncSharedTakeawaysFromCloud();
 }
 
@@ -4263,6 +4285,64 @@ async function syncJourneysFromCloud(){
     if(row.is_active) active = row.journey_id;
   }
   if(active) localStorage.setItem(`held_${currentProfile}_activeJourney`, active);
+}
+
+
+async function syncTogetherJourneysFromCloud(){
+  if(!currentUser) return;
+
+  const {data:membership,error:membershipError}=await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+
+  if(membershipError || !membership?.couple_id) return;
+
+  const {data:members,error:membersError}=await supabaseClient
+    .from("couple_members")
+    .select("user_id")
+    .eq("couple_id",membership.couple_id);
+
+  if(membersError || !members?.length) return;
+
+  const userIds=members.map(member=>member.user_id);
+
+  const {data:activeRows,error:journeyError}=await supabaseClient
+    .from("user_journeys")
+    .select("user_id,journey_id,is_active")
+    .in("user_id",userIds)
+    .eq("is_active",true);
+
+  if(journeyError) return;
+
+  const spouseProfile=currentProfile==="patricia" ? "alec" : "patricia";
+
+  for(const row of (activeRows || [])){
+    const ownerProfile=row.user_id===currentUser.id ? currentProfile : spouseProfile;
+    localStorage.setItem(`held_together_${ownerProfile}_activeJourney`,row.journey_id);
+  }
+
+  renderTogetherJourneyNames();
+}
+
+function journeyTitleForProfile(profileId,journeyId){
+  const journeys=profileData[profileId]?.journeys || [];
+  return journeys.find(journey=>journey.id===journeyId)?.title || "No active journey selected";
+}
+
+function renderTogetherJourneyNames(){
+  const patFallback=localStorage.getItem("held_patricia_activeJourney") || profileData.patricia.journeys[0].id;
+  const alecFallback=localStorage.getItem("held_alec_activeJourney") || profileData.alec.journeys[0].id;
+
+  const patJourneyId=localStorage.getItem("held_together_patricia_activeJourney") || patFallback;
+  const alecJourneyId=localStorage.getItem("held_together_alec_activeJourney") || alecFallback;
+
+  const patElement=document.getElementById("patSharedJourney");
+  const alecElement=document.getElementById("alecSharedJourney");
+
+  if(patElement) patElement.textContent=journeyTitleForProfile("patricia",patJourneyId);
+  if(alecElement) alecElement.textContent=journeyTitleForProfile("alec",alecJourneyId);
 }
 
 async function syncJournalsFromCloud(){
@@ -4326,7 +4406,9 @@ async function syncSharedTakeawaysFromCloud(){
   if(error) return;
 
   const mapped = (data || []).map(row => ({
-    from: row.user_id === currentUser.id ? currentProfile : "spouse",
+    from: row.user_id === currentUser.id
+      ? currentProfile
+      : (currentProfile === "patricia" ? "alec" : "patricia"),
     text: row.body,
     date: new Date(row.created_at).toLocaleDateString(),
     journey: row.journey_id || ""
@@ -4338,6 +4420,7 @@ const originalStartSelectedJourney = window.startSelectedJourney;
 window.startSelectedJourney = async function(){
   if(!selectedJourneyId) return;
   localStorage.setItem(`held_${currentProfile}_activeJourney`, selectedJourneyId);
+  localStorage.setItem(`held_together_${currentProfile}_activeJourney`, selectedJourneyId);
 
   if(currentUser){
     await supabaseClient.from("user_journeys").update({ is_active:false }).eq("user_id", currentUser.id);
@@ -4507,6 +4590,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260717-v13</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260728-v14</div>
 </body>
 </html>
