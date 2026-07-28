@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260728_v14";
+  const RESET_KEY = "held_cache_reset_20260728_v15";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260728-v14");
+    refreshedUrl.searchParams.set("heldBuild", "20260728-v15");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4291,36 +4291,24 @@ async function syncJourneysFromCloud(){
 async function syncTogetherJourneysFromCloud(){
   if(!currentUser) return;
 
-  const {data:membership,error:membershipError}=await supabaseClient
-    .from("couple_members")
-    .select("couple_id")
-    .eq("user_id",currentUser.id)
-    .maybeSingle();
+  const {data,error}=await supabaseClient.rpc("get_couple_active_journeys");
+  if(error){
+    console.error("Could not load couple active journeys:",error);
+    renderTogetherJourneyNames();
+    return;
+  }
 
-  if(membershipError || !membership?.couple_id) return;
-
-  const {data:members,error:membersError}=await supabaseClient
-    .from("couple_members")
-    .select("user_id")
-    .eq("couple_id",membership.couple_id);
-
-  if(membersError || !members?.length) return;
-
-  const userIds=members.map(member=>member.user_id);
-
-  const {data:activeRows,error:journeyError}=await supabaseClient
-    .from("user_journeys")
-    .select("user_id,journey_id,is_active")
-    .in("user_id",userIds)
-    .eq("is_active",true);
-
-  if(journeyError) return;
+  // Clear previous cloud values so an old journey cannot remain visible.
+  localStorage.removeItem("held_together_patricia_activeJourney");
+  localStorage.removeItem("held_together_alec_activeJourney");
 
   const spouseProfile=currentProfile==="patricia" ? "alec" : "patricia";
 
-  for(const row of (activeRows || [])){
+  for(const row of (data || [])){
     const ownerProfile=row.user_id===currentUser.id ? currentProfile : spouseProfile;
-    localStorage.setItem(`held_together_${ownerProfile}_activeJourney`,row.journey_id);
+    if(row.journey_id){
+      localStorage.setItem(`held_together_${ownerProfile}_activeJourney`,row.journey_id);
+    }
   }
 
   renderTogetherJourneyNames();
@@ -4332,17 +4320,32 @@ function journeyTitleForProfile(profileId,journeyId){
 }
 
 function renderTogetherJourneyNames(){
-  const patFallback=localStorage.getItem("held_patricia_activeJourney") || profileData.patricia.journeys[0].id;
-  const alecFallback=localStorage.getItem("held_alec_activeJourney") || profileData.alec.journeys[0].id;
+  const patCloud=localStorage.getItem("held_together_patricia_activeJourney");
+  const alecCloud=localStorage.getItem("held_together_alec_activeJourney");
 
-  const patJourneyId=localStorage.getItem("held_together_patricia_activeJourney") || patFallback;
-  const alecJourneyId=localStorage.getItem("held_together_alec_activeJourney") || alecFallback;
+  const patOwnFallback=currentProfile==="patricia"
+    ? localStorage.getItem("held_patricia_activeJourney")
+    : null;
+  const alecOwnFallback=currentProfile==="alec"
+    ? localStorage.getItem("held_alec_activeJourney")
+    : null;
+
+  const patJourneyId=patCloud || patOwnFallback;
+  const alecJourneyId=alecCloud || alecOwnFallback;
 
   const patElement=document.getElementById("patSharedJourney");
   const alecElement=document.getElementById("alecSharedJourney");
 
-  if(patElement) patElement.textContent=journeyTitleForProfile("patricia",patJourneyId);
-  if(alecElement) alecElement.textContent=journeyTitleForProfile("alec",alecJourneyId);
+  if(patElement){
+    patElement.textContent=patJourneyId
+      ? journeyTitleForProfile("patricia",patJourneyId)
+      : "No active journey selected";
+  }
+  if(alecElement){
+    alecElement.textContent=alecJourneyId
+      ? journeyTitleForProfile("alec",alecJourneyId)
+      : "No active journey selected";
+  }
 }
 
 async function syncJournalsFromCloud(){
@@ -4434,6 +4437,7 @@ window.startSelectedJourney = async function(){
     }, { onConflict:"user_id,journey_id" });
   }
 
+  await syncTogetherJourneysFromCloud();
   renderAll();
   showView("devotional");
 };
@@ -4451,12 +4455,13 @@ window.completeDay = async function(){
   localStorage.removeItem(draftKey(j.id,2));
 
   if(currentUser){
+    const activeJourneyId=localStorage.getItem(`held_${currentProfile}_activeJourney`);
     await supabaseClient.from("user_journeys").upsert({
       user_id: currentUser.id,
       journey_id: j.id,
       current_day: nextDay,
       completed_days: done,
-      is_active: true
+      is_active: activeJourneyId===j.id
     }, { onConflict:"user_id,journey_id" });
 
     const mood = localStorage.getItem(`held_${currentProfile}_${j.id}_mood`) || null;
@@ -4590,6 +4595,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260728-v14</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260728-v15</div>
 </body>
 </html>
