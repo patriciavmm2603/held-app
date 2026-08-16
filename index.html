@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260728-v15");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v16");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -37,6 +37,7 @@
 <title>Held | Scripture-led healing</title>
 <link rel="icon" type="image/png" href="assets/held-app-icon.png" />
 <link rel="apple-touch-icon" href="assets/held-app-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
 <meta name="theme-color" content="#0f7578" />
 <meta name="description" content="Held is a Scripture-led devotional, Bible study, journaling, and marriage discipleship app." />
 <style>
@@ -465,6 +466,18 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .mood-history{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#f4eee4;font-size:.8rem;font-weight:700}
 .day-complete-note{font-size:.88rem;color:var(--muted);margin-top:8px}
 @media(max-width:720px){.dev-sticky-nav{bottom:8px;align-items:stretch;flex-direction:column}.dev-sticky-nav .nav-group{width:100%}.dev-sticky-nav button{flex:1}}
+.prayer-compose{margin:18px 0;padding:18px;border:1px solid rgba(21,152,154,.25);border-radius:20px;background:linear-gradient(145deg,#f1fbf8,#fffaf2)}
+.prayer-compose textarea{min-height:105px}
+.prayer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px}
+.prayer-list{display:grid;gap:12px;margin-top:12px}
+.prayer-item{padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.prayer-item.unread{border-color:var(--teal);box-shadow:0 0 0 2px rgba(21,152,154,.08)}
+.prayer-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.82rem}
+.prayer-item p{white-space:pre-wrap;margin:10px 0}
+.prayer-status{display:inline-flex;padding:4px 8px;border-radius:999px;background:var(--aqua);color:var(--teal-dark);font-size:.76rem;font-weight:800}
+.notification-badge{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#b84242;color:#fff;font-size:.7rem;line-height:19px;margin-left:3px}
+.notification-badge.visible{display:inline-block}
+.notification-note{font-size:.82rem;color:var(--muted)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -783,7 +796,20 @@ button:disabled{opacity:.55;cursor:not-allowed}
     <button class="secondary" type="button" onclick="shareTogetherAnswer()">Share this answer</button>
   </div>
 </div>
-<div id="sharedTakeaways"></div></div></section>
+<div id="sharedTakeaways"></div>
+<div class="section-title"><h3>Prayer requests</h3></div>
+<div class="prayer-compose">
+  <strong>Send a prayer request to your spouse</strong>
+  <p class="muted">Only the two of you can see requests shared here.</p>
+  <textarea id="prayerRequestText" maxlength="2000" placeholder="How can I pray for you?"></textarea>
+  <div class="prayer-toolbar">
+    <button id="sendPrayerBtn" class="primary" type="button" onclick="sendPrayerRequest()">Send prayer request</button>
+    <button id="enableNotificationsBtn" class="secondary" type="button" onclick="enablePrayerNotifications()">Enable notifications</button>
+  </div>
+  <div id="notificationNote" class="notification-note"></div>
+</div>
+<div id="prayerRequests" class="prayer-list"><p class="muted">Loading prayer requests…</p></div>
+</div></section>
 
 <section id="progress" class="view"><div class="card"><div class="eyebrow">Journey map</div><h3 id="progressTitle"></h3><div id="dayGrid" class="day-grid"></div>
 <div class="section-title"><h3>Completed journeys and progress</h3></div><div id="allProgress" class="grid3"></div></div></section>
@@ -791,7 +817,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 </main>
 </div>
 
-<nav class="bottom-nav"><button data-view="home" class="active">Home</button><button data-view="library">Journeys</button><button data-view="study">Bible</button><button data-view="together">Together</button><button data-view="progress">More</button></nav>
+<nav class="bottom-nav"><button data-view="home" class="active">Home</button><button data-view="library">Journeys</button><button data-view="study">Bible</button><button data-view="together">Together <span id="prayerNavBadge" class="notification-badge" aria-label="unread prayer requests"></span></button><button data-view="progress">More</button></nav>
 </div>
 
 <script>
@@ -4228,6 +4254,10 @@ async function resetPassword(){
 }
 
 async function signOut(){
+  if(prayerRealtimeChannel){
+    await supabaseClient.removeChannel(prayerRealtimeChannel);
+    prayerRealtimeChannel=null;
+  }
   await supabaseClient.auth.signOut();
   currentUser = null;
   document.getElementById("authScreen").classList.remove("hidden");
@@ -4268,6 +4298,10 @@ async function loadProfileAndCloudData(){
   await syncStudyNotesFromCloud();
   await syncTogetherJourneysFromCloud();
   await syncSharedTakeawaysFromCloud();
+  await loadPrayerRequests();
+  subscribeToPrayerRequests();
+  updateNotificationControls();
+  registerHeldServiceWorker();
 }
 
 async function syncJourneysFromCloud(){
@@ -4567,6 +4601,217 @@ window.shareTakeaway = async function(){
   alert("Only that takeaway was shared.");
 };
 
+
+let prayerRequestsCache=[];
+let prayerReceiptsCache=[];
+let prayerCoupleId=null;
+let prayerSpouseId=null;
+let prayerRealtimeChannel=null;
+
+async function registerHeldServiceWorker(){
+  if(!("serviceWorker" in navigator)) return null;
+  try{return await navigator.serviceWorker.register("./service-worker.js");}
+  catch(error){console.warn("Held notifications could not register:",error);return null;}
+}
+
+function updateNotificationControls(){
+  const button=document.getElementById("enableNotificationsBtn");
+  const note=document.getElementById("notificationNote");
+  if(!button || !note) return;
+  if(!("Notification" in window)){
+    button.style.display="none";
+    note.textContent="Notifications are not supported in this browser. Prayer requests will still appear here.";
+    return;
+  }
+  if(Notification.permission==="granted"){
+    button.textContent="Notifications enabled";
+    button.disabled=true;
+    note.textContent="Held can alert you while the app is open or running in the background.";
+  }else if(Notification.permission==="denied"){
+    button.textContent="Notifications blocked";
+    button.disabled=true;
+    note.textContent="Allow notifications for Held in your phone or browser settings.";
+  }else{
+    button.textContent="Enable notifications";
+    button.disabled=false;
+    note.textContent="On iPhone, open Held from your Home Screen before enabling notifications.";
+  }
+}
+
+async function enablePrayerNotifications(){
+  if(!("Notification" in window)){updateNotificationControls();return;}
+  const permission=await Notification.requestPermission();
+  updateNotificationControls();
+  if(permission==="granted"){
+    const registration=await registerHeldServiceWorker();
+    if(registration){
+      registration.showNotification("Held notifications are on",{
+        body:"You’ll see new prayer requests from your spouse.",
+        icon:"assets/held-app-icon.png",
+        badge:"assets/held-app-icon.png",
+        tag:"held-notifications-ready"
+      });
+    }
+  }
+}
+
+async function showPrayerNotification(request){
+  if(!request || request.recipient_id!==currentUser?.id || Notification.permission!=="granted") return;
+  const registration=await registerHeldServiceWorker();
+  if(!registration) return;
+  registration.showNotification("New prayer request in Held",{
+    body:request.body.length>120?request.body.slice(0,117)+"…":request.body,
+    icon:"assets/held-app-icon.png",
+    badge:"assets/held-app-icon.png",
+    tag:"held-prayer-"+request.id,
+    data:{url:window.location.origin+window.location.pathname+"#together"}
+  });
+}
+
+async function getPrayerCouple(){
+  const {data:membership,error}=await supabaseClient
+    .from("couple_members")
+    .select("couple_id")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+  if(error || !membership?.couple_id) return null;
+  const {data:members}=await supabaseClient
+    .from("couple_members")
+    .select("user_id")
+    .eq("couple_id",membership.couple_id);
+  prayerCoupleId=membership.couple_id;
+  prayerSpouseId=(members||[]).find(member=>member.user_id!==currentUser.id)?.user_id||null;
+  return prayerCoupleId;
+}
+
+async function loadPrayerRequests(){
+  if(!currentUser) return;
+  if(!prayerCoupleId) await getPrayerCouple();
+  const container=document.getElementById("prayerRequests");
+  if(!prayerCoupleId){
+    if(container) container.innerHTML='<p class="muted">Your couple connection is not ready yet.</p>';
+    return;
+  }
+  const {data:requests,error}=await supabaseClient
+    .from("prayer_requests")
+    .select("id,sender_id,recipient_id,body,created_at")
+    .eq("couple_id",prayerCoupleId)
+    .order("created_at",{ascending:false});
+  if(error){
+    if(container) container.innerHTML='<p class="muted">Prayer requests could not load. Please try again.</p>';
+    return;
+  }
+  prayerRequestsCache=requests||[];
+  const ids=prayerRequestsCache.map(item=>item.id);
+  prayerReceiptsCache=[];
+  if(ids.length){
+    const {data:receipts}=await supabaseClient
+      .from("prayer_request_receipts")
+      .select("prayer_request_id,user_id,read_at,prayed_at")
+      .in("prayer_request_id",ids);
+    prayerReceiptsCache=receipts||[];
+  }
+  renderPrayerRequests();
+}
+
+function receiptFor(requestId,userId){
+  return prayerReceiptsCache.find(receipt=>receipt.prayer_request_id===requestId&&receipt.user_id===userId);
+}
+
+function renderPrayerRequests(){
+  const container=document.getElementById("prayerRequests");
+  if(!container) return;
+  const unread=prayerRequestsCache.filter(request=>
+    request.recipient_id===currentUser?.id&&!receiptFor(request.id,currentUser.id)?.read_at
+  ).length;
+  const badge=document.getElementById("prayerNavBadge");
+  if(badge){
+    badge.textContent=unread?String(unread):"";
+    badge.classList.toggle("visible",unread>0);
+  }
+  if(!prayerRequestsCache.length){
+    container.innerHTML='<p class="muted">No prayer requests yet. This can be a gentle place to begin.</p>';
+    return;
+  }
+  container.innerHTML=prayerRequestsCache.map(request=>{
+    const received=request.recipient_id===currentUser.id;
+    const receipt=receiptFor(request.id,request.recipient_id);
+    const unreadItem=received&&!receipt?.read_at;
+    const name=received?(currentProfile==="patricia"?"Alec":"Patricia"):"You";
+    const status=receipt?.prayed_at?"Prayed for":(receipt?.read_at?"Seen":(received?"New":"Sent"));
+    return `<div class="prayer-item ${unreadItem?"unread":""}">
+      <div class="prayer-meta"><strong>${name}</strong><span>${new Date(request.created_at).toLocaleString()}</span></div>
+      <p>${escapeHtml(request.body)}</p>
+      <div class="prayer-toolbar">
+        <span class="prayer-status">${status}</span>
+        ${received?'<button class="secondary" type="button" onclick="markPrayerPrayed(\''+request.id+'\')">'+(receipt?.prayed_at?"Prayed ✓":"I prayed for this")+'</button>':""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function sendPrayerRequest(){
+  const field=document.getElementById("prayerRequestText");
+  const button=document.getElementById("sendPrayerBtn");
+  const body=field?.value.trim();
+  if(!body){alert("Write a prayer request first.");return;}
+  if(!currentUser){alert("Sign in first.");return;}
+  if(!prayerCoupleId || !prayerSpouseId) await getPrayerCouple();
+  if(!prayerCoupleId || !prayerSpouseId){alert("Your couple connection is not ready yet.");return;}
+  button.disabled=true;
+  const {error}=await supabaseClient.from("prayer_requests").insert({
+    couple_id:prayerCoupleId,
+    sender_id:currentUser.id,
+    recipient_id:prayerSpouseId,
+    body
+  });
+  button.disabled=false;
+  if(error){alert(error.message);return;}
+  field.value="";
+  await loadPrayerRequests();
+  alert("Prayer request sent.");
+}
+
+async function markPrayerRead(requestId,prayed=false){
+  if(!currentUser) return;
+  const existing=receiptFor(requestId,currentUser.id);
+  const row={
+    prayer_request_id:requestId,
+    user_id:currentUser.id,
+    read_at:existing?.read_at||new Date().toISOString(),
+    prayed_at:prayed?(existing?.prayed_at||new Date().toISOString()):(existing?.prayed_at||null)
+  };
+  const {error}=await supabaseClient.from("prayer_request_receipts")
+    .upsert(row,{onConflict:"prayer_request_id,user_id"});
+  if(!error) await loadPrayerRequests();
+}
+
+async function markPrayerPrayed(requestId){
+  await markPrayerRead(requestId,true);
+}
+
+function subscribeToPrayerRequests(){
+  if(!currentUser || prayerRealtimeChannel) return;
+  prayerRealtimeChannel=supabaseClient.channel("held-prayer-"+currentUser.id)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"prayer_requests"},async payload=>{
+      if(payload.new?.recipient_id===currentUser.id) await showPrayerNotification(payload.new);
+      await loadPrayerRequests();
+    })
+    .on("postgres_changes",{event:"*",schema:"public",table:"prayer_request_receipts"},loadPrayerRequests)
+    .subscribe();
+}
+
+document.addEventListener("click",event=>{
+  const togetherButton=event.target.closest('[data-view="together"]');
+  if(!togetherButton) return;
+  setTimeout(async()=>{
+    const unread=prayerRequestsCache.filter(request=>
+      request.recipient_id===currentUser?.id&&!receiptFor(request.id,currentUser.id)?.read_at
+    );
+    for(const request of unread) await markPrayerRead(request.id,false);
+  },500);
+});
+
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if(event === "PASSWORD_RECOVERY"){
     currentUser = session?.user || currentUser;
@@ -4594,6 +4839,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260728-v15</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v16</div>
 </body>
 </html>
