@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v24");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v25");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4547,7 +4547,8 @@ window.completeDay = async function(){
   const j = activeJourney();
   saveDraft();
   let day = getDay(j.id), done = getCompleted(j.id);
-  if(!done.includes(day)) done.push(day);
+  const wasAlreadyComplete=done.includes(day);
+  if(!wasAlreadyComplete) done.push(day);
   localStorage.setItem(progressKey(j.id), JSON.stringify(done));
   const nextDay = day < 21 ? day + 1 : day;
   localStorage.setItem(dayKey(j.id), String(nextDay));
@@ -4572,6 +4573,13 @@ window.completeDay = async function(){
       mood,
       completed_at: new Date().toISOString()
     }, { onConflict:"user_id,journey_id,day_number" });
+
+    if(!wasAlreadyComplete&&[7,14,21].includes(day)){
+      const {error:milestonePushError}=await supabaseClient.functions.invoke("send-prayer-push",{
+        body:{milestone_day:day}
+      });
+      if(milestonePushError) console.error("Milestone notification could not be sent:",milestonePushError);
+    }
   }
 
   alert(day===21 ? "Journey complete." : "Today is complete. Your next day is ready.");
@@ -4975,6 +4983,8 @@ document.addEventListener("click",event=>{
 
 function handleHeldDeepLink(){
   const hash=window.location.hash||"";
+  if(hash==="#progress"){showView("progress");return;}
+  if(hash==="#home"){showView("home");return;}
   if(!hash.startsWith("#together")) return;
   showView("together");
   const match=hash.match(/^#together\/(prayer|shared)\/([0-9a-f-]+)$/i);
@@ -5017,6 +5027,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v24</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v25</div>
 </body>
 </html>
