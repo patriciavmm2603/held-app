@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v16");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v17");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4626,7 +4626,7 @@ function updateNotificationControls(){
   if(Notification.permission==="granted"){
     button.textContent="Notifications enabled";
     button.disabled=true;
-    note.textContent="Held can alert you while the app is open or running in the background.";
+    note.textContent="Held can alert you to new prayer requests while the app is open.";
   }else if(Notification.permission==="denied"){
     button.textContent="Notifications blocked";
     button.disabled=true;
@@ -4839,6 +4839,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v16</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v17</div>
 </body>
 </html>
