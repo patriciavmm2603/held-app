@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v25");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v26");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4902,10 +4902,10 @@ async function sendPrayerRequest(){
   const field=document.getElementById("prayerRequestText");
   const button=document.getElementById("sendPrayerBtn");
   const body=field?.value.trim();
-  if(!body){alert("Write a prayer request first.");return;}
-  if(!currentUser){alert("Sign in first.");return;}
+  if(!body){showHeldMessage("Write a prayer request first.");return;}
+  if(!currentUser){showHeldMessage("Sign in first.");return;}
   if(!prayerCoupleId || !prayerSpouseId) await getPrayerCouple();
-  if(!prayerCoupleId || !prayerSpouseId){alert("Your couple connection is not ready yet.");return;}
+  if(!prayerCoupleId || !prayerSpouseId){showHeldMessage("Your couple connection is not ready yet.");return;}
   button.disabled=true;
   const {data:newRequest,error}=await supabaseClient.from("prayer_requests").insert({
     couple_id:prayerCoupleId,
@@ -4915,7 +4915,7 @@ async function sendPrayerRequest(){
   }).select("id").single();
   if(error){
     button.disabled=false;
-    alert(error.message);
+    showHeldMessage(error.message);
     return;
   }
   const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{
@@ -4926,11 +4926,11 @@ async function sendPrayerRequest(){
   await loadPrayerRequests();
   if(pushError){
     console.error("Prayer saved, but push delivery failed:",pushError);
-    alert("Prayer request saved. The notification could not be delivered right now.");
+    showHeldMessage("Prayer request saved. The notification could not be delivered right now.");
   }else if(!pushResult?.sent){
-    alert("Prayer request sent. Your spouse needs to open the updated Held app once to finish phone notifications.");
+    showHeldMessage("Prayer request sent. Your spouse needs to open the updated Held app once to finish phone notifications.");
   }else{
-    alert("Prayer request sent with a phone notification.");
+    showHeldMessage("Prayer request sent with a phone notification.");
   }
 }
 
@@ -5027,6 +5027,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v25</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v26</div>
 </body>
 </html>
