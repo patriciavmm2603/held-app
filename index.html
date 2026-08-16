@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v23");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v24");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4295,8 +4295,26 @@ async function signOut(){
   document.getElementById("authScreen").classList.remove("hidden");
 }
 
+let lastActivityPing=0;
+async function recordAppOpened(force=false){
+  if(!currentUser) return;
+  const now=Date.now();
+  if(!force&&now-lastActivityPing<5*60*1000) return;
+  lastActivityPing=now;
+  const {error}=await supabaseClient.from("app_activity").upsert({
+    user_id:currentUser.id,
+    last_opened_at:new Date(now).toISOString()
+  },{onConflict:"user_id"});
+  if(error) console.error("Held could not update last-opened time:",error);
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible") recordAppOpened();
+});
+window.addEventListener("focus",()=>recordAppOpened());
+
 async function beginSession(user){
   currentUser = user;
+  await recordAppOpened(true);
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("userEmail").textContent = user.email || "";
   await loadProfileAndCloudData();
@@ -4999,6 +5017,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v23</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v24</div>
 </body>
 </html>
