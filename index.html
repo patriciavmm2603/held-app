@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v21");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v22");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4145,7 +4145,7 @@ async function shareTogetherAnswer(){
     body:value
   }).select("id").single();
   if(error){alert(error.message);return;}
-  const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-shared-push",{
+  const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{
     body:{takeaway_id:sharedRow.id}
   });
   field.value="";
@@ -4981,6 +4981,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v21</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v22</div>
 </body>
 </html>
