@@ -1,0 +1,24 @@
+{
+  "name": "Held — Scripture-led healing",
+  "short_name": "Held",
+  "description": "A private Scripture-led devotional and marriage discipleship app.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffaf2",
+  "theme_color": "#0f7578",
+  "icons": [
+    {
+      "src": "assets/held-app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/held-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
