@@ -4250,17 +4250,16 @@ async function loadProfileAndCloudData(){
     .eq("id", currentUser.id)
     .maybeSingle();
 
-  const displayName = profileRow?.display_name || currentUser.email?.split("@")[0] || "Friend";
-  const normalizedEmail = String(currentUser.email || "").toLowerCase();
-  const normalizedName = String(displayName || "").toLowerCase();
+  const displayName =
+    profileRow?.display_name ||
+    currentUser.user_metadata?.display_name ||
+    currentUser.email?.split("@")[0] ||
+    "Friend";
+  const normalizedName = String(displayName).trim().toLowerCase();
 
-  if(normalizedEmail === "alec.remi@gmail.com"){
-    currentProfile = "alec";
-  }else if(normalizedEmail === "munoz.pat@outlook.com"){
-    currentProfile = "patricia";
-  }else{
-    currentProfile = normalizedName.includes("alec") ? "alec" : "patricia";
-  }
+  // Choose the devotional profile from the account name instead of exposing
+  // personal email addresses in this public repository.
+  currentProfile = normalizedName.includes("alec") ? "alec" : "patricia";
 
   localStorage.setItem("held_profile", currentProfile);
 
