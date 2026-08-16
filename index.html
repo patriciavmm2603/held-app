@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v22");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v23");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -478,6 +478,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .notification-badge{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#b84242;color:#fff;font-size:.7rem;line-height:19px;margin-left:3px}
 .notification-badge.visible{display:inline-block}
 .notification-note{font-size:.82rem;color:var(--muted)}
+.held-toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,18px);z-index:10000;max-width:min(420px,calc(100vw - 32px));padding:13px 18px;border-radius:16px;background:var(--ink);color:white;box-shadow:0 14px 34px rgba(23,58,61,.28);font-weight:700;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.held-toast.visible{opacity:1;transform:translate(-50%,0)}
 .notification-target{animation:heldTargetPulse 1.8s ease-out;box-shadow:0 0 0 3px rgba(21,152,154,.28)}
 @keyframes heldTargetPulse{0%{transform:scale(.98);background:#dff5f1}45%{transform:scale(1)}100%{background:var(--paper)}}
 </style>
@@ -4124,18 +4126,34 @@ function saveTogetherPrivately(){
   localStorage.setItem(`held_${currentProfile}_together_private`,value);
   alert("Saved privately. Your spouse cannot see it.");
 }
+function showHeldMessage(message){
+  let toast=document.getElementById("heldToast");
+  if(!toast){
+    toast=document.createElement("div");
+    toast.id="heldToast";
+    toast.className="held-toast";
+    toast.setAttribute("role","status");
+    toast.setAttribute("aria-live","polite");
+    document.body.appendChild(toast);
+  }
+  toast.textContent=message;
+  toast.classList.add("visible");
+  clearTimeout(showHeldMessage.timer);
+  showHeldMessage.timer=setTimeout(()=>toast.classList.remove("visible"),3200);
+}
+
 async function shareTogetherAnswer(){
   const field=document.getElementById("togetherAnswer");
   const value=field.value.trim();
-  if(!value){alert("Write an answer first.");return;}
-  if(!currentUser){alert("Sign in first.");return;}
+  if(!value){showHeldMessage("Write an answer first.");return;}
+  if(!currentUser){showHeldMessage("Sign in first.");return;}
   const {data:membership}=await supabaseClient
     .from("couple_members")
     .select("couple_id")
     .eq("user_id",currentUser.id)
     .maybeSingle();
   if(!membership?.couple_id){
-    alert("Your accounts are not linked as a couple yet. Save it privately for now.");
+    showHeldMessage("Your accounts are not linked as a couple yet. Save it privately for now.");
     return;
   }
   const {data:sharedRow,error}=await supabaseClient.from("shared_takeaways").insert({
@@ -4144,7 +4162,7 @@ async function shareTogetherAnswer(){
     journey_id:activeJourney().id,
     body:value
   }).select("id").single();
-  if(error){alert(error.message);return;}
+  if(error){showHeldMessage(error.message);return;}
   const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{
     body:{takeaway_id:sharedRow.id}
   });
@@ -4154,11 +4172,11 @@ async function shareTogetherAnswer(){
   renderShared();
   if(pushError){
     console.error("Shared answer saved, but push delivery failed:",pushError);
-    alert("Shared with your spouse. The phone notification could not be delivered right now.");
+    showHeldMessage("Shared with your spouse. The phone notification could not be delivered right now.");
   }else if(!pushResult?.sent){
-    alert("Shared with your spouse. Their phone is not registered for notifications yet.");
+    showHeldMessage("Shared with your spouse. Their phone is not registered for notifications yet.");
   }else{
-    alert("Shared with your spouse and sent a phone notification.");
+    showHeldMessage("Shared with your spouse and sent a phone notification.");
   }
 }
 document.addEventListener("keydown",function(event){
@@ -4981,6 +4999,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v22</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v23</div>
 </body>
 </html>
