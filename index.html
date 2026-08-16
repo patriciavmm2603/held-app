@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v20");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v21");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4074,6 +4074,7 @@ function renderShared(){
   document.getElementById("sharedTakeaways").innerHTML=arr.length
     ? arr.map(x=>`<div class="entry" ${x.id?`id="shared-${x.id}"`:""}><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${escapeHtml(sharedJourneyTitle(x.journey))} · ${x.date}</small></div>`).join("")
     : `<p class="muted">No shared takeaways yet.</p>`;
+  if(typeof updateTogetherBadge==="function") updateTogetherBadge();
 }
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 </script>
@@ -4469,6 +4470,17 @@ async function syncSharedTakeawaysFromCloud(){
     journey: row.journey_id || ""
   }));
   localStorage.setItem("held_shared", JSON.stringify(mapped));
+  sharedTakeawayReceiptsCache=[];
+  const sharedIds=mapped.map(item=>item.id).filter(Boolean);
+  if(sharedIds.length){
+    const {data:receipts}=await supabaseClient
+      .from("shared_takeaway_receipts")
+      .select("shared_takeaway_id,user_id,read_at")
+      .in("shared_takeaway_id",sharedIds);
+    sharedTakeawayReceiptsCache=receipts||[];
+  }
+  renderShared();
+  updateTogetherBadge();
 }
 
 const originalStartSelectedJourney = window.startSelectedJourney;
@@ -4623,6 +4635,7 @@ window.shareTakeaway = async function(){
 
 let prayerRequestsCache=[];
 let prayerReceiptsCache=[];
+let sharedTakeawayReceiptsCache=[];
 let prayerCoupleId=null;
 let prayerSpouseId=null;
 let prayerRealtimeChannel=null;
@@ -4775,17 +4788,51 @@ function receiptFor(requestId,userId){
   return prayerReceiptsCache.find(receipt=>receipt.prayer_request_id===requestId&&receipt.user_id===userId);
 }
 
+
+function updateTogetherBadge(){
+  const prayerUnread=prayerRequestsCache.filter(request=>
+    request.recipient_id===currentUser?.id&&!receiptFor(request.id,currentUser.id)?.read_at
+  ).length;
+  const shared=JSON.parse(localStorage.getItem("held_shared")||"[]");
+  const sharedUnread=shared.filter(item=>
+    item.id&&item.from!==currentProfile&&!sharedTakeawayReceiptsCache.some(receipt=>
+      receipt.shared_takeaway_id===item.id&&receipt.user_id===currentUser?.id
+    )
+  ).length;
+  const total=prayerUnread+sharedUnread;
+  const badge=document.getElementById("prayerNavBadge");
+  if(badge){
+    badge.textContent=total?String(total):"";
+    badge.classList.toggle("visible",total>0);
+  }
+}
+
+async function markUnreadSharedAnswersRead(){
+  if(!currentUser) return;
+  const shared=JSON.parse(localStorage.getItem("held_shared")||"[]");
+  const unread=shared.filter(item=>
+    item.id&&item.from!==currentProfile&&!sharedTakeawayReceiptsCache.some(receipt=>
+      receipt.shared_takeaway_id===item.id&&receipt.user_id===currentUser.id
+    )
+  );
+  if(!unread.length) return;
+  const rows=unread.map(item=>({
+    shared_takeaway_id:item.id,
+    user_id:currentUser.id,
+    read_at:new Date().toISOString()
+  }));
+  const {error}=await supabaseClient.from("shared_takeaway_receipts")
+    .upsert(rows,{onConflict:"shared_takeaway_id,user_id"});
+  if(!error) await syncSharedTakeawaysFromCloud();
+}
+
 function renderPrayerRequests(){
   const container=document.getElementById("prayerRequests");
   if(!container) return;
   const unread=prayerRequestsCache.filter(request=>
     request.recipient_id===currentUser?.id&&!receiptFor(request.id,currentUser.id)?.read_at
   ).length;
-  const badge=document.getElementById("prayerNavBadge");
-  if(badge){
-    badge.textContent=unread?String(unread):"";
-    badge.classList.toggle("visible",unread>0);
-  }
+  updateTogetherBadge();
   if(!prayerRequestsCache.length){
     container.innerHTML='<p class="muted">No prayer requests yet. This can be a gentle place to begin.</p>';
     return;
@@ -4868,6 +4915,12 @@ function subscribeToPrayerRequests(){
       await loadPrayerRequests();
     })
     .on("postgres_changes",{event:"*",schema:"public",table:"prayer_request_receipts"},loadPrayerRequests)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"shared_takeaways"},async()=>{
+      await syncSharedTakeawaysFromCloud();
+    })
+    .on("postgres_changes",{event:"*",schema:"public",table:"shared_takeaway_receipts"},async()=>{
+      await syncSharedTakeawaysFromCloud();
+    })
     .subscribe();
 }
 
@@ -4879,6 +4932,7 @@ document.addEventListener("click",event=>{
       request.recipient_id===currentUser?.id&&!receiptFor(request.id,currentUser.id)?.read_at
     );
     for(const request of unread) await markPrayerRead(request.id,false);
+    await markUnreadSharedAnswersRead();
   },500);
 });
 
@@ -4927,6 +4981,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v20</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v21</div>
 </body>
 </html>
