@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v19");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v20");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -478,6 +478,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .notification-badge{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#b84242;color:#fff;font-size:.7rem;line-height:19px;margin-left:3px}
 .notification-badge.visible{display:inline-block}
 .notification-note{font-size:.82rem;color:var(--muted)}
+.notification-target{animation:heldTargetPulse 1.8s ease-out;box-shadow:0 0 0 3px rgba(21,152,154,.28)}
+@keyframes heldTargetPulse{0%{transform:scale(.98);background:#dff5f1}45%{transform:scale(1)}100%{background:var(--paper)}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -4070,7 +4072,7 @@ function sharedJourneyTitle(journeyId){
 function renderShared(){
   const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");
   document.getElementById("sharedTakeaways").innerHTML=arr.length
-    ? arr.map(x=>`<div class="entry"><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${escapeHtml(sharedJourneyTitle(x.journey))} · ${x.date}</small></div>`).join("")
+    ? arr.map(x=>`<div class="entry" ${x.id?`id="shared-${x.id}"`:""}><strong>${x.from==="patricia"?"Patricia":"Alec"}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${escapeHtml(sharedJourneyTitle(x.journey))} · ${x.date}</small></div>`).join("")
     : `<p class="muted">No shared takeaways yet.</p>`;
 }
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
@@ -4135,18 +4137,28 @@ async function shareTogetherAnswer(){
     alert("Your accounts are not linked as a couple yet. Save it privately for now.");
     return;
   }
-  const {error}=await supabaseClient.from("shared_takeaways").insert({
+  const {data:sharedRow,error}=await supabaseClient.from("shared_takeaways").insert({
     couple_id:membership.couple_id,
     user_id:currentUser.id,
     journey_id:activeJourney().id,
     body:value
-  });
+  }).select("id").single();
   if(error){alert(error.message);return;}
+  const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-shared-push",{
+    body:{takeaway_id:sharedRow.id}
+  });
   field.value="";
   localStorage.removeItem(`held_${currentProfile}_together_private`);
   await syncSharedTakeawaysFromCloud();
   renderShared();
-  alert("Shared with your spouse.");
+  if(pushError){
+    console.error("Shared answer saved, but push delivery failed:",pushError);
+    alert("Shared with your spouse. The phone notification could not be delivered right now.");
+  }else if(!pushResult?.sent){
+    alert("Shared with your spouse. Their phone is not registered for notifications yet.");
+  }else{
+    alert("Shared with your spouse and sent a phone notification.");
+  }
 }
 document.addEventListener("keydown",function(event){
   const auth=document.getElementById("authScreen");
@@ -4270,6 +4282,7 @@ async function beginSession(user){
   document.getElementById("userEmail").textContent = user.email || "";
   await loadProfileAndCloudData();
   renderAll();
+  setTimeout(handleHeldDeepLink,0);
 }
 
 async function loadProfileAndCloudData(){
@@ -4441,12 +4454,13 @@ async function syncSharedTakeawaysFromCloud(){
 
   const { data, error } = await supabaseClient
     .from("shared_takeaways")
-    .select("user_id,journey_id,body,created_at")
+    .select("id,user_id,journey_id,body,created_at")
     .eq("couple_id", membership.couple_id)
     .order("created_at", { ascending:false });
   if(error) return;
 
   const mapped = (data || []).map(row => ({
+    id: row.id,
     from: row.user_id === currentUser.id
       ? currentProfile
       : (currentProfile === "patricia" ? "alec" : "patricia"),
@@ -4782,7 +4796,7 @@ function renderPrayerRequests(){
     const unreadItem=received&&!receipt?.read_at;
     const name=received?(currentProfile==="patricia"?"Alec":"Patricia"):"You";
     const status=receipt?.prayed_at?"Prayed for":(receipt?.read_at?"Seen":(received?"New":"Sent"));
-    return `<div class="prayer-item ${unreadItem?"unread":""}">
+    return `<div id="prayer-${request.id}" class="prayer-item ${unreadItem?"unread":""}">
       <div class="prayer-meta"><strong>${name}</strong><span>${new Date(request.created_at).toLocaleString()}</span></div>
       <p>${escapeHtml(request.body)}</p>
       <div class="prayer-toolbar">
@@ -4868,6 +4882,24 @@ document.addEventListener("click",event=>{
   },500);
 });
 
+
+function handleHeldDeepLink(){
+  const hash=window.location.hash||"";
+  if(!hash.startsWith("#together")) return;
+  showView("together");
+  const match=hash.match(/^#together\/(prayer|shared)\/([0-9a-f-]+)$/i);
+  if(!match) return;
+  const targetId=`${match[1].toLowerCase()}-${match[2]}`;
+  setTimeout(()=>{
+    const target=document.getElementById(targetId);
+    if(!target) return;
+    target.classList.add("notification-target");
+    target.scrollIntoView({behavior:"smooth",block:"center"});
+    setTimeout(()=>target.classList.remove("notification-target"),2200);
+  },900);
+}
+window.addEventListener("hashchange",handleHeldDeepLink);
+
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if(event === "PASSWORD_RECOVERY"){
     currentUser = session?.user || currentUser;
@@ -4895,6 +4927,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v19</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v20</div>
 </body>
 </html>
