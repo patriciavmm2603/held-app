@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v18");
+    refreshedUrl.searchParams.set("heldBuild", "20260816-v19");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4303,7 +4303,8 @@ async function loadProfileAndCloudData(){
   subscribeToPrayerRequests();
   await registerHeldServiceWorker();
   if("Notification" in window && Notification.permission==="granted"){
-    await ensurePushSubscription();
+    try{await ensurePushSubscription();}
+    catch(error){console.error("Held phone registration did not finish:",error);}
   }
   updateNotificationControls();
 }
@@ -4894,6 +4895,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v18</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v19</div>
 </body>
 </html>
