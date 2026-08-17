@@ -1,4 +1,4 @@
-const CACHE_NAME="held-v30";
+const CACHE_NAME="held-v31";
 const CORE_ASSETS=["./","./index.html","./manifest.webmanifest","./assets/held-app-icon.png"];
 
 self.addEventListener("install",event=>{
@@ -36,17 +36,16 @@ self.addEventListener("notificationclick",event=>{
   );
 });
 
-
 self.addEventListener("push",event=>{
   let message={};
   try{message=event.data?.json()||{};}catch{message={};}
   const destination=new URL(message.url||"./#together",self.registration.scope).href;
   event.waitUntil(
-    self.registration.showNotification(message.title||"New prayer request in Held",{
-      body:message.body||"Your spouse sent you a prayer request.",
+    self.registration.showNotification(message.title||"New message in Held",{
+      body:message.body||"Your spouse shared something with you.",
       icon:"assets/held-app-icon.png",
       badge:"assets/held-app-icon.png",
-      tag:message.requestId?"held-prayer-"+message.requestId:"held-prayer",
+      tag:message.requestId?"held-message-"+message.requestId:"held-message",
       renotify:true,
       data:{url:destination}
     })
