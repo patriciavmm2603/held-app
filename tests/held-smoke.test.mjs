@@ -32,10 +32,10 @@ test("Conversation submission prevents double taps", () => {
   assert.match(html, /error\?\.code==="23505"/);
 });
 
-test("Sender never sees their own conversation invitation", () => {
+test("Sender and completed rounds never show a conversation invitation", () => {
   assert.match(
     html,
-    /item\.kind==="conversation_invite"&&item\.user_id===currentUser\?\.id/
+    /item\.kind==="conversation_invite"&&\(item\.user_id===currentUser\?\.id\|\|item\.details\?\.unlocked\)/
   );
 });
 
