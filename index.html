@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260816-v26");
+    refreshedUrl.searchParams.set("heldBuild", "20260817-v27");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -480,6 +480,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .notification-note{font-size:.82rem;color:var(--muted)}
 .held-toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,18px);z-index:10000;max-width:min(420px,calc(100vw - 32px));padding:13px 18px;border-radius:16px;background:var(--ink);color:white;box-shadow:0 14px 34px rgba(23,58,61,.28);font-weight:700;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
 .held-toast.visible{opacity:1;transform:translate(-50%,0)}
+.share-note-option{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--ink);font-size:14px}.share-note-option input{width:18px;height:18px;accent-color:var(--teal)}
+
 .notification-target{animation:heldTargetPulse 1.8s ease-out;box-shadow:0 0 0 3px rgba(21,152,154,.28)}
 @keyframes heldTargetPulse{0%{transform:scale(.98);background:#dff5f1}45%{transform:scale(1)}100%{background:var(--paper)}}
 </style>
@@ -749,7 +751,9 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <p id="wordCaution" class="muted"></p>
     </details>
   </div>
-  <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote"></textarea></div><button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
+  <div class="prompt"><strong>Save a Bible study note</strong><textarea id="studyNote" placeholder="Write what stood out to you..."></textarea></div>
+  <label class="share-note-option"><input id="shareStudyNoteWithSpouse" type="checkbox"> <span>Also share this note with my spouse</span></label>
+  <button class="secondary" onclick="saveStudyNote()">Add to notebook</button></div>
  </div>
 </section>
 
@@ -4613,31 +4617,73 @@ window.saveJournal = async function(){
 
 const originalSaveStudyNote = window.saveStudyNote;
 window.saveStudyNote = async function(){
-  const j = activeJourney();
-  const t = document.getElementById("studyNote").value.trim();
-  if(!t){ alert("Write a note first."); return; }
+  const j=activeJourney();
+  const field=document.getElementById("studyNote");
+  const shareOption=document.getElementById("shareStudyNoteWithSpouse");
+  const t=field.value.trim();
+  if(!t){showHeldMessage("Write a note first.");return;}
 
-  const day = getDay(j.id);
-  const content = dayContent(j, day);
+  const day=getDay(j.id);
+  const content=dayContent(j,day);
 
   if(currentUser){
-    const { error } = await supabaseClient.from("study_notes").insert({
-      user_id: currentUser.id,
-      journey_id: j.id,
-      day_number: day,
-      passage: content.passage,
-      key_word: content.word ? content.word.trans : null,
-      body: t
+    const {error}=await supabaseClient.from("study_notes").insert({
+      user_id:currentUser.id,
+      journey_id:j.id,
+      day_number:day,
+      passage:content.passage,
+      key_word:content.word ? content.word.trans : null,
+      body:t
     });
-    if(error){ alert(error.message); return; }
+    if(error){showHeldMessage(error.message);return;}
+
+    if(shareOption?.checked){
+      const {data:membership}=await supabaseClient
+        .from("couple_members")
+        .select("couple_id")
+        .eq("user_id",currentUser.id)
+        .maybeSingle();
+      if(!membership?.couple_id){
+        showHeldMessage("Saved privately. Your couple connection is not ready for sharing yet.");
+        return;
+      }
+      const sharedBody=`Bible study note · ${content.passage}\n${t}`;
+      const {data:sharedRow,error:shareError}=await supabaseClient.from("shared_takeaways").insert({
+        couple_id:membership.couple_id,
+        user_id:currentUser.id,
+        journey_id:j.id,
+        body:sharedBody
+      }).select("id").single();
+      if(shareError){
+        showHeldMessage("Saved privately, but the note could not be shared right now.");
+        return;
+      }
+      const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{
+        body:{takeaway_id:sharedRow.id}
+      });
+      await syncSharedTakeawaysFromCloud();
+      const savedNotes=JSON.parse(localStorage.getItem(notebookKey(j.id)) || "[]");
+      savedNotes.unshift({text:t,date:new Date().toLocaleDateString(),day});
+      localStorage.setItem(notebookKey(j.id),JSON.stringify(savedNotes));
+      field.value="";
+      shareOption.checked=false;
+      renderNotebook();
+      if(pushError || !pushResult?.sent){
+        showHeldMessage("Saved and shared. Your spouse will see it in Together.");
+      }else{
+        showHeldMessage("Saved, shared, and sent to your spouse.");
+      }
+      return;
+    }
   }
 
-  const arr = JSON.parse(localStorage.getItem(notebookKey(j.id)) || "[]");
-  arr.unshift({ text:t, date:new Date().toLocaleDateString(), day });
-  localStorage.setItem(notebookKey(j.id), JSON.stringify(arr));
-  document.getElementById("studyNote").value = "";
+  const arr=JSON.parse(localStorage.getItem(notebookKey(j.id)) || "[]");
+  arr.unshift({text:t,date:new Date().toLocaleDateString(),day});
+  localStorage.setItem(notebookKey(j.id),JSON.stringify(arr));
+  field.value="";
+  if(shareOption) shareOption.checked=false;
   renderNotebook();
-  alert("Added to your Bible notebook.");
+  showHeldMessage("Added to your private Bible notebook.");
 };
 
 const originalShareTakeaway = window.shareTakeaway;
@@ -5027,6 +5073,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260816-v26</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v27</div>
 </body>
 </html>
