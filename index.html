@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260817_v32";
+  const RESET_KEY = "held_cache_reset_20260817_v33";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260817-v32");
+    refreshedUrl.searchParams.set("heldBuild", "20260817-v33");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -5048,7 +5048,7 @@ async function loadCoupleHub(){
 }
 function renderCoupleHub(){
   const moments=document.getElementById("coupleMoments");
-  if(moments){const visible=coupleMomentsCache.filter(item=>item.is_shared||item.user_id===currentUser?.id);moments.innerHTML=visible.length?visible.map(item=>{const mine=item.user_id===currentUser?.id;const label={encouragement:"Encouragement",weekly_reflection:"Weekly reflection",conversation_answer:"Conversation answer",conversation_invite:"Conversation invitation",memory:"Memory",answered_prayer:"Answered prayer"}[item.kind]||"Shared moment";const privateLabel=!item.is_shared?(item.kind==="conversation_answer"?" · Private until both respond":" · Private"):"";return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${privateLabel}</small></div>`;}).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';}
+  if(moments){const visible=coupleMomentsCache.filter(item=>(item.is_shared||item.user_id===currentUser?.id)&&!(item.kind==="conversation_invite"&&item.user_id===currentUser?.id));moments.innerHTML=visible.length?visible.map(item=>{const mine=item.user_id===currentUser?.id;const label={encouragement:"Encouragement",weekly_reflection:"Weekly reflection",conversation_answer:"Conversation answer",conversation_invite:"Conversation invitation",memory:"Memory",answered_prayer:"Answered prayer"}[item.kind]||"Shared moment";const privateLabel=!item.is_shared?(item.kind==="conversation_answer"?" · Private until both respond":" · Private"):"";return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${privateLabel}</small></div>`;}).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';}
   const conversationStatus=document.getElementById("conversationStatus");if(conversationStatus){const roundId=heldConversationRoundId(),roundAnswers=coupleMomentsCache.filter(x=>x.kind==="conversation_answer"&&x.details?.round_id===roundId),mine=roundAnswers.find(x=>x.user_id===currentUser?.id),bothRevealed=roundAnswers.filter(x=>x.is_shared).length>=2,invite=coupleMomentsCache.find(x=>x.kind==="conversation_invite"&&x.details?.round_id===roundId);conversationStatus.textContent=bothRevealed?"You both responded — both answers are revealed below.":mine?`Your answer is saved privately. Waiting for ${spouseName()} to respond.`:invite?`${spouseName()} answered privately. Respond to reveal both answers.`:"Your answers stay private until both of you respond.";}
 
   const checkins=document.getElementById("recentCheckins");if(checkins)checkins.innerHTML=coupleCheckinsCache.slice(0,6).map(item=>`<div class="entry"><strong>${item.user_id===currentUser?.id?"You":spouseName()} · ${escapeHtml(item.mood||"Checked in")}</strong><p>${item.need?escapeHtml(item.need):"No support request added."}</p><small class="muted">Energy ${item.energy||"—"}/5 · ${new Date(item.created_at).toLocaleDateString()}</small></div>`).join("")||'<p class="muted">No check-ins yet.</p>';
@@ -5180,6 +5180,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v32</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v33</div>
 </body>
 </html>
