@@ -7,12 +7,14 @@ on:
       - "index.html"
       - "service-worker.js"
       - "tests/**"
+      - "supabase/**"
       - ".github/workflows/held-qa.yml"
   pull_request:
     paths:
       - "index.html"
       - "service-worker.js"
       - "tests/**"
+      - "supabase/**"
   workflow_dispatch:
 
 permissions:
