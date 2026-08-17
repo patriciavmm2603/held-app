@@ -1,0 +1,33 @@
+name: Held QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "service-worker.js"
+      - "tests/**"
+      - ".github/workflows/held-qa.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "service-worker.js"
+      - "tests/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  held-smoke-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out Held
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test spouse visibility, notifications, and cache consistency
+        run: node --test tests/held-smoke.test.mjs
