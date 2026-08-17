@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260817-v27");
+    refreshedUrl.searchParams.set("heldBuild", "20260817-v28");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -484,6 +484,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 .notification-target{animation:heldTargetPulse 1.8s ease-out;box-shadow:0 0 0 3px rgba(21,152,154,.28)}
 @keyframes heldTargetPulse{0%{transform:scale(.98);background:#dff5f1}45%{transform:scale(1)}100%{background:var(--paper)}}
+.couple-hub{margin:20px 0}.couple-rhythm{padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,var(--aqua),#fff7e8);margin-bottom:12px}.connection-card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.72);padding:14px 16px;margin:10px 0}.connection-card summary{font-weight:700;cursor:pointer}.connection-card textarea,.connection-card select{width:100%;margin-top:10px}.compact-grid{margin:10px 0}.compact-grid label{display:grid;gap:6px}.mini-feed{display:grid;gap:8px;margin-top:12px}.mini-feed .entry{margin:0}.weekly-recap{line-height:1.65}.moment-kind{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal-dark);margin-bottom:4px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -795,6 +796,29 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 <section id="together" class="view"><div class="card"><div class="eyebrow">Together</div><h3>Walking in faith, side by side</h3>
 <div class="shared"><strong>Patricia’s active journey</strong><p id="patSharedJourney"></p></div><div class="shared" style="margin-top:10px"><strong>Alec’s active journey</strong><p id="alecSharedJourney"></p></div>
+<div class="couple-hub">
+  <div class="section-title"><h3>Our daily connection</h3><p class="muted">Everything here is private to the two of you.</p></div>
+  <div id="coupleRhythm" class="couple-rhythm"></div>
+  <details class="connection-card" open>
+    <summary>Daily check-in</summary>
+    <p class="muted">Share only if you want your spouse to see it.</p>
+    <div class="grid2 compact-grid">
+      <label>Mood<select id="checkinMood"><option>Peaceful</option><option>Hopeful</option><option>Tired</option><option>Anxious</option><option>Overwhelmed</option><option>Guarded</option></select></label>
+      <label>Energy (1–5)<input id="checkinEnergy" type="range" min="1" max="5" value="3"></label>
+    </div>
+    <textarea id="checkinNeed" maxlength="500" placeholder="What would help you feel supported today?"></textarea>
+    <label class="share-note-option"><input id="shareCheckin" type="checkbox"> Share this check-in with my spouse</label>
+    <button class="secondary" type="button" onclick="saveDailyConnection()">Save check-in</button>
+    <div id="recentCheckins" class="mini-feed"></div>
+  </details>
+  <details class="connection-card"><summary>Send encouragement</summary><select id="encouragementKind"><option value="encouragement">Encouragement</option><option value="verse">A verse for you</option><option value="gratitude">Something I appreciate</option></select><textarea id="encouragementText" maxlength="2000" placeholder="Write something loving and specific..."></textarea><button class="secondary" type="button" onclick="sendEncouragement()">Send to my spouse</button></details>
+  <details class="connection-card"><summary>Weekly marriage reflection</summary><textarea id="weeklyGratitude" maxlength="1200" placeholder="Something I appreciated about us this week..."></textarea><textarea id="weeklyHard" maxlength="1200" placeholder="Something that felt difficult..."></textarea><textarea id="weeklySupport" maxlength="1200" placeholder="One way you can support me this week..."></textarea><button class="secondary" type="button" onclick="shareWeeklyReflection()">Share reflection</button></details>
+  <details class="connection-card"><summary>Conversation mode</summary><p class="muted" id="conversationPrompt">Where did you feel most loved by me this week?</p><textarea id="conversationResponse" maxlength="2000" placeholder="Answer privately first..."></textarea><div class="actions"><button class="secondary" type="button" onclick="saveConversationAnswer(false)">Save privately</button><button class="primary" type="button" onclick="revealConversationAnswer()">Reveal my answer</button></div></details>
+  <details class="connection-card"><summary>Remember this</summary><textarea id="memoryText" maxlength="2000" placeholder="Save an answered prayer, meaningful moment, or milestone..."></textarea><button class="secondary" type="button" onclick="saveSharedMemory()">Add to our timeline</button></details>
+  <details class="connection-card"><summary>Sunday recap</summary><div id="weeklyRecap" class="weekly-recap"></div></details>
+  <details class="connection-card"><summary>Quiet-day settings</summary><p class="muted">Pause non-urgent reminders when you need rest. Prayer requests remain visible inside Held.</p><div class="actions"><button class="ghost" type="button" onclick="setQuietDay(24)">Pause for 24 hours</button><button class="ghost" type="button" onclick="setQuietDay(72)">Pause for 3 days</button><button class="secondary" type="button" onclick="setQuietDay(0)">Resume reminders</button></div><div id="quietDayStatus" class="muted"></div></details>
+  <div class="section-title"><h3>Our shared moments</h3></div><div id="coupleMoments" class="mini-feed"></div>
+</div>
 <div class="prompt">
   <strong>Our shared question</strong>
   <p>What is God inviting each of us to release, receive, or practice this week?</p>
@@ -941,6 +965,7 @@ function showView(id){
  if(id==="together" && currentUser){
    syncTogetherJourneysFromCloud();
    syncSharedTakeawaysFromCloud().then(renderShared);
+   loadCoupleHub();
  }
  window.scrollTo({top:0,behavior:"smooth"})
 }
@@ -4059,16 +4084,16 @@ function renderAll(){
  if(togetherField) togetherField.value=localStorage.getItem(`held_${currentProfile}_together_private`)||"";
 }
 function selectMood(btn,m){const j=activeJourney(),day=getDay(j.id);document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");localStorage.setItem(moodKey(j.id,day),m)}
-function saveDraft(showMessage=true){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);localStorage.setItem(draftKey(j.id,3),document.getElementById("prompt3").value);if(showMessage)alert("Your answers are saved privately for this day.")}
-function saveReflection(showMessage=true){const j=activeJourney(),day=getDay(j.id),content=dayContent(j,day);const answer1=document.getElementById("prompt1").value.trim(),answer2=document.getElementById("prompt2").value.trim(),answer3=document.getElementById("prompt3").value.trim(),mood=localStorage.getItem(moodKey(j.id,day))||"";if(!answer1&&!answer2&&!answer3&&!mood){if(showMessage)alert("Write an answer or choose how you are feeling before saving.");return false}const entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]");const entry={day,passage:content.passage,theme:content.theme,question1:content.p1,answer1,question2:content.p2,answer2,question3:content.p3,answer3,mood,date:new Date().toLocaleDateString()};const i=entries.findIndex(x=>x.day===day);if(i>=0)entries[i]=entry;else entries.unshift(entry);localStorage.setItem(reflectionKey(j.id),JSON.stringify(entries));saveDraft(false);renderDayReflections();if(showMessage)alert("Reflection saved privately under Journal → Day reflections.");return true}
-function completeDay(){const j=activeJourney();let day=getDay(j.id),done=getCompleted(j.id);saveReflection(false);if(!done.includes(day))done.push(day);localStorage.setItem(progressKey(j.id),JSON.stringify(done));if(day<21){localStorage.setItem(dayKey(j.id),String(day+1));alert(`Day ${day} is complete. Day ${day+1} is ready.`);renderAll();showView("devotional");setDevTab("read")}else{alert("Journey complete.");renderAll();showView("progress")}}
+function saveDraft(showMessage=true){const j=activeJourney();localStorage.setItem(draftKey(j.id,1),document.getElementById("prompt1").value);localStorage.setItem(draftKey(j.id,2),document.getElementById("prompt2").value);localStorage.setItem(draftKey(j.id,3),document.getElementById("prompt3").value);if(showMessage)showHeldMessage("Your answers are saved privately for this day.")}
+function saveReflection(showMessage=true){const j=activeJourney(),day=getDay(j.id),content=dayContent(j,day);const answer1=document.getElementById("prompt1").value.trim(),answer2=document.getElementById("prompt2").value.trim(),answer3=document.getElementById("prompt3").value.trim(),mood=localStorage.getItem(moodKey(j.id,day))||"";if(!answer1&&!answer2&&!answer3&&!mood){if(showMessage)showHeldMessage("Write an answer or choose how you are feeling before saving.");return false}const entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]");const entry={day,passage:content.passage,theme:content.theme,question1:content.p1,answer1,question2:content.p2,answer2,question3:content.p3,answer3,mood,date:new Date().toLocaleDateString()};const i=entries.findIndex(x=>x.day===day);if(i>=0)entries[i]=entry;else entries.unshift(entry);localStorage.setItem(reflectionKey(j.id),JSON.stringify(entries));saveDraft(false);renderDayReflections();if(showMessage)showHeldMessage("Reflection saved privately under Journal → Day reflections.");return true}
+function completeDay(){const j=activeJourney();let day=getDay(j.id),done=getCompleted(j.id);saveReflection(false);if(!done.includes(day))done.push(day);localStorage.setItem(progressKey(j.id),JSON.stringify(done));if(day<21){localStorage.setItem(dayKey(j.id),String(day+1));showHeldMessage(`Day ${day} is complete. Day ${day+1} is ready.`);renderAll();showView("devotional");setDevTab("read")}else{showHeldMessage("Journey complete.");renderAll();showView("progress")}}
 function renderDayGrid(){const j=activeJourney(),day=getDay(j.id),done=getCompleted(j.id);document.getElementById("dayGrid").innerHTML=j.days.map((d,i)=>{const n=i+1;let c="day";if(done.includes(n))c+=" done";if(n===day)c+=" current";if(n>day&&!done.includes(n))c+=" locked";return `<button class="${c}" onclick="jumpToDay(${n})"><strong>${done.includes(n)?"✓ Day "+n:"Day "+n}</strong><small>${d[1]}</small></button>`}).join("")}
-function jumpToDay(n){const j=activeJourney(),done=getCompleted(j.id),day=getDay(j.id);if(n>day&&!done.includes(n)){alert("Complete the earlier days first.");return}localStorage.setItem(dayKey(j.id),String(n));renderAll();showView("devotional");setDevTab("read")}
+function jumpToDay(n){const j=activeJourney(),done=getCompleted(j.id),day=getDay(j.id);if(n>day&&!done.includes(n)){showHeldMessage("Complete the earlier days first.");return}localStorage.setItem(dayKey(j.id),String(n));renderAll();showView("devotional");setDevTab("read")}
 function renderAllProgress(){document.getElementById("allProgress").innerHTML=profile().journeys.map(j=>{const done=getCompleted(j.id).length;return `<div class="journey-card clickable" onclick="openJourney('${j.id}')"><span class="tag">${j.book}</span><h4>${j.title}</h4><p class="muted">${done} of 21 days completed</p><div class="progress"><span style="width:${Math.round(done/21*100)}%"></span></div></div>`}).join("")}
-function saveStudyNote(){const j=activeJourney(),t=document.getElementById("studyNote").value.trim();if(!t){alert("Write a note first.");return}const arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(notebookKey(j.id),JSON.stringify(arr));document.getElementById("studyNote").value="";renderNotebook();alert("Added to your Bible notebook.")}
+function saveStudyNote(){const j=activeJourney(),t=document.getElementById("studyNote").value.trim();if(!t){showHeldMessage("Write a note first.");return}const arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(notebookKey(j.id),JSON.stringify(arr));document.getElementById("studyNote").value="";renderNotebook();showHeldMessage("Added to your Bible notebook.")}
 function renderNotebook(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(notebookKey(j.id))||"[]");document.getElementById("notebookList").innerHTML=arr.length?arr.map(x=>`<div class="entry"><strong>${j.title} · Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No study notes yet for this journey.</p>`}
-function saveJournal(){const j=activeJourney(),t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(journalKey(j.id),JSON.stringify(arr));document.getElementById("journalText").value="";renderJournal();alert("Saved privately.")}
-function shareTakeaway(){const t=document.getElementById("journalText").value.trim();if(!t){alert("Write something first.");return}const takeaway=prompt("What one sentence do you want to share?");if(!takeaway)return;const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString(),journey:activeJourney().title});localStorage.setItem("held_shared",JSON.stringify(arr));renderShared();alert("Only that takeaway was shared.")}
+function saveJournal(){const j=activeJourney(),t=document.getElementById("journalText").value.trim();if(!t){showHeldMessage("Write something first.");return}const arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");arr.unshift({text:t,date:new Date().toLocaleDateString(),day:getDay(j.id)});localStorage.setItem(journalKey(j.id),JSON.stringify(arr));document.getElementById("journalText").value="";renderJournal();showHeldMessage("Saved privately.")}
+function shareTakeaway(){const t=document.getElementById("journalText").value.trim();if(!t){showHeldMessage("Write something first.");return}const takeaway=t;const arr=JSON.parse(localStorage.getItem("held_shared")||"[]");arr.unshift({from:currentProfile,text:takeaway,date:new Date().toLocaleDateString(),journey:activeJourney().title});localStorage.setItem("held_shared",JSON.stringify(arr));renderShared();showHeldMessage("Only that takeaway was shared.")}
 function renderJournal(){const j=activeJourney(),arr=JSON.parse(localStorage.getItem(journalKey(j.id))||"[]");document.getElementById("journalEntries").innerHTML=arr.length?arr.map(x=>`<div class="entry"><span class="badge">Private</span><strong>Day ${x.day}</strong><p>${escapeHtml(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):`<p class="muted">No other private entries yet for this journey.</p>`;renderDayReflections()}
 function renderDayReflections(){const container=document.getElementById("dayReflectionEntries");if(!container)return;const j=activeJourney(),entries=JSON.parse(localStorage.getItem(reflectionKey(j.id))||"[]").sort((a,b)=>b.day-a.day);container.innerHTML=entries.length?entries.map(x=>`<div class="saved-reflection"><span class="badge">Private</span>${x.mood?`<span class="mood-history">${escapeHtml(x.mood)}</span>`:""}<h4>Day ${x.day}: ${escapeHtml(x.theme||"Reflection")}</h4><div class="muted">${escapeHtml(x.passage||"")} · ${escapeHtml(x.date||"")}</div>${x.answer1?`<div class="answer"><strong>${escapeHtml(x.question1||"Question 1")}</strong><p>${escapeHtml(x.answer1)}</p></div>`:""}${x.answer2?`<div class="answer"><strong>${escapeHtml(x.question2||"Question 2")}</strong><p>${escapeHtml(x.answer2)}</p></div>`:""}${x.answer3?`<div class="answer"><strong>${escapeHtml(x.question3||"Question 3")}</strong><p>${escapeHtml(x.answer3)}</p></div>`:""}</div>`).join(""):`<p class="muted">No saved day reflections yet. Save your answers from the Reflect tab and they will appear here.</p>`}
 function sharedJourneyTitle(journeyId){
@@ -4126,9 +4151,9 @@ async function updatePassword(){
 function saveTogetherPrivately(){
   const field=document.getElementById("togetherAnswer");
   const value=field.value.trim();
-  if(!value){alert("Write an answer first.");return;}
+  if(!value){showHeldMessage("Write an answer first.");return;}
   localStorage.setItem(`held_${currentProfile}_together_private`,value);
-  alert("Saved privately. Your spouse cannot see it.");
+  showHeldMessage("Saved privately. Your spouse cannot see it.");
 }
 function showHeldMessage(message){
   let toast=document.getElementById("heldToast");
@@ -4354,6 +4379,7 @@ async function loadProfileAndCloudData(){
   await syncTogetherJourneysFromCloud();
   await syncSharedTakeawaysFromCloud();
   await loadPrayerRequests();
+  await loadCoupleHub();
   subscribeToPrayerRequests();
   await registerHeldServiceWorker();
   if("Notification" in window && Notification.permission==="granted"){
@@ -4586,7 +4612,7 @@ window.completeDay = async function(){
     }
   }
 
-  alert(day===21 ? "Journey complete." : "Today is complete. Your next day is ready.");
+  showHeldMessage(day===21 ? "Journey complete." : "Today is complete. Your next day is ready.");
   renderAll();
   showView("progress");
 };
@@ -4595,7 +4621,7 @@ const originalSaveJournal = window.saveJournal;
 window.saveJournal = async function(){
   const j = activeJourney();
   const t = document.getElementById("journalText").value.trim();
-  if(!t){ alert("Write something first."); return; }
+  if(!t){ showHeldMessage("Write something first."); return; }
 
   if(currentUser){
     const { error } = await supabaseClient.from("journal_entries").insert({
@@ -4604,7 +4630,7 @@ window.saveJournal = async function(){
       day_number: getDay(j.id),
       body: t
     });
-    if(error){ alert(error.message); return; }
+    if(error){ showHeldMessage(error.message); return; }
   }
 
   const arr = JSON.parse(localStorage.getItem(journalKey(j.id)) || "[]");
@@ -4612,7 +4638,7 @@ window.saveJournal = async function(){
   localStorage.setItem(journalKey(j.id), JSON.stringify(arr));
   document.getElementById("journalText").value = "";
   renderJournal();
-  alert("Saved privately.");
+  showHeldMessage("Saved privately.");
 };
 
 const originalSaveStudyNote = window.saveStudyNote;
@@ -4689,12 +4715,11 @@ window.saveStudyNote = async function(){
 const originalShareTakeaway = window.shareTakeaway;
 window.shareTakeaway = async function(){
   const t = document.getElementById("journalText").value.trim();
-  if(!t){ alert("Write something first."); return; }
-  const takeaway = prompt("What one sentence do you want to share?");
-  if(!takeaway) return;
+  if(!t){ showHeldMessage("Write something first."); return; }
+  const takeaway = t;
 
   if(!currentUser){
-    alert("Sign in first.");
+    showHeldMessage("Sign in first.");
     return;
   }
 
@@ -4705,7 +4730,7 @@ window.shareTakeaway = async function(){
     .maybeSingle();
 
   if(!membership?.couple_id){
-    alert("Your accounts are not linked as a couple yet. Save this privately for now.");
+    showHeldMessage("Your accounts are not linked as a couple yet. Save this privately for now.");
     return;
   }
 
@@ -4715,11 +4740,11 @@ window.shareTakeaway = async function(){
     journey_id: activeJourney().id,
     body: takeaway
   });
-  if(error){ alert(error.message); return; }
+  if(error){ showHeldMessage(error.message); return; }
 
   await syncSharedTakeawaysFromCloud();
   renderShared();
-  alert("Only that takeaway was shared.");
+  showHeldMessage("Only that takeaway was shared.");
 };
 
 
@@ -4939,6 +4964,7 @@ function renderPrayerRequests(){
       <div class="prayer-toolbar">
         <span class="prayer-status">${status}</span>
         ${received?'<button class="secondary" type="button" onclick="markPrayerPrayed(\''+request.id+'\')">'+(receipt?.prayed_at?"Prayed ✓":"I prayed for this")+'</button>':""}
+        <button class="ghost" type="button" onclick="markPrayerAnswered('${request.id}')">Answered prayer</button>
       </div>
     </div>`;
   }).join("");
@@ -4996,8 +5022,54 @@ async function markPrayerRead(requestId,prayed=false){
 
 async function markPrayerPrayed(requestId){
   await markPrayerRead(requestId,true);
+  const {error}=await supabaseClient.functions.invoke("send-prayer-push",{body:{prayed_request_id:requestId}});
+  if(error) console.error("Prayer acknowledgment notification could not be delivered:",error);
+  else showHeldMessage("Your spouse will know you prayed.");
 }
 
+
+let coupleMomentsCache=[];
+let coupleCheckinsCache=[];
+let heldPreferences=null;
+const HELD_CONVERSATION_PROMPT="Where did you feel most loved by me this week?";
+function spouseName(){return currentProfile==="patricia"?"Alec":"Patricia";}
+async function loadCoupleHub(){
+  if(!currentUser)return;if(!prayerCoupleId)await getPrayerCouple();if(!prayerCoupleId)return;
+  const since=new Date(Date.now()-30*86400000).toISOString();
+  const [m,c,p]=await Promise.all([
+    supabaseClient.from("couple_moments").select("id,user_id,kind,body,details,is_shared,created_at").eq("couple_id",prayerCoupleId).order("created_at",{ascending:false}).limit(80),
+    supabaseClient.from("daily_checkins").select("id,user_id,journey_id,day_number,mood,energy,need,share_with_spouse,created_at").gte("created_at",since).order("created_at",{ascending:false}),
+    supabaseClient.from("user_preferences").select("quiet_until,reminders_paused").eq("user_id",currentUser.id).maybeSingle()
+  ]);
+  if(!m.error)coupleMomentsCache=m.data||[];if(!c.error)coupleCheckinsCache=c.data||[];heldPreferences=p.data||null;renderCoupleHub();
+}
+function renderCoupleHub(){
+  const moments=document.getElementById("coupleMoments");
+  if(moments){const visible=coupleMomentsCache.filter(item=>item.is_shared||item.user_id===currentUser?.id);moments.innerHTML=visible.length?visible.map(item=>{const mine=item.user_id===currentUser?.id;const label={encouragement:"Encouragement",weekly_reflection:"Weekly reflection",conversation_answer:"Conversation",memory:"Memory",answered_prayer:"Answered prayer"}[item.kind]||"Shared moment";return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${item.is_shared?"":" · Private until you reveal it"}</small></div>`;}).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';}
+  const checkins=document.getElementById("recentCheckins");if(checkins)checkins.innerHTML=coupleCheckinsCache.slice(0,6).map(item=>`<div class="entry"><strong>${item.user_id===currentUser?.id?"You":spouseName()} · ${escapeHtml(item.mood||"Checked in")}</strong><p>${item.need?escapeHtml(item.need):"No support request added."}</p><small class="muted">Energy ${item.energy||"—"}/5 · ${new Date(item.created_at).toLocaleDateString()}</small></div>`).join("")||'<p class="muted">No check-ins yet.</p>';
+  const today=new Date().toDateString(),todayUsers=new Set(coupleCheckinsCache.filter(x=>new Date(x.created_at).toDateString()===today).map(x=>x.user_id)),sharedDays={};coupleCheckinsCache.forEach(x=>{const d=new Date(x.created_at).toDateString();(sharedDays[d]||=new Set()).add(x.user_id);});const togetherDays=Object.values(sharedDays).filter(users=>users.size>1).length;
+  const rhythm=document.getElementById("coupleRhythm");if(rhythm)rhythm.innerHTML=`<strong>${todayUsers.size===2?"You both checked in today ✓":todayUsers.size===1?"One of you checked in today":"A fresh day to connect"}</strong><div class="muted">${togetherDays} shared check-in day${togetherDays===1?"":"s"} in the last 30 days.</div>`;
+  const weekAgo=Date.now()-7*86400000,weekMoments=coupleMomentsCache.filter(x=>new Date(x.created_at).getTime()>=weekAgo&&x.is_shared),weekCheckins=coupleCheckinsCache.filter(x=>new Date(x.created_at).getTime()>=weekAgo);
+  const recap=document.getElementById("weeklyRecap");if(recap)recap.innerHTML=`<strong>Your week in Held</strong><p>${weekCheckins.length} check-ins · ${weekMoments.filter(x=>x.kind==="encouragement").length} encouragements · ${weekMoments.filter(x=>x.kind==="answered_prayer").length} answered prayers · ${weekMoments.filter(x=>x.kind==="memory").length} saved memories</p><p class="muted">What is one thing you want to thank God for together?</p>`;
+  const quiet=document.getElementById("quietDayStatus");if(quiet){const until=heldPreferences?.quiet_until?new Date(heldPreferences.quiet_until):null;quiet.textContent=until&&until>Date.now()?`Reminders paused until ${until.toLocaleString()}.`:"Reminders are active.";}
+}
+async function saveDailyConnection(){
+ const mood=document.getElementById("checkinMood").value,energy=Number(document.getElementById("checkinEnergy").value),need=document.getElementById("checkinNeed").value.trim(),share=document.getElementById("shareCheckin").checked,j=activeJourney(),day=getDay(j.id);
+ const {error}=await supabaseClient.from("daily_checkins").upsert({user_id:currentUser.id,journey_id:j.id,day_number:day,mood,energy,need:need||null,share_with_spouse:share,updated_at:new Date().toISOString()},{onConflict:"user_id,journey_id,day_number"});
+ if(error){showHeldMessage(error.message);return;}document.getElementById("checkinNeed").value="";document.getElementById("shareCheckin").checked=false;await loadCoupleHub();showHeldMessage(share?"Check-in saved and shared with your spouse.":"Check-in saved privately.");
+}
+async function createCoupleMoment(kind,body,details={},shared=true){
+ if(!body?.trim()){showHeldMessage("Write something first.");return null;}if(!prayerCoupleId)await getPrayerCouple();
+ const {data,error}=await supabaseClient.from("couple_moments").insert({couple_id:prayerCoupleId,user_id:currentUser.id,kind,body:body.trim(),details,is_shared:shared}).select("id").single();
+ if(error){showHeldMessage(error.message);return null;}if(shared){const {error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{body:{moment_id:data.id}});if(pushError)console.error("Moment notification could not be delivered:",pushError);}await loadCoupleHub();return data;
+}
+async function sendEncouragement(){const field=document.getElementById("encouragementText"),type=document.getElementById("encouragementKind").value,labels={encouragement:"Encouragement",verse:"A verse for you",gratitude:"Something I appreciate"};const row=await createCoupleMoment("encouragement",`${labels[type]}: ${field.value}`,{type},true);if(row){field.value="";showHeldMessage("Encouragement sent to your spouse.");}}
+async function shareWeeklyReflection(){const gratitude=document.getElementById("weeklyGratitude").value.trim(),hard=document.getElementById("weeklyHard").value.trim(),support=document.getElementById("weeklySupport").value.trim();if(!gratitude&&!hard&&!support){showHeldMessage("Write at least one reflection first.");return;}const body=[gratitude&&`Grateful for: ${gratitude}`,hard&&`What felt difficult: ${hard}`,support&&`Support I need: ${support}`].filter(Boolean).join("\n\n");const row=await createCoupleMoment("weekly_reflection",body,{gratitude,hard,support},true);if(row){["weeklyGratitude","weeklyHard","weeklySupport"].forEach(id=>document.getElementById(id).value="");showHeldMessage("Weekly reflection shared.");}}
+async function saveConversationAnswer(shared=false){const field=document.getElementById("conversationResponse"),answer=field.value.trim();const row=await createCoupleMoment("conversation_answer",answer,{prompt:HELD_CONVERSATION_PROMPT},shared);if(row){field.value="";showHeldMessage(shared?"Answer revealed to your spouse.":"Answer saved privately. Reveal it when you are ready.");}}
+async function revealConversationAnswer(){const typed=document.getElementById("conversationResponse").value.trim();if(typed){await saveConversationAnswer(true);return;}const privateAnswer=coupleMomentsCache.find(x=>x.user_id===currentUser?.id&&x.kind==="conversation_answer"&&!x.is_shared);if(!privateAnswer){showHeldMessage("Write or save a private answer first.");return;}const {error}=await supabaseClient.from("couple_moments").update({is_shared:true,updated_at:new Date().toISOString()}).eq("id",privateAnswer.id);if(error){showHeldMessage(error.message);return;}await supabaseClient.functions.invoke("send-prayer-push",{body:{moment_id:privateAnswer.id}});await loadCoupleHub();showHeldMessage("Your answer is now revealed.");}
+async function saveSharedMemory(){const field=document.getElementById("memoryText"),row=await createCoupleMoment("memory",field.value,{},true);if(row){field.value="";showHeldMessage("Added to your shared timeline.");}}
+async function markPrayerAnswered(requestId){const request=prayerRequestsCache.find(item=>item.id===requestId);if(!request)return;const already=coupleMomentsCache.some(item=>item.kind==="answered_prayer"&&item.details?.prayer_id===requestId);if(already){showHeldMessage("This prayer is already marked answered.");return;}const row=await createCoupleMoment("answered_prayer",request.body,{prayer_id:requestId},true);if(row){renderPrayerRequests();showHeldMessage("Answered prayer saved to your shared timeline.");}}
+async function setQuietDay(hours){const quietUntil=hours?new Date(Date.now()+hours*3600000).toISOString():null;const {error}=await supabaseClient.from("user_preferences").upsert({user_id:currentUser.id,quiet_until:quietUntil,reminders_paused:hours>0,updated_at:new Date().toISOString()},{onConflict:"user_id"});if(error){showHeldMessage(error.message);return;}await loadCoupleHub();showHeldMessage(hours?"Quiet time is on. Non-urgent reminders are paused.":"Reminders resumed.");}
 function subscribeToPrayerRequests(){
   if(!currentUser || prayerRealtimeChannel) return;
   prayerRealtimeChannel=supabaseClient.channel("held-prayer-"+currentUser.id)
@@ -5011,6 +5083,8 @@ function subscribeToPrayerRequests(){
     .on("postgres_changes",{event:"*",schema:"public",table:"shared_takeaway_receipts"},async()=>{
       await syncSharedTakeawaysFromCloud();
     })
+    .on("postgres_changes",{event:"*",schema:"public",table:"couple_moments"},loadCoupleHub)
+    .on("postgres_changes",{event:"*",schema:"public",table:"daily_checkins"},loadCoupleHub)
     .subscribe();
 }
 
@@ -5073,6 +5147,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v27</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v28</div>
 </body>
 </html>
