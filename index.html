@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260817_v29";
+  const RESET_KEY = "held_cache_reset_20260817_v30";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260817-v29");
+    refreshedUrl.searchParams.set("heldBuild", "20260817-v30");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -4734,17 +4734,18 @@ window.shareTakeaway = async function(){
     return;
   }
 
-  const { error } = await supabaseClient.from("shared_takeaways").insert({
+  const { data:sharedRow, error } = await supabaseClient.from("shared_takeaways").insert({
     couple_id: membership.couple_id,
     user_id: currentUser.id,
     journey_id: activeJourney().id,
     body: takeaway
-  });
+  }).select("id").single();
   if(error){ showHeldMessage(error.message); return; }
 
+  const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{body:{takeaway_id:sharedRow.id}});
   await syncSharedTakeawaysFromCloud();
   renderShared();
-  showHeldMessage("Only that takeaway was shared.");
+  showHeldMessage(!pushError&&Number(pushResult?.sent)>0?"Takeaway shared and your spouse was notified.":"Takeaway shared. Your spouse will see it in Together.");
 };
 
 
@@ -5055,8 +5056,16 @@ function renderCoupleHub(){
 }
 async function saveDailyConnection(){
  const mood=document.getElementById("checkinMood").value,energy=Number(document.getElementById("checkinEnergy").value),need=document.getElementById("checkinNeed").value.trim(),share=document.getElementById("shareCheckin").checked,j=activeJourney(),day=getDay(j.id);
- const {error}=await supabaseClient.from("daily_checkins").upsert({user_id:currentUser.id,journey_id:j.id,day_number:day,mood,energy,need:need||null,share_with_spouse:share,updated_at:new Date().toISOString()},{onConflict:"user_id,journey_id,day_number"});
- if(error){showHeldMessage(error.message);return;}document.getElementById("checkinNeed").value="";document.getElementById("shareCheckin").checked=false;await loadCoupleHub();showHeldMessage(share?"Check-in saved and shared with your spouse.":"Check-in saved privately.");
+ const {data:checkin,error}=await supabaseClient.from("daily_checkins").upsert({user_id:currentUser.id,journey_id:j.id,day_number:day,mood,energy,need:need||null,share_with_spouse:share,updated_at:new Date().toISOString()},{onConflict:"user_id,journey_id,day_number"}).select("id").single();
+ if(error){showHeldMessage(error.message);return;}
+ let notified=false;
+ if(share){
+   const {data:pushResult,error:pushError}=await supabaseClient.functions.invoke("send-prayer-push",{body:{checkin_id:checkin.id}});
+   notified=!pushError&&Number(pushResult?.sent)>0;
+   if(pushError)console.error("Check-in notification could not be delivered:",pushError);
+ }
+ document.getElementById("checkinNeed").value="";document.getElementById("shareCheckin").checked=false;await loadCoupleHub();
+ showHeldMessage(share?(notified?"Check-in shared and your spouse was notified.":"Check-in shared. Your spouse will see it in Together."):"Check-in saved privately.");
 }
 async function createCoupleMoment(kind,body,details={},shared=true){
  if(!body?.trim()){showHeldMessage("Write something first.");return null;}if(!prayerCoupleId)await getPrayerCouple();
@@ -5147,6 +5156,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v29</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v30</div>
 </body>
 </html>
