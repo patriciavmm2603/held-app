@@ -32,6 +32,35 @@ drop trigger if exists enforce_conversation_moment_integrity_trigger on public.c
 create trigger enforce_conversation_moment_integrity_trigger before insert or update or delete on public.couple_moments
 for each row execute function public.enforce_conversation_moment_integrity();
 
+drop policy if exists couple_moments_insert on public.couple_moments;
+create policy couple_moments_insert on public.couple_moments for insert to authenticated
+with check (
+  user_id=(select auth.uid()) and is_couple_member(couple_id)
+  and kind<>'conversation_invite'
+  and (kind<>'conversation_answer' or is_shared=false)
+);
+
+drop policy if exists couple_moments_update on public.couple_moments;
+create policy couple_moments_update on public.couple_moments for update to authenticated
+using (
+  user_id=(select auth.uid()) and is_couple_member(couple_id)
+  and kind<>'conversation_invite'
+  and not (kind='conversation_answer' and is_shared)
+)
+with check (
+  user_id=(select auth.uid()) and is_couple_member(couple_id)
+  and kind<>'conversation_invite'
+  and (kind<>'conversation_answer' or is_shared=false)
+);
+
+drop policy if exists couple_moments_delete on public.couple_moments;
+create policy couple_moments_delete on public.couple_moments for delete to authenticated
+using (
+  user_id=(select auth.uid()) and is_couple_member(couple_id)
+  and kind<>'conversation_invite'
+  and not (kind='conversation_answer' and is_shared)
+);
+
 create or replace function public.process_conversation_response(p_user_id uuid,p_round_id text)
 returns table(recipient_id uuid,revealed boolean,item_id text)
 language plpgsql security invoker set search_path=public,pg_temp as $$
