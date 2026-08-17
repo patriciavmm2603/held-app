@@ -58,6 +58,9 @@ test("Conversation privacy is enforced in Postgres", () => {
   assert.match(conversationSql, /current_user <> 'service_role'/);
   assert.match(conversationSql, /revoke all on function public\.process_conversation_response/);
   assert.match(conversationSql, /pg_advisory_xact_lock/);
+  assert.match(conversationSql, /create policy couple_moments_insert/);
+  assert.match(conversationSql, /kind<>'conversation_invite'/);
+  assert.match(conversationSql, /not \(kind='conversation_answer' and is_shared\)/);
 });
 
 test("Conversation reveal is atomic and couple-scoped", () => {
