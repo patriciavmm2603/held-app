@@ -93,3 +93,9 @@ test("Held visual polish keeps mobile and conversation hierarchy", () => {
   assert.match(html, /prefers-reduced-motion/);
   assert.match(html, /details\.connection-card/);
 });
+
+test("Phone layout cannot reserve the hidden desktop sidebar column", () => {
+  assert.match(html, /@media\(max-width:900px\)[\s\S]*?\.layout\{display:block;width:100%;grid-template-columns:minmax\(0,1fr\)\}/);
+  assert.match(html, /\.layout>main,\.view,\.hero\{width:100%;max-width:none;min-width:0\}/);
+  assert.match(html, /\.signout-btn\{white-space:nowrap/);
+});

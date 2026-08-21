@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v36";
+  const RESET_KEY = "held_cache_reset_20260821_v37";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260821-v36");
+    refreshedUrl.searchParams.set("heldBuild", "20260821-v37");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -643,7 +643,10 @@ body>div[style*="position:fixed"][style*="Held build"]{
   .conversation-reveal>p:nth-of-type(2){margin-left:10px}
 }
 @media(max-width:900px){
-  .app{padding:12px 12px calc(104px + env(safe-area-inset-bottom))}
+  .app{width:100%;max-width:none;padding:12px 12px calc(104px + env(safe-area-inset-bottom))}
+  .layout{display:block;width:100%;grid-template-columns:minmax(0,1fr)}
+  .layout>main,.view,.hero{width:100%;max-width:none;min-width:0}
+  .signout-btn{white-space:nowrap;min-width:max-content}
   .topbar{top:6px;margin:0 -4px 14px;padding:9px 10px;border-radius:18px}
   .brand .logo{width:42px;height:42px;border-radius:14px}
   .brand h1{font-size:23px}
@@ -5409,6 +5412,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v36</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v37</div>
 </body>
 </html>
