@@ -117,3 +117,12 @@ test("Completed conversations automatically advance to a fresh private round", (
 test("Conversation round suffixes are recognized as numbers", () => {
   assert.match(html, /\^\\d\+\$\/\.test\(suffix\)/);
 });
+
+
+test("Reading navigation opens the requested study step at its top", () => {
+  assert.match(html, /function setDevTab\(name,scrollToTop=false\)/);
+  assert.match(html, /setDevTab\(control\.dataset\.devTab,true\)/);
+  assert.match(html, /getElementById\(name \+ "Tab"\)\?\.scrollIntoView/);
+  assert.match(html, /data-dev-tab="understand">I finished reading · Help me understand/);
+  assert.match(html, /data-dev-tab="reflect">I understand the passage · Help me respond/);
+});

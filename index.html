@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v39";
+  const RESET_KEY = "held_cache_reset_20260821_v40";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -910,7 +910,7 @@ body>div[style*="position:fixed"][style*="Held build"]{
     </div>
   </div>
   <div class="dev-sticky-nav" aria-label="Daily study navigation">
-    <div class="nav-group"><button class="ghost" type="button" onclick="setDevTab('read')">Read</button><button class="ghost" type="button" onclick="setDevTab('understand')">Understand</button><button class="ghost" type="button" onclick="setDevTab('reflect')">Reflect</button></div>
+    <div class="nav-group"><button class="ghost" type="button" onclick="setDevTab('read',true)">Read</button><button class="ghost" type="button" onclick="setDevTab('understand',true)">Understand</button><button class="ghost" type="button" onclick="setDevTab('reflect',true)">Reflect</button></div>
     <div class="nav-group"><button class="secondary" type="button" onclick="saveReflection()">Save</button><button class="primary" type="button" onclick="completeDay()">Complete day</button></div>
   </div>
  </div>
@@ -1101,7 +1101,7 @@ alec:{
 function makeJourney(id,book,title,description,themes,days){return {id,book,title,description,themes,days}}
 
 
-function setDevTab(name){
+function setDevTab(name,scrollToTop=false){
   const valid = ["read","understand","reflect"];
   if(!valid.includes(name)) return;
 
@@ -1120,13 +1120,18 @@ function setDevTab(name){
       panel.style.display = active ? "block" : "none";
     }
   });
+  if(scrollToTop){
+    requestAnimationFrame(function(){
+      document.getElementById(name + "Tab")?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
 }
 
 document.addEventListener("click", function(event){
   const control = event.target.closest("[data-dev-tab]");
   if(!control) return;
   event.preventDefault();
-  setDevTab(control.dataset.devTab);
+  setDevTab(control.dataset.devTab,true);
 });
 
 let currentProfile=localStorage.getItem("held_profile")||"patricia";
@@ -5428,6 +5433,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v39</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v40</div>
 </body>
 </html>
