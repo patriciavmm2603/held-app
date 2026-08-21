@@ -85,3 +85,11 @@ test("Revealed conversations keep the question and both answers together", () =>
   assert.match(html, /escapeHtml\(spouseName\(\)\).* said/);
   assert.match(html, /renderedConversationRounds/);
 });
+
+test("Held visual polish keeps mobile and conversation hierarchy", () => {
+  assert.match(html, /Held visual polish v36/);
+  assert.match(html, /\.conversation-reveal/);
+  assert.match(html, /env\(safe-area-inset-bottom\)/);
+  assert.match(html, /prefers-reduced-motion/);
+  assert.match(html, /details\.connection-card/);
+});
