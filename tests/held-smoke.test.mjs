@@ -113,3 +113,7 @@ test("Completed conversations automatically advance to a fresh private round", (
   assert.match(html, /field\.disabled=false/);
   assert.doesNotMatch(html, /field\.disabled=bothRevealed/);
 });
+
+test("Conversation round suffixes are recognized as numbers", () => {
+  assert.match(html, /\^\\d\+\$\/\.test\(suffix\)/);
+});

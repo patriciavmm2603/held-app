@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v38";
+  const RESET_KEY = "held_cache_reset_20260821_v39";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -5239,7 +5239,7 @@ const HELD_CONVERSATION_PROMPTS=[
  "Where do you need more gentleness from me?"
 ];
 function heldConversationWeekId(){const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-start.getDay());const y=start.getFullYear(),m=String(start.getMonth()+1).padStart(2,"0"),d=String(start.getDate()).padStart(2,"0");return `${y}-${m}-${d}`;}
-function heldConversationRoundNumber(roundId,weekId=heldConversationWeekId()){if(roundId===weekId)return 1;const suffix=String(roundId||"").slice(weekId.length+1);return String(roundId||"").startsWith(weekId+"-")&&/^\\d+$/.test(suffix)?Number(suffix):0;}
+function heldConversationRoundNumber(roundId,weekId=heldConversationWeekId()){if(roundId===weekId)return 1;const suffix=String(roundId||"").slice(weekId.length+1);return String(roundId||"").startsWith(weekId+"-")&&/^\d+$/.test(suffix)?Number(suffix):0;}
 function heldConversationRoundId(){
  const weekId=heldConversationWeekId();
  const weekly=coupleMomentsCache.filter(item=>(item.kind==="conversation_answer"||item.kind==="conversation_invite")&&heldConversationRoundNumber(item.details?.round_id,weekId)>0);
@@ -5428,6 +5428,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v38</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v39</div>
 </body>
 </html>
