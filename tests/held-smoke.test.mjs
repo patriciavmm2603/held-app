@@ -117,3 +117,21 @@ test("Completed conversations automatically advance to a fresh private round", (
 test("Conversation round suffixes are recognized as numbers", () => {
   assert.match(html, /\^\\d\+\$\/\.test\(suffix\)/);
 });
+
+
+test("Reading navigation opens the requested study step at its top", () => {
+  assert.match(html, /function setDevTab\(name,scrollToTop=false\)/);
+  assert.match(html, /setDevTab\(control\.dataset\.devTab,true\)/);
+  assert.match(html, /getElementById\(name \+ "Tab"\)\?\.scrollIntoView/);
+  assert.match(html, /data-dev-tab="understand">I finished reading · Help me understand/);
+  assert.match(html, /data-dev-tab="reflect">I understand the passage · Help me respond/);
+});
+
+
+test("Luke 8 Understand content is passage-specific and plain", () => {
+  assert.match(html, /match: p => p\.includes\("Luke 8:4–15"\)/);
+  assert.match(html, /The focus is not farming technique; it is what happens after the word is heard/);
+  assert.match(html, /good soil as people who hear the word, hold firmly to it/);
+  assert.match(html, /if\(j\.id==="money"\|\|\(daily&&specific\)\)/);
+  assert.match(html, /generated\.main=specific\.main\|\|generated\.main/);
+});
