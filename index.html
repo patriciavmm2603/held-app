@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260817_v34";
+  const RESET_KEY = "held_cache_reset_20260821_v35";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -24,7 +24,7 @@
     }
 
     const refreshedUrl = new URL(window.location.href);
-    refreshedUrl.searchParams.set("heldBuild", "20260817-v34");
+    refreshedUrl.searchParams.set("heldBuild", "20260821-v35");
     window.location.replace(refreshedUrl.toString());
   }
 
@@ -5048,7 +5048,27 @@ async function loadCoupleHub(){
 }
 function renderCoupleHub(){
   const moments=document.getElementById("coupleMoments");
-  if(moments){const visible=coupleMomentsCache.filter(item=>(item.is_shared||item.user_id===currentUser?.id)&&!(item.kind==="conversation_invite"&&(item.user_id===currentUser?.id||item.details?.unlocked)));moments.innerHTML=visible.length?visible.map(item=>{const mine=item.user_id===currentUser?.id;const label={encouragement:"Encouragement",weekly_reflection:"Weekly reflection",conversation_answer:"Conversation answer",conversation_invite:"Conversation invitation",memory:"Memory",answered_prayer:"Answered prayer"}[item.kind]||"Shared moment";const privateLabel=!item.is_shared?(item.kind==="conversation_answer"?" · Private until both respond":" · Private"):"";return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${privateLabel}</small></div>`;}).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';}
+  if(moments){
+    const visible=coupleMomentsCache.filter(item=>(item.is_shared||item.user_id===currentUser?.id)&&!(item.kind==="conversation_invite"&&(item.user_id===currentUser?.id||item.details?.unlocked)));
+    const renderedConversationRounds=new Set();
+    moments.innerHTML=visible.length?visible.map(item=>{
+      const mine=item.user_id===currentUser?.id;
+      if(item.kind==="conversation_answer"&&item.is_shared){
+        const roundId=item.details?.round_id||item.id;
+        if(renderedConversationRounds.has(roundId))return "";
+        renderedConversationRounds.add(roundId);
+        const answers=visible.filter(answer=>answer.kind==="conversation_answer"&&answer.is_shared&&(answer.details?.round_id||answer.id)===roundId);
+        const myAnswer=answers.find(answer=>answer.user_id===currentUser?.id);
+        const spouseAnswer=answers.find(answer=>answer.user_id!==currentUser?.id);
+        const prompt=item.details?.prompt||answers.find(answer=>answer.details?.prompt)?.details?.prompt||"Your conversation";
+        const revealedAt=Math.max(...answers.map(answer=>new Date(answer.updated_at||answer.created_at).getTime()));
+        return `<div class="entry conversation-reveal"><span class="moment-kind">Conversation revealed</span><strong>${escapeHtml(prompt)}</strong><p><b>You said</b><br>${myAnswer?escapeHtml(myAnswer.body):"—"}</p><p><b>${escapeHtml(spouseName())} said</b><br>${spouseAnswer?escapeHtml(spouseAnswer.body):"—"}</p><small class="muted">${new Date(revealedAt).toLocaleDateString()}</small></div>`;
+      }
+      const label={encouragement:"Encouragement",weekly_reflection:"Weekly reflection",conversation_answer:"Conversation answer",conversation_invite:"Conversation invitation",memory:"Memory",answered_prayer:"Answered prayer"}[item.kind]||"Shared moment";
+      const privateLabel=!item.is_shared?(item.kind==="conversation_answer"?" · Private until both respond":" · Private"):"";
+      return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${privateLabel}</small></div>`;
+    }).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';
+  }
   const conversationStatus=document.getElementById("conversationStatus");if(conversationStatus){const roundId=heldConversationRoundId(),roundAnswers=coupleMomentsCache.filter(x=>x.kind==="conversation_answer"&&x.details?.round_id===roundId),mine=roundAnswers.find(x=>x.user_id===currentUser?.id),bothRevealed=roundAnswers.filter(x=>x.is_shared).length>=2,invite=coupleMomentsCache.find(x=>x.kind==="conversation_invite"&&x.details?.round_id===roundId),field=document.getElementById("conversationResponse"),button=document.getElementById("conversationSubmitBtn");conversationStatus.textContent=bothRevealed?"You both responded — both answers are revealed below.":mine?`Your answer is saved privately. Waiting for ${spouseName()} to respond.`:invite?`${spouseName()} answered privately. Respond to reveal both answers.`:"Your answers stay private until both of you respond.";if(field){field.disabled=bothRevealed;field.placeholder=bothRevealed?"Both answers are revealed below.":"Write your private answer...";}if(button&&!conversationSubmitPending){button.disabled=bothRevealed;button.textContent=bothRevealed?"Answers revealed":"Submit my answer";}}
 
   const checkins=document.getElementById("recentCheckins");if(checkins)checkins.innerHTML=coupleCheckinsCache.slice(0,6).map(item=>`<div class="entry"><strong>${item.user_id===currentUser?.id?"You":spouseName()} · ${escapeHtml(item.mood||"Checked in")}</strong><p>${item.need?escapeHtml(item.need):"No support request added."}</p><small class="muted">Energy ${item.energy||"—"}/5 · ${new Date(item.created_at).toLocaleDateString()}</small></div>`).join("")||'<p class="muted">No check-ins yet.</p>';
@@ -5194,6 +5214,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260817-v34</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v35</div>
 </body>
 </html>

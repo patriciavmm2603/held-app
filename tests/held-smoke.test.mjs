@@ -77,3 +77,11 @@ test("Revealed answers lock and notifications open Conversation Mode", () => {
   assert.match(html, /target\.open=true/);
   assert.match(html, /data\?\.sent>0/);
 });
+
+test("Revealed conversations keep the question and both answers together", () => {
+  assert.match(html, /Conversation revealed/);
+  assert.match(html, /const prompt=item\.details\?\.prompt/);
+  assert.match(html, />You said<\/b>/);
+  assert.match(html, /escapeHtml\(spouseName\(\)\).* said/);
+  assert.match(html, /renderedConversationRounds/);
+});
