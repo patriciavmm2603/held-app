@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v40";
+  const RESET_KEY = "held_cache_reset_20260821_v41";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -2325,6 +2325,21 @@ const passageStudies = [
       elsewhere:"Deuteronomy 8 interprets manna as a lesson that people live by what comes from God’s mouth. Psalm 78 calls it bread from heaven. John 6 uses it as background for Jesus as the bread of life.",
       caution:"Manna is not a general promise that believers will receive resources without work or planning. Its theological meaning grows from Israel’s specific wilderness formation."
     }
+  },
+  {
+    match: p => p.includes("Luke 8:4–15") || p.includes("Luke 8:4-15"),
+    context: "People from many towns gather around Jesus, and He tells a farming story about one seed falling on four kinds of ground. When the disciples ask what it means, Jesus explains that the seed is God’s word and the soils picture different ways people hear it. The focus is not farming technique; it is what happens after the word is heard.",
+    fit: "Luke places this parable in a section about hearing Jesus well. The sayings that follow speak about a lamp that should not be hidden and about Jesus’ true family as those who hear God’s word and do it. The repeated question is whether hearing becomes faithful, lasting response.",
+    main: "God’s word is generously offered, but hearing alone is not the same as receiving it deeply. Pressure, shallow roots, worry, wealth, and pleasure can prevent growth. Jesus describes good soil as people who hear the word, hold firmly to it, and bear fruit with patient endurance.",
+    notMean: "Jesus is not giving you labels for deciding which people are permanently hard, shallow, or faithful. The parable is an invitation to examine your own response. It also does not say that mature faith appears instantly; the good soil bears fruit with patience.",
+    word: {
+      orig:"κατέχω", trans:"katechō · kat-EH-kho", language:"Greek verb",
+      meaning:"To hold firmly, retain, or keep possession of something.",
+      range:"The verb can describe holding something securely, keeping a teaching in mind, or refusing to let go.",
+      inPassage:"Luke 8:15 says the good soil hears the word and holds firmly to it. Lasting fruit grows from continued reception, not a brief emotional response.",
+      elsewhere:"First Corinthians 15:2 uses the verb for holding firmly to the gospel. First Thessalonians 5:21 uses it for holding fast to what is good.",
+      caution:"Holding firmly is not anxious striving or earning God’s favor. In this parable it describes receiving the word deeply enough for it to shape an enduring life."
+    }
   }
 ];
 
@@ -3830,11 +3845,11 @@ function reflectionQuestionsFor(journeyId,day,content){
 
 function dayContentBase(j,day){
  const item=j.days[day-1]||j.days[0], passage=item[0], theme=item[1];
+ const specific=passageStudies.find(study=>study.match(passage));
+ const daily=moneyJourneyDaily[passage];
 
- if(j.id==="money"){
-   const specific=passageStudies.find(study=>study.match(passage));
-   const base=(typeof lukeMoneyStudies!=="undefined"&&lukeMoneyStudies[passage])||specific||defaultStudy(passage,theme);
-   const daily=moneyJourneyDaily[passage];
+ if(j.id==="money"||(daily&&specific)){
+   const base=(j.id==="money"&&typeof lukeMoneyStudies!=="undefined"&&lukeMoneyStudies[passage])||specific||defaultStudy(passage,theme);
    if(daily){
      return {
        passage,theme,genre:heldGenre(passage),curated:true,
@@ -3848,10 +3863,10 @@ function dayContentBase(j,day){
  }
 
  const generated=heldGeneratedStudy(j,day);
- const specific=passageStudies.find(study=>study.match(passage));
  if(specific){
    generated.context=specific.context||generated.context;
    generated.fit=specific.fit||generated.fit;
+   generated.main=specific.main||generated.main;
    generated.notMean=specific.notMean||generated.notMean;
    generated.word=specific.word||generated.word;
  }
@@ -5433,6 +5448,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v40</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v41</div>
 </body>
 </html>

@@ -126,3 +126,12 @@ test("Reading navigation opens the requested study step at its top", () => {
   assert.match(html, /data-dev-tab="understand">I finished reading · Help me understand/);
   assert.match(html, /data-dev-tab="reflect">I understand the passage · Help me respond/);
 });
+
+
+test("Luke 8 Understand content is passage-specific and plain", () => {
+  assert.match(html, /match: p => p\.includes\("Luke 8:4–15"\)/);
+  assert.match(html, /The focus is not farming technique; it is what happens after the word is heard/);
+  assert.match(html, /good soil as people who hear the word, hold firmly to it/);
+  assert.match(html, /if\(j\.id==="money"\|\|\(daily&&specific\)\)/);
+  assert.match(html, /generated\.main=specific\.main\|\|generated\.main/);
+});
