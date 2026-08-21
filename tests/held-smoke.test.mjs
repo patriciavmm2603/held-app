@@ -99,3 +99,17 @@ test("Phone layout cannot reserve the hidden desktop sidebar column", () => {
   assert.match(html, /\.layout>main,\.view,\.hero\{width:100%;max-width:none;min-width:0\}/);
   assert.match(html, /\.signout-btn\{white-space:nowrap/);
 });
+
+
+test("Completed conversations automatically advance to a fresh private round", () => {
+  assert.match(html, /const HELD_CONVERSATION_PROMPTS=\[/);
+  assert.match(html, /function heldConversationWeekId\(\)/);
+  assert.match(html, /function heldConversationRoundNumber\(/);
+  assert.match(html, /function heldConversationRoundId\(\)/);
+  assert.match(html, /const pending=weekly\.find/);
+  assert.match(html, /latest===0\?weekId:/);
+  assert.match(html, /heldConversationPrompt\(roundId\)/);
+  assert.match(html, /prompt\.textContent=heldConversationPrompt\(roundId\)/);
+  assert.match(html, /field\.disabled=false/);
+  assert.doesNotMatch(html, /field\.disabled=bothRevealed/);
+});

@@ -1,4 +1,4 @@
-const CACHE_NAME="held-v37";
+const CACHE_NAME="held-v38";
 const CORE_ASSETS=["./","./index.html","./manifest.webmanifest","./assets/held-app-icon.png"];
 
 self.addEventListener("install",event=>{

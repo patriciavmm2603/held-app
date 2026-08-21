@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v37";
+  const RESET_KEY = "held_cache_reset_20260821_v38";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -5231,8 +5231,24 @@ let coupleMomentsCache=[];
 let conversationSubmitPending=false;
 let coupleCheckinsCache=[];
 let heldPreferences=null;
-const HELD_CONVERSATION_PROMPT="Where did you feel most loved by me this week?";
-function heldConversationRoundId(){const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-start.getDay());const y=start.getFullYear(),m=String(start.getMonth()+1).padStart(2,"0"),d=String(start.getDate()).padStart(2,"0");return `${y}-${m}-${d}`;}
+const HELD_CONVERSATION_PROMPTS=[
+ "Where did you feel most loved by me this week?",
+ "What is one thing you wish I understood better right now?",
+ "How can I support you more intentionally this week?",
+ "What is something about us you are grateful for today?",
+ "Where do you need more gentleness from me?"
+];
+function heldConversationWeekId(){const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-start.getDay());const y=start.getFullYear(),m=String(start.getMonth()+1).padStart(2,"0"),d=String(start.getDate()).padStart(2,"0");return `${y}-${m}-${d}`;}
+function heldConversationRoundNumber(roundId,weekId=heldConversationWeekId()){if(roundId===weekId)return 1;const suffix=String(roundId||"").slice(weekId.length+1);return String(roundId||"").startsWith(weekId+"-")&&/^\\d+$/.test(suffix)?Number(suffix):0;}
+function heldConversationRoundId(){
+ const weekId=heldConversationWeekId();
+ const weekly=coupleMomentsCache.filter(item=>(item.kind==="conversation_answer"||item.kind==="conversation_invite")&&heldConversationRoundNumber(item.details?.round_id,weekId)>0);
+ const pending=weekly.find(item=>(item.kind==="conversation_answer"&&!item.is_shared)||(item.kind==="conversation_invite"&&!item.details?.unlocked));
+ if(pending)return pending.details.round_id;
+ const latest=Math.max(0,...weekly.map(item=>heldConversationRoundNumber(item.details?.round_id,weekId)));
+ return latest===0?weekId:`${weekId}-${latest+1}`;
+}
+function heldConversationPrompt(roundId=heldConversationRoundId()){const number=heldConversationRoundNumber(roundId)||1;return HELD_CONVERSATION_PROMPTS[(number-1)%HELD_CONVERSATION_PROMPTS.length];}
 function spouseName(){return currentProfile==="patricia"?"Alec":"Patricia";}
 async function loadCoupleHub(){
   if(!currentUser)return;if(!prayerCoupleId)await getPrayerCouple();if(!prayerCoupleId)return;
@@ -5267,7 +5283,7 @@ function renderCoupleHub(){
       return `<div class="entry"><span class="moment-kind">${label}</span><strong>${mine?"You":spouseName()}</strong><p>${escapeHtml(item.body)}</p><small class="muted">${new Date(item.created_at).toLocaleDateString()}${privateLabel}</small></div>`;
     }).join(""):'<p class="muted">Your shared memories and encouragements will appear here.</p>';
   }
-  const conversationStatus=document.getElementById("conversationStatus");if(conversationStatus){const roundId=heldConversationRoundId(),roundAnswers=coupleMomentsCache.filter(x=>x.kind==="conversation_answer"&&x.details?.round_id===roundId),mine=roundAnswers.find(x=>x.user_id===currentUser?.id),bothRevealed=roundAnswers.filter(x=>x.is_shared).length>=2,invite=coupleMomentsCache.find(x=>x.kind==="conversation_invite"&&x.details?.round_id===roundId),field=document.getElementById("conversationResponse"),button=document.getElementById("conversationSubmitBtn");conversationStatus.textContent=bothRevealed?"You both responded — both answers are revealed below.":mine?`Your answer is saved privately. Waiting for ${spouseName()} to respond.`:invite?`${spouseName()} answered privately. Respond to reveal both answers.`:"Your answers stay private until both of you respond.";if(field){field.disabled=bothRevealed;field.placeholder=bothRevealed?"Both answers are revealed below.":"Write your private answer...";}if(button&&!conversationSubmitPending){button.disabled=bothRevealed;button.textContent=bothRevealed?"Answers revealed":"Submit my answer";}}
+  const conversationStatus=document.getElementById("conversationStatus");if(conversationStatus){const roundId=heldConversationRoundId(),roundAnswers=coupleMomentsCache.filter(x=>x.kind==="conversation_answer"&&x.details?.round_id===roundId),mine=roundAnswers.find(x=>x.user_id===currentUser?.id),invite=coupleMomentsCache.find(x=>x.kind==="conversation_invite"&&x.details?.round_id===roundId),field=document.getElementById("conversationResponse"),button=document.getElementById("conversationSubmitBtn"),prompt=document.getElementById("conversationPrompt");if(prompt)prompt.textContent=heldConversationPrompt(roundId);conversationStatus.textContent=mine?`Your answer is saved privately. Waiting for ${spouseName()} to respond.`:invite?`${spouseName()} answered privately. Respond to reveal both answers.`:"Your answers stay private until both of you respond.";if(field){field.disabled=false;field.placeholder="Write your private answer...";}if(button&&!conversationSubmitPending){button.disabled=false;button.textContent="Submit my answer";}}
 
   const checkins=document.getElementById("recentCheckins");if(checkins)checkins.innerHTML=coupleCheckinsCache.slice(0,6).map(item=>`<div class="entry"><strong>${item.user_id===currentUser?.id?"You":spouseName()} · ${escapeHtml(item.mood||"Checked in")}</strong><p>${item.need?escapeHtml(item.need):"No support request added."}</p><small class="muted">Energy ${item.energy||"—"}/5 · ${new Date(item.created_at).toLocaleDateString()}</small></div>`).join("")||'<p class="muted">No check-ins yet.</p>';
   const today=new Date().toDateString(),todayUsers=new Set(coupleCheckinsCache.filter(x=>new Date(x.created_at).toDateString()===today).map(x=>x.user_id)),sharedDays={};coupleCheckinsCache.forEach(x=>{const d=new Date(x.created_at).toDateString();(sharedDays[d]||=new Set()).add(x.user_id);});const togetherDays=Object.values(sharedDays).filter(users=>users.size>1).length;
@@ -5302,7 +5318,7 @@ async function submitConversationAnswer(){
  conversationSubmitPending=true;if(button){button.disabled=true;button.textContent="Submitting…";}
  try{
   if(!prayerCoupleId)await getPrayerCouple();if(!prayerCoupleId){showHeldMessage("Connect with your spouse first.");return;}
-  const roundId=heldConversationRoundId(),details={prompt:HELD_CONVERSATION_PROMPT,round_id:roundId};
+  const roundId=heldConversationRoundId(),details={prompt:heldConversationPrompt(roundId),round_id:roundId};
   let existing=coupleMomentsCache.find(x=>x.user_id===currentUser?.id&&x.kind==="conversation_answer"&&x.details?.round_id===roundId),error;
   if(existing?.is_shared){showHeldMessage("Both answers are already revealed and can no longer be edited.");return;}
   if(existing){({error}=await supabaseClient.from("couple_moments").update({body:answer,details,updated_at:new Date().toISOString()}).eq("id",existing.id));}
@@ -5412,6 +5428,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 })();
 </script>
 
-<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v37</div>
+<div style="position:fixed;right:10px;bottom:8px;font-size:10px;opacity:.35;z-index:9999">Held build 20260821-v38</div>
 </body>
 </html>
