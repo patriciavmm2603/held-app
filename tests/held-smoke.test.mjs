@@ -135,3 +135,63 @@ test("Luke 8 Understand content is passage-specific and plain", () => {
   assert.match(html, /if\(j\.id==="money"\|\|\(daily&&specific\)\)/);
   assert.match(html, /generated\.main=specific\.main\|\|generated\.main/);
 });
+
+
+function extractReflectionQuestions(source) {
+  const marker = "const heldReflectionQuestions = {";
+  const start = source.indexOf(marker);
+  assert.ok(start >= 0, "heldReflectionQuestions block must exist");
+  let depth = 0, inStr = false, esc = false, end = -1;
+  for (let i = start; i < source.length; i++) {
+    const ch = source[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === "\\") esc = true;
+      else if (ch === '"') inStr = false;
+    } else {
+      if (ch === '"') inStr = true;
+      else if (ch === "{") depth++;
+      else if (ch === "}") { depth--; if (depth === 0) { end = i + 1; break; } }
+    }
+  }
+  assert.ok(end > start, "heldReflectionQuestions block must close");
+  return {
+    block: source.slice(start, end),
+    questions: eval("(" + source.slice(start + marker.length - 1, end).replace(/;$/, "") + ") || {}") ,
+  };
+}
+
+test("Reflection questions cover every journey with 21 curated days", () => {
+  const { questions } = extractReflectionQuestions(html);
+  const ids = ["survival","anxiety","money","control","identity","grief",
+               "redeemed","leader","forgiveness","empathy","father","provision"];
+  assert.deepEqual(Object.keys(questions).sort(), ids.slice().sort());
+  for (const id of ids) {
+    assert.equal(questions[id].length, 21, `${id} must have 21 days`);
+    const p1s = new Set();
+    for (let d = 0; d < 21; d++) {
+      const day = questions[id][d];
+      for (const k of ["p1","p2","p3"]) {
+        assert.ok(day[k] && day[k].trim().length > 10, `${id} day ${d+1} ${k} must be substantive`);
+      }
+      p1s.add(day.p1);
+    }
+    assert.equal(p1s.size, 21, `${id} p1 questions must be unique per day`);
+  }
+});
+
+test("Reflection questions are not templated and have no mojibake", () => {
+  const { block } = extractReflectionQuestions(html);
+  const banned = [
+    "what are you feeling or believing about it right now",
+    "Notice how Jesus responds to the question, need, fear, or conflict",
+    "You could ask for help, share one responsibility, or explain what support would feel safe",
+    "You could pray honestly, write the fear down",
+    "You could review one number, have one honest conversation",
+    "You could work, plan, pray, rest, ask for help, or talk honestly with your wife",
+  ];
+  for (const phrase of banned) {
+    assert.ok(!block.includes(phrase), `templated phrase must be gone: ${phrase.slice(0, 40)}…`);
+  }
+  assert.ok(!block.includes("�"), "no mojibake replacement characters");
+});
