@@ -132,8 +132,54 @@ test("Luke 8 Understand content is passage-specific and plain", () => {
   assert.match(html, /match: p => p\.includes\("Luke 8:4–15"\)/);
   assert.match(html, /The focus is not farming technique; it is what happens after the word is heard/);
   assert.match(html, /good soil as people who hear the word, hold firmly to it/);
-  assert.match(html, /if\(j\.id==="money"\|\|\(daily&&specific\)\)/);
+  assert.match(html, /const daily=j\.id==="money"\?moneyJourneyDaily\[passage\]:\(heldCuratedDaily\[j\.id\]\|\|\{\}\)\[passage\];/);
+  assert.match(html, /if\(j\.id==="money"\|\|daily\)/);
   assert.match(html, /generated\.main=specific\.main\|\|generated\.main/);
+});
+
+function extractCuratedDaily(source) {
+  const marker = "const heldCuratedDaily = {";
+  const start = source.indexOf(marker);
+  assert.ok(start >= 0, "heldCuratedDaily block must exist");
+  let depth = 0, inStr = false, esc = false, end = -1;
+  for (let i = start; i < source.length; i++) {
+    const ch = source[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === "\\") esc = true;
+      else if (ch === '"') inStr = false;
+    } else {
+      if (ch === '"') inStr = true;
+      else if (ch === "{") depth++;
+      else if (ch === "}") { depth--; if (depth === 0) { end = i + 1; break; } }
+    }
+  }
+  assert.ok(end > start, "heldCuratedDaily block must close");
+  return eval("(" + source.slice(start + marker.length - 1, end) + ")");
+}
+
+test("Curated daily studies replace generated boilerplate per journey", () => {
+  const curated = extractCuratedDaily(html);
+  const fields = ["context","fit","main","notMean","tension","observe","movement",
+                  "companions","prayer","practice","boundary"];
+  for (const jid of ["survival","anxiety"]) {
+    assert.ok(curated[jid], `${jid} must have curated studies`);
+    const keys = Object.keys(curated[jid]);
+    assert.equal(keys.length, 21, `${jid} must cover 21 days`);
+    for (const k of keys) {
+      const st = curated[jid][k];
+      for (const f of fields) {
+        assert.ok(st[f] !== undefined && st[f] !== null, `${jid} ${k} needs ${f}`);
+      }
+      assert.ok(Array.isArray(st.observe) && st.observe.length >= 2, `${jid} ${k} observe`);
+      assert.ok(Array.isArray(st.movement) && st.movement.length >= 2, `${jid} ${k} movement`);
+      assert.ok(Array.isArray(st.companions) && st.companions.length >= 3, `${jid} ${k} companions`);
+    }
+  }
+  const flat = JSON.stringify(curated);
+  assert.ok(!flat.includes("The passage calls the reader to understand"), "no generated main-point boilerplate");
+  assert.ok(!flat.includes("The text offers real direction without promising"), "no generated tension boilerplate");
+  assert.ok(!flat.includes("�"), "no mojibake");
 });
 
 
