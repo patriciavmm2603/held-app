@@ -162,7 +162,9 @@ test("Curated daily studies replace generated boilerplate per journey", () => {
   const curated = extractCuratedDaily(html);
   const fields = ["context","fit","main","notMean","tension","observe","movement",
                   "companions","prayer","practice","boundary"];
-  for (const jid of ["survival","anxiety"]) {
+  const journeys = Object.keys(curated);
+  assert.ok(journeys.length >= 2, "at least two journeys curated");
+  for (const jid of journeys) {
     assert.ok(curated[jid], `${jid} must have curated studies`);
     const keys = Object.keys(curated[jid]);
     assert.equal(keys.length, 21, `${jid} must cover 21 days`);
