@@ -4,7 +4,7 @@
 
 <script>
 (function(){
-  const RESET_KEY = "held_cache_reset_20260821_v42";
+  const RESET_KEY = "held_cache_reset_20260821_v43";
   async function resetOldHeldCache(){
     if (localStorage.getItem(RESET_KEY)) return;
     localStorage.setItem(RESET_KEY, "done");
@@ -3843,21 +3843,1996 @@ function reflectionQuestionsFor(journeyId,day,content){
   };
 }
 
+const heldCuratedDaily = {
+  "survival": {
+    "Matthew 6:19–24": {
+      "context": "In the Sermon on the Mount, Jesus has just finished teaching about giving, praying, and fasting in secret (6:1–18). He now turns to possessions, speaking to disciples tempted to build security out of stored wealth. The question is not whether they will trust something, but what.",
+      "fit": "This journey is about separating wise responsibility from fear-driven control. This passage gives the diagnostic: where your treasure rests, your heart follows — so control often reveals itself as misplaced treasure.",
+      "main": "What you store and where you store it shapes your heart. You cannot give ultimate allegiance to both God and wealth.",
+      "notMean": "Jesus is not calling saving or providing for your family sinful. He is confronting possessions as ultimate security, identity, or master.",
+      "tension": "Jesus draws a hard either/or, yet most of us live in the gray middle of budgets, savings, and responsibilities. The passage hands you no formula for how much is too much. It leaves you asking who your stored things are actually serving.",
+      "observe": [
+        "Moth, rust, and thieves: everything stored on earth decays, corrodes, or gets stolen.",
+        "\"Where your treasure is, there your heart will be also\" — the heart follows the treasure, not the other way around.",
+        "\"No one can serve two masters\" — Jesus personalizes wealth as \"mammon,\" a rival master rather than a neutral tool."
+      ],
+      "movement": [
+        "Do not store up treasures on earth, where decay and theft reach them.",
+        "Store up treasures in heaven instead, where nothing corrupts.",
+        "Your heart follows your treasure, so treasure placement is heart placement.",
+        "Two masters cannot both be served; one will be loved and the other hated."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 12:13–21",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "The rich fool's bigger barns show exactly what earthly treasure-storage looks like — and how suddenly it ends."
+        },
+        {
+          "passage": "1 Timothy 6:6–10",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Paul names the love of money as a root of ruin and commends godliness with contentment as the alternative."
+        },
+        {
+          "passage": "Proverbs 30:7–9",
+          "category": "Wisdom",
+          "relation": "prayerful response",
+          "reason": "Agur prays for neither poverty nor riches, fearing both would bend his allegiance away from God."
+        },
+        {
+          "passage": "Matthew 19:16–22",
+          "category": "Gospel",
+          "relation": "canonical tension",
+          "reason": "The rich young ruler keeps the commandments yet walks away sad — his treasure had already chosen his master."
+        }
+      ],
+      "prayer": "Father, show me where my treasure actually rests — not where I say it does. Loosen my grip on stored security so my heart can follow You instead. Teach me to hold things with open hands.",
+      "practice": "Name one possession, account, or number you check compulsively; leave it unchecked today and notice what rises in you.",
+      "boundary": "Do not make a drastic financial decision from one morning's reading. Bring significant money choices into prayer and honest conversation with your husband and wise counsel."
+    },
+    "Matthew 6:25–34": {
+      "context": "This passage follows immediately — \"therefore\" — on the treasure teaching. Jesus turns from possessions to the anxiety underneath them: food, drink, clothing. These were not hypothetical worries for His hearers; they were daily survival needs.",
+      "fit": "Fear-driven control often wears the mask of worry, rehearsing tomorrow to feel safe today. This passage relocates provision from your vigilance to the Father's care, one day at a time.",
+      "main": "The Father knows your needs and is more trustworthy than your worry; seek His kingdom first, and handle only today's trouble today.",
+      "notMean": "Jesus is not banning planning, work, saving, or medical care. He targets consuming worry that treats tomorrow as though the Father were absent.",
+      "tension": "Birds are fed, yet faithful people still go hungry; lilies are clothed, yet believers still face lack. The promise is the Father's attentive care, not immunity from need — and that distinction matters.",
+      "observe": [
+        "\"Therefore I tell you\" ties worry directly to the treasure problem: anxiety is what serving mammon feels like.",
+        "Birds do not sow or reap, lilies do not labor or spin — yet both are provided for, and \"are you not of more value than they?\"",
+        "\"Which of you by being anxious can add a single hour to his span of life?\" — worry produces nothing it promises.",
+        "\"Sufficient for the day is its own trouble\" — Jesus limits your jurisdiction to today."
+      ],
+      "movement": [
+        "Do not be anxious about your life — food, drink, clothing.",
+        "Look at the birds: the Father feeds them, and you matter more.",
+        "Consider the lilies: the Father clothes them, though they never strive.",
+        "Seek first the kingdom — your Father knows you need these things — and let today carry only today's trouble."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 12:22–34",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's version adds \"do not be afraid, little flock\" — the same teaching with the Father's tenderness made explicit."
+        },
+        {
+          "passage": "Philippians 4:6–7",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Paul turns anxiety into prayer \"with thanksgiving\" and promises God's peace as the guard, not the removal of pressure."
+        },
+        {
+          "passage": "Psalm 55:22",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "Cast your burden on the Lord and He will sustain you — the Old Testament version of today's transfer."
+        },
+        {
+          "passage": "1 Peter 5:6–7",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Casting anxiety on God is paired with humble endurance under trial — trust does not cancel hardship."
+        }
+      ],
+      "prayer": "Father, You know the needs I can name and the ones I cannot yet see. Free me from using worry as though it were preparation. Teach me to seek Your kingdom today and leave tomorrow's trouble where it belongs.",
+      "practice": "Write down today's actual needs on paper, write \"the Father knows\" beside each one, and refuse to rehearse tomorrow's.",
+      "boundary": "Persistent or disabling anxiety deserves real support — counseling, medical care, community — not just a verse. Seek help without shame if worry is running your life."
+    },
+    "Matthew 7:7–11": {
+      "context": "Near the sermon's end, after the warnings about judgment (7:1–5) and discernment (7:6), Jesus urges persistent asking. \"Ask, seek, knock\" are present imperatives — keep on asking, keep on seeking, keep on knocking.",
+      "fit": "Survival mode says handle it alone; receiving partnership — with God and with your husband — begins with learning to ask. This passage makes asking a discipline, not a weakness.",
+      "main": "The Father gives good things to those who ask; so keep asking, keep seeking, keep knocking.",
+      "notMean": "This is not a blank check for every request. God gives \"good things\" — what is truly good — not whatever we demand, however we demand it.",
+      "tension": "Some ask and do not receive, and Jesus offers no explanation for unanswered prayer here. He anchors the practice in the Father's character rather than in guaranteed outcomes.",
+      "observe": [
+        "The triple imperative — ask, seek, knock — escalates in intensity: requesting, searching, pounding.",
+        "\"Everyone who asks receives\" is stated without qualification, then grounded in the Father's character.",
+        "The bread-and-stone, fish-and-serpent pairs argue from ordinary parental care to God's greater generosity.",
+        "\"How much more\" — Jesus reasons from flawed human fathers to the perfect Father."
+      ],
+      "movement": [
+        "Ask, and it will be given to you.",
+        "Seek, and you will find.",
+        "Knock, and the door will be opened.",
+        "Even flawed fathers give good gifts, not harmful substitutes — how much more will your Father give good things to those who ask Him."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 11:5–13",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke adds the midnight friend and names the supreme gift as the Holy Spirit — persistence meets God's best generosity."
+        },
+        {
+          "passage": "James 1:5–8",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "James insists on asking \"in faith, with no doubting\" — the posture of asking matters as much as the persistence."
+        },
+        {
+          "passage": "Psalm 34:4–10",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "David testifies \"I sought the Lord, and he answered me\" — the psalm is a lived record of ask-and-receive."
+        },
+        {
+          "passage": "1 John 5:14–15",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Confidence in asking rests on asking \"according to his will\" — alignment, not volume, is the key."
+        }
+      ],
+      "prayer": "Father, I have treated self-sufficiency as strength and asking as failure. Teach me to ask You plainly and persistently. Make me someone who receives — from You, and from the people You have given me.",
+      "practice": "Ask God for one specific thing out loud today; then ask your husband for one specific, concrete help.",
+      "boundary": "Asking God does not replace practical steps, wise counsel, or professional help where they are needed. Prayer and responsibility belong together."
+    },
+    "Matthew 5:3–10": {
+      "context": "These verses open the Sermon on the Mount — the Beatitudes. Jesus speaks to crowds living under Roman occupation, many of them poor, grieving, and powerless. He begins not with commands but with declarations of who is blessed.",
+      "fit": "Survival strength is armor: hold it together, need nothing, never crack. Jesus blesses the poor in spirit, the mourners, the meek — a strength that receives rather than grasps, which is the doorway out of survival mode.",
+      "main": "God's kingdom belongs to those the world calls weak; blessedness is found in dependence on God, not in self-sufficiency.",
+      "notMean": "Jesus is not romanticizing suffering or calling poverty itself holy. Mourning is blessed because comfort comes, not because pain is good.",
+      "tension": "The blessings are spoken in the present tense — \"theirs IS the kingdom\" — yet comfort, mercy, and satisfaction are still awaited. The now and the not-yet sit side by side without apology.",
+      "observe": [
+        "\"Blessed are\" repeats eight times, each pairing a lowly condition with a kingdom promise.",
+        "The first and last beatitudes both end with \"theirs is the kingdom of heaven\" — an inclusio framing the whole list.",
+        "Present-tense promises (the kingdom) alternate with future ones (they shall be comforted, satisfied, shown mercy).",
+        "The list moves from inward posture (poor in spirit) to outward cost (persecuted for righteousness)."
+      ],
+      "movement": [
+        "Blessed are the poor in spirit, the mourners, the meek.",
+        "Blessed are those who hunger and thirst for righteousness.",
+        "Blessed are the merciful, the pure in heart, the peacemakers.",
+        "Blessed are the persecuted — the kingdom is theirs too."
+      ],
+      "companions": [
+        {
+          "passage": "Isaiah 61:1–3",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "The Servant's mission to the poor, brokenhearted, and mourning stands behind Jesus' blessings."
+        },
+        {
+          "passage": "Psalm 34:18",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "\"The Lord is near to the brokenhearted\" — the same nearness Jesus promises to mourners."
+        },
+        {
+          "passage": "James 4:6–10",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "God opposes the proud but gives grace to the humble — the New Testament echo of \"poor in spirit.\""
+        },
+        {
+          "passage": "2 Corinthians 12:9–10",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Paul learns that weakness is the very place Christ's power rests — strength redefined, not just admired."
+        }
+      ],
+      "prayer": "Lord, I have confused hardness with strength and need with failure. Make me poor in spirit — honest about what I cannot carry. Let me receive the kingdom as a gift instead of earning it as a wage.",
+      "practice": "Name one place you have been \"holding it together\"; tell God in your own words that you cannot, and stop performing there today.",
+      "boundary": "Grief and depression are real and deserve real care. Lament is prayer, and counseling is wisdom — not weak faith."
+    },
+    "Matthew 6:5–13": {
+      "context": "This sits in the sermon's section on secret devotion (6:1–18). Jesus contrasts the hypocrites' theatrical prayers with the Father who sees in secret, then gives His disciples the Lord's Prayer as the pattern — not a script to chant, but a shape for praying.",
+      "fit": "Control tries to manage outcomes; this prayer surrenders them first — \"Your kingdom come, Your will be done\" — and only then asks for daily bread. Prayer before control is the journey's daily practice.",
+      "main": "Pray to the Father in secret, simply and honestly; align with His kingdom before presenting your needs.",
+      "notMean": "Jesus is not forbidding public prayer or repeated requests. He forbids performance and empty babble — prayer as theater or technique.",
+      "tension": "\"Your will be done\" sits in the same breath as \"give us today our daily bread\" — total surrender and bold asking together. The prayer refuses to choose between them.",
+      "observe": [
+        "\"When you pray\" assumes the practice; the question is never whether but how.",
+        "Hypocrites \"love to stand and pray\" to be seen; the Father rewards what is done in secret.",
+        "\"Do not heap up empty phrases\" — the Gentiles thought many words moved their gods.",
+        "The prayer's order matters: God's name, kingdom, and will come before bread, forgiveness, and leading."
+      ],
+      "movement": [
+        "Do not pray like the hypocrites, performing for an audience — go into your room and pray to your Father in secret.",
+        "Do not babble; your Father knows what you need before you ask.",
+        "Pray then like this: hallowed be Your name, Your kingdom come, Your will be done.",
+        "Then ask: daily bread, forgiveness as forgiven, leading away from temptation."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 11:1–4",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "The disciples ask \"teach us to pray\" — the prayer is given as an answer to honest inability, not expertise."
+        },
+        {
+          "passage": "Psalm 62:8",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "\"Pour out your heart before him\" — the psalms model the unperformed honesty Jesus commends."
+        },
+        {
+          "passage": "Philippians 4:6",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Paul's \"in everything by prayer\" carries the same assumption: prayer first, then peace."
+        },
+        {
+          "passage": "Ecclesiastes 5:2",
+          "category": "Wisdom",
+          "relation": "canonical tension",
+          "reason": "\"Let your words be few\" — the Teacher warns against hasty, voluminous speech before God."
+        }
+      ],
+      "prayer": "Father in heaven, before I try to fix anything today, I come to You. Hallowed be Your name in my house and my heart. Your kingdom come, Your will be done — in my plans as in heaven. Give us today what we truly need.",
+      "practice": "Pray the Lord's Prayer slowly today, pausing in silence after \"Your will be done\" before you continue.",
+      "boundary": "Prayer is relationship, not a technique for controlling outcomes. Unanswered prayer is not failed prayer — bring the ache to God honestly."
+    },
+    "Matthew 6:14–15": {
+      "context": "Two verses, placed immediately after the Lord's Prayer. Of everything in that prayer, Jesus singles out one line for commentary: \"forgive us our debts, as we also have forgiven our debtors.\" The placement is deliberate and severe.",
+      "fit": "Survival mode keeps ledgers — every hurt catalogued, every debt tracked. Partnership, with God and your husband, requires release. This passage ties receiving forgiveness to extending it.",
+      "main": "Forgive others, and your Father forgives you; refuse to forgive, and you block your own reception of mercy.",
+      "notMean": "This does not mean our forgiveness earns salvation, nor that forgiveness pretends nothing happened. It is the evidence and channel of grace already received.",
+      "tension": "The severity troubles — \"neither will your Father forgive your trespasses.\" Scripture elsewhere grounds forgiveness in Christ's finished work, not our performance. The demand stands to expose how desperately we need grace, not to make grace conditional on our perfection.",
+      "observe": [
+        "Of the whole Lord's Prayer, only the forgiveness petition gets this extended commentary.",
+        "\"If you forgive others their trespasses\" — the condition is stated positively first, then mirrored negatively.",
+        "The language is debts and trespasses: moral and relational ledgers, not vague feelings.",
+        "The Father's forgiveness is linked to ours without softening on either side."
+      ],
+      "movement": [
+        "The prayer asks: forgive us our debts, as we forgive our debtors.",
+        "Jesus explains: if you forgive others, your Father will forgive you.",
+        "The mirror: if you do not forgive others, your Father will not forgive you."
+      ],
+      "companions": [
+        {
+          "passage": "Matthew 18:21–35",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "The unforgiving servant, forgiven millions yet choking a fellow servant over pocket change, embodies today's warning."
+        },
+        {
+          "passage": "Ephesians 4:31–32",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "\"Forgiving one another, as God in Christ forgave you\" — the same link, grounded explicitly in Christ."
+        },
+        {
+          "passage": "Psalm 103:10–12",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "God removes transgressions \"as far as the east is from the west\" — the scale of forgiveness we are drawn into."
+        },
+        {
+          "passage": "Colossians 3:13",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Paul commands forgiveness \"as the Lord has forgiven you\" even when the complaint is legitimate — release is not denial."
+        }
+      ],
+      "prayer": "Father, I am holding debts I have dressed up as discernment. Show me the ledgers I keep — against my husband, against others, against You. Teach me to release what You have already released me from.",
+      "practice": "Name one debt you are keeping a ledger on; speak one sentence of release about it to God today.",
+      "boundary": "Forgiveness does not require restored trust or unsafe access. Boundaries and forgiveness can coexist — and where there is abuse, safety and help come first."
+    },
+    "Matthew 7:24–27": {
+      "context": "The sermon's closing parable. After the narrow gate and the fruit warnings, Jesus ends with two builders. The whole sermon funnels here: hearing His words means nothing without doing them.",
+      "fit": "Survival builds on sand — whatever feels stable (control, self-reliance, vigilance) but shifts under weight. Partnership with God is the rock practice: hearing and doing, day after day.",
+      "main": "Everyone who hears Jesus' words and acts on them builds on rock; hearing alone builds on sand, and storms expose the difference.",
+      "notMean": "This does not promise that obedience rescues you from every storm. Both houses face the same rain, floods, and winds — the difference is what remains standing.",
+      "tension": "Faithful people still watch plans collapse, health fail, and dreams die. The promise is about the foundation holding, not the house staying pretty — and that is a harder, truer comfort.",
+      "observe": [
+        "\"Everyone who hears these words of mine and does them\" — the wise builder is defined by obedience, not admiration.",
+        "Both builders hear; only one does. The difference is never information.",
+        "The same storm strikes both houses — rain, floods, winds beat against each.",
+        "\"Great was the fall of it\" — the collapse of sand-built lives is total, not partial."
+      ],
+      "movement": [
+        "Hear Jesus' words and do them: you are like a wise man who built on rock.",
+        "The storm comes — and the rock house stands.",
+        "Hear Jesus' words and do not do them: you are like a fool who built on sand.",
+        "The storm comes — and great is the fall."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:46–49",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke adds that the wise builder \"dug deep\" — obedience is excavation, not decoration."
+        },
+        {
+          "passage": "James 1:22–25",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Be doers of the word, not hearers only — James turns the parable into a direct command."
+        },
+        {
+          "passage": "Psalm 127:1",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "\"Unless the Lord builds the house, those who build it labor in vain\" — the Old Testament's building theology."
+        },
+        {
+          "passage": "1 Corinthians 3:10–15",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Paul's building may burn yet the builder be saved — foundation and superstructure are judged separately."
+        }
+      ],
+      "prayer": "Lord, show me where I am building on sand — the control, the self-reliance, the vigilance I call wisdom. Make me a doer of Your words, not just a hearer. Be the rock under everything I am building.",
+      "practice": "Pick one thing Jesus has said to you this week and take the next small obedient step on it today.",
+      "boundary": "A collapsed season does not prove you built wrong. Bring the rubble to God and to wise counsel — not to shame."
+    },
+    "Matthew 5:21–26": {
+      "context": "The first of six \"You have heard... but I say to you\" antitheses. Jesus takes the command against murder and drives it inward — to anger and contempt — then demands urgent reconciliation.",
+      "fit": "Survival mode nurses resentment quietly while keeping the peace outwardly. Jesus commands repair over performance: go and be reconciled, even if it interrupts your worship.",
+      "main": "Anger and contempt violate the heart of \"you shall not murder\"; pursue reconciliation urgently, even leaving your gift at the altar to do it.",
+      "notMean": "Not all anger is sin — Scripture elsewhere allows anger without sin. What Jesus condemns is anger that despises: the \"raca,\" the \"you fool.\"",
+      "tension": "\"Be reconciled\" assumes the other person will engage, and some will not. The command governs your movement toward repair, not the outcome you cannot control.",
+      "observe": [
+        "\"You have heard... but I say to you\" — Jesus claims authority to interpret the Law's intent.",
+        "Anger makes one liable to judgment; \"raca\" (empty-head) to the council; \"you fool\" to the fire — contempt escalates.",
+        "\"Leave your gift there before the altar\" — worship waits on reconciliation, not the reverse.",
+        "\"Come to terms quickly with your accuser\" — urgency, on the way, before the judge."
+      ],
+      "movement": [
+        "Murder was forbidden — but anger already makes you liable.",
+        "Contempt (\"raca,\" \"fool\") deepens the guilt further.",
+        "If you remember a grievance, leave your offering, go and be reconciled first — then come back and offer your gift.",
+        "Settle matters quickly with your opponent while you are on the way."
+      ],
+      "companions": [
+        {
+          "passage": "Ephesians 4:26–27, 31–32",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Be angry and do not sin; do not let the sun go down — Paul gives the daily practice for today's command."
+        },
+        {
+          "passage": "Romans 12:17–18",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "\"As far as it depends on you, live peaceably\" — your responsibility ends where the other person's begins."
+        },
+        {
+          "passage": "Psalm 4:4",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "\"Be angry, and do not sin; ponder in your own hearts on your beds, and be silent\" — the psalmist's version."
+        },
+        {
+          "passage": "Matthew 18:15",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "Jesus later gives the concrete steps: go and tell him his fault, between you and him alone."
+        }
+      ],
+      "prayer": "Lord, who am I resenting while calling it honesty? Show me the contempt I have baptized as discernment. Give me courage to move toward repair instead of rehearsing the grievance.",
+      "practice": "Name one strained relationship; take one step toward it today — a text, an apology, a conversation starter.",
+      "boundary": "Reconciliation does not mean returning to harm. Where there is abuse or danger, safety comes first and counsel must be involved."
+    },
+    "Matthew 5:38–48": {
+      "context": "The fifth and sixth antitheses: \"eye for eye\" and \"love your neighbor.\" Jesus overturns both retaliation and tribal love, commanding nonresistance and love for enemies — the sermon's most radical stretch.",
+      "fit": "Survival instincts demand payback and self-protection. Jesus replaces the retaliation cycle with a different power: refusing evil-for-evil and loving even enemies, as the Father does.",
+      "main": "Do not resist evil with evil; love your enemies and pray for your persecutors, reflecting the Father who gives sun and rain to all.",
+      "notMean": "This is not passivity before abuse or a ban on justice. It refuses personal vengeance; it does not abandon protection, boundaries, or the pursuit of justice.",
+      "tension": "\"Be perfect, as your heavenly Father is perfect\" sets an impossible standard. It is meant to drive you to grace, not to despair — perfection as direction, received before it is achieved.",
+      "observe": [
+        "\"Eye for eye\" is quoted — then replaced: \"do not resist the one who is evil.\"",
+        "Four concrete examples escalate: cheek, cloak, second mile, open-handed giving.",
+        "\"Love your neighbor\" had become \"and hate your enemy\" — Jesus exposes the added half.",
+        "The Father's indiscriminate generosity (sun, rain) becomes the model; \"be perfect\" the goal."
+      ],
+      "movement": [
+        "The old rule: retaliation, measured and limited.",
+        "The new way: turn the cheek, give the cloak, go the second mile.",
+        "The old love was neighbors only and enemies hated; the new love loves enemies and prays for persecutors.",
+        "The reason: your Father is indiscriminately generous — be perfect as He is."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:27–36",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's version adds \"do good, expecting nothing in return\" — enemy love as a way of life, not a moment."
+        },
+        {
+          "passage": "Romans 12:19–21",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "\"Overcome evil with good\" — Paul turns the sermon into the church's operating instruction."
+        },
+        {
+          "passage": "Proverbs 25:21–22",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "Feed your enemy, give him drink — the Old Testament already pointed past retaliation."
+        },
+        {
+          "passage": "1 Peter 3:9",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Do not repay evil for evil but bless — Peter applies it to households under pressure."
+        }
+      ],
+      "prayer": "Father, my instinct is to hit back, keep score, and love selectively. Make me like You — generous to the grateful and the ungrateful alike. Teach me to bless where I want to curse.",
+      "practice": "Identify one person you want to \"get even\" with; pray a one-sentence blessing for them instead of rehearsing the payback.",
+      "boundary": "Non-retaliation never requires staying in abuse. Call for help, set firm boundaries, and involve authorities where safety is at stake."
+    },
+    "Matthew 6:1–4": {
+      "context": "This opens the sermon's section on secret devotion (6:1–18): giving, then prayer, then fasting. \"Beware of practicing your righteousness before other people in order to be seen by them\" — the warning frames all three.",
+      "fit": "Survival mode either performs generosity to earn approval or withholds from fear of lack. Jesus frees giving from both traps: secret, Father-seen, and certain of reward.",
+      "main": "Give in secret, not for applause; your Father who sees in secret will reward you.",
+      "notMean": "Not every gift must be anonymous forever — Scripture records generous gifts openly. The issue is motive: seen by people versus seen by the Father.",
+      "tension": "\"Your Father who sees in secret will reward you\" — the nature and timing of the reward are unspecified. You are asked to trust the Father's accounting without demanding the terms.",
+      "observe": [
+        "\"Beware\" — the section opens with a warning, not an encouragement.",
+        "Hypocrites \"sound a trumpet\"; the image is deliberate public theater.",
+        "\"They have received their reward\" — applause is the whole wage, paid in full.",
+        "\"Do not let your left hand know what your right hand is doing\" — secrecy so deep it excludes even yourself."
+      ],
+      "movement": [
+        "Warning: do not practice righteousness to be seen by people.",
+        "The hypocrites' method: trumpet, synagogue, street — applause as reward.",
+        "The alternative: give so secretly even your left hand doesn't know.",
+        "The promise: your Father who sees in secret will reward you."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 21:1–4",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "The widow's two coins, given quietly, outweigh the rich men's theater — Jesus Himself applies the measure."
+        },
+        {
+          "passage": "2 Corinthians 9:6–8",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "\"God loves a cheerful giver\" — Paul keeps generosity joyful and voluntary, never coerced."
+        },
+        {
+          "passage": "Proverbs 19:17",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "Kindness to the poor is a loan to the Lord — the Father's secret accounting again."
+        },
+        {
+          "passage": "Acts 20:35",
+          "category": "Narrative",
+          "relation": "canonical tension",
+          "reason": "\"It is more blessed to give than to receive\" — yet the early church also gave publicly and accountably."
+        }
+      ],
+      "prayer": "Father, untangle my giving from my image. Free me from performing generosity and from hoarding it. Let me give the way You give — quietly, gladly, and for Your eyes.",
+      "practice": "Do one generous thing today that no one will ever know about.",
+      "boundary": "Secret giving does not mean secret finances in marriage. Keep money fully honest and shared with your husband."
+    },
+    "Matthew 6:16–18": {
+      "context": "The third in the secret-devotion trio: giving (6:1–4), prayer (6:5–15), fasting (6:16–18). Jesus contrasts disfigured, gloomy faces performed for people with anointed heads and washed faces seen only by the Father.",
+      "fit": "Survival spirituality performs to prove okay-ness — to God, to church, to yourself. Private faithfulness lets God be the only audience that matters.",
+      "main": "Fast — and by extension, practice every spiritual discipline — for the Father's eyes, not people's; He sees in secret and rewards.",
+      "notMean": "This is not a command that everyone must fast on a schedule, nor a ban on shared spiritual practices. It is about the audience of your devotion.",
+      "tension": "We are embodied, social creatures; practicing \"in secret\" while living in community takes wisdom. Secrecy here is about motive, not isolation from the people God gave you.",
+      "observe": [
+        "\"When you fast\" — like giving and praying, the practice is assumed, not commanded.",
+        "Hypocrites \"disfigure their faces\" to advertise their denial — the performance contradicts the practice.",
+        "\"They have received their reward\" — the familiar verdict on performed righteousness.",
+        "\"Anoint your head and wash your face\" — look normal; let the Father be the only witness."
+      ],
+      "movement": [
+        "Do not look gloomy like the hypocrites, advertising your fast.",
+        "They perform to be seen by others — and that is their whole reward.",
+        "Look ordinary: anointed head, washed face.",
+        "Your Father who sees in secret will reward you."
+      ],
+      "companions": [
+        {
+          "passage": "Isaiah 58:3–9",
+          "category": "Prophets",
+          "relation": "canonical tension",
+          "reason": "God rejects performed fasting and defines His chosen fast: loose bonds, feed the hungry, shelter the homeless."
+        },
+        {
+          "passage": "Joel 2:12–13",
+          "category": "Prophets",
+          "relation": "prayerful response",
+          "reason": "\"Rend your hearts and not your garments\" — the inward reality behind every outward practice."
+        },
+        {
+          "passage": "Psalm 51:16–17",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "God desires \"a broken and contrite heart\" over sacrifice — the audience is always His, never the crowd's."
+        },
+        {
+          "passage": "Zechariah 7:5",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "\"Was it for me that you fasted?\" — God asks the motive question directly."
+        }
+      ],
+      "prayer": "Lord, who am I performing for? Strip the audience from my devotion until only You remain. Make my private faithfulness realer than my public spirituality.",
+      "practice": "Choose one small, unseen act of devotion today — unshared prayer, a quiet fast from something — for His eyes only.",
+      "boundary": "Private faith is not isolated faith. Stay connected to community and honest with your husband about your spiritual life."
+    },
+    "Matthew 7:1–5": {
+      "context": "This opens the sermon's final movement. After the Lord's Prayer, treasure, and worry teachings, Jesus addresses the judgmental eye — before inviting His hearers to ask, seek, and knock.",
+      "fit": "Survival mode scans everyone for threats and faults. Jesus says the measuring stick you use on others becomes the one used on you. Clear sight starts with your own plank.",
+      "main": "Do not judge with a condemning measure; remove your own plank first — then you will see clearly enough to help your brother.",
+      "notMean": "This is not a ban on all discernment — 7:6 requires it, and 7:15–20 commands fruit inspection. What is forbidden is hypocritical condemnation.",
+      "tension": "\"Then you will see clearly to take the speck out of your brother's eye\" — helping is still the goal, but only after self-examination. The line between judging and helping is the plank.",
+      "observe": [
+        "\"Judge not, that you be not judged\" — the warning is about the boomerang, not about blindness.",
+        "\"With the measure you use it will be measured to you\" — your standard becomes your sentence.",
+        "Speck versus plank (literally a log): the comic disproportion is the point.",
+        "\"Hypocrite!\" — the only time in the sermon Jesus uses the word for His own disciples' temptation."
+      ],
+      "movement": [
+        "Do not judge, or you will be judged by your own standard.",
+        "Why do you see the speck in your brother's eye?",
+        "You miss the log in your own eye — hypocrite.",
+        "First take the log out; then you will see clearly to remove the speck."
+      ],
+      "companions": [
+        {
+          "passage": "Romans 2:1–3",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Paul turns the sermon on its readers: in judging another you condemn yourself, practicing the same things."
+        },
+        {
+          "passage": "Galatians 6:1",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Restore the one caught in transgression \"in a spirit of gentleness\" — and watch yourself."
+        },
+        {
+          "passage": "James 4:11–12",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "There is one Lawgiver and Judge — speaking against a brother claims a seat that isn't yours."
+        },
+        {
+          "passage": "John 8:7–11",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "\"Let him who is without sin cast the first stone\" — Jesus enacts the sermon on the temple steps."
+        }
+      ],
+      "prayer": "Lord, show me my plank before I point at specks. Forgive the contempt I have called discernment. Make me the kind of person whose corrections heal because they come from examined humility.",
+      "practice": "Before raising one concern about your husband today, name one of your own faults out loud to God first.",
+      "boundary": "Naming real wrongs is not \"judging\" — discernment with humility is still required, especially where safety is at stake."
+    },
+    "Matthew 7:6": {
+      "context": "A single verse, set between \"do not judge\" (7:1–5) and \"ask, seek, knock\" (7:7–11). Jesus pivots from non-condemnation to discernment: not everything holy is for every audience.",
+      "fit": "Survival mode either overshares with unsafe people or walls everyone out. Wisdom discerns who can receive what — boundaries as stewardship, not punishment.",
+      "main": "Do not give what is holy to those who will trample it; discernment about people is part of love, not a failure of it.",
+      "notMean": "This is not permission to label people \"dogs\" or \"pigs\" with contempt and write them off. It governs stewardship of sacred things, not the worth of persons.",
+      "tension": "Who decides who the \"dogs\" are? The verse has been misused to exclude. Read with 7:1–5, it warns against both naivete and contempt — and the line between them is thin.",
+      "observe": [
+        "\"Do not give dogs what is holy\" — \"holy\" likely means consecrated food; some things are set apart.",
+        "\"Do not throw your pearls before pigs\" — pearls were precious; the waste is the point.",
+        "\"Lest they trample them... and turn to attack you\" — misplaced openness can turn violent.",
+        "Its placement matters: between non-judgment and bold asking, discernment keeps both honest."
+      ],
+      "movement": [
+        "Withhold what is holy from those who despise it.",
+        "Withhold pearls from those who cannot value them.",
+        "Otherwise they trample the gift — and turn on the giver."
+      ],
+      "companions": [
+        {
+          "passage": "Proverbs 9:7–9",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "Correct a scoffer and you get abuse; correct the wise and they love you — discernment precedes instruction."
+        },
+        {
+          "passage": "Matthew 10:16",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "\"Wise as serpents and innocent as doves\" — Jesus pairs shrewdness with gentleness for His sent ones."
+        },
+        {
+          "passage": "Proverbs 23:9",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "\"Do not speak in the hearing of a fool\" — the Teacher's blunter version of the same boundary."
+        },
+        {
+          "passage": "Titus 3:10–11",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "After two warnings, \"have nothing more to do\" with the divisive person — boundaries have a procedure."
+        }
+      ],
+      "prayer": "Father, give me discernment without contempt. Show me what is holy that I have been throwing carelessly, and where I have walled off what You meant me to share. Teach me the difference.",
+      "practice": "Identify one thing you keep over-explaining to someone who tramples it; practice one gentle \"no\" — or one holy silence — today.",
+      "boundary": "Boundaries protect; they do not punish. If a relationship feels unsafe rather than merely difficult, bring it to counsel, not just willpower."
+    },
+    "Matthew 7:12": {
+      "context": "The Golden Rule — one verse that Jesus says sums up \"the Law and the Prophets.\" It sits between the Father's generosity (7:7–11) and the narrow gate (7:13–14), carrying the sermon's whole ethical weight.",
+      "fit": "Survival mode asks \"what keeps me safe?\" The Golden Rule reframes every interaction: treat others the way you long to be treated — including your husband.",
+      "main": "In everything, do to others what you would have them do to you — this is what the Law and the Prophets were always about.",
+      "notMean": "Not \"treat others as they treat you\" — that is retaliation wearing a rule's clothing. The standard is your own God-given desire to be loved well.",
+      "tension": "Simple to state, costly to practice — especially with people who never reciprocate. The verse gives no exception clause for difficult people.",
+      "observe": [
+        "\"So\" connects it to the Father's generosity in 7:7–11: because He gives good gifts, you give good treatment.",
+        "\"In everything\" — no sphere exempted, no relationship excluded.",
+        "\"This is the Law and the Prophets\" — the entire Old Testament ethic compressed into one sentence."
+      ],
+      "movement": [
+        "The Father gives good things to those who ask Him.",
+        "Therefore: treat others as you wish to be treated — in everything.",
+        "This single rule fulfills the Law and the Prophets."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:31",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's plainer version — \"as you wish that others would do to you, do so to them\" — same rule, same force."
+        },
+        {
+          "passage": "Romans 13:8–10",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "\"Love is the fulfilling of the law\" — Paul unpacks how the rule absorbs every commandment."
+        },
+        {
+          "passage": "Leviticus 19:18",
+          "category": "Law",
+          "relation": "thematic reinforcement",
+          "reason": "\"Love your neighbor as yourself\" — the ancient root Jesus is summarizing."
+        },
+        {
+          "passage": "Philippians 2:3–4",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Count others more significant than yourselves — the rule applied to ambition and rivalry."
+        }
+      ],
+      "prayer": "Lord, make this rule my reflex instead of my aspiration. In every conversation today — especially at home — let me treat others the way I ache to be treated.",
+      "practice": "Do one thing for your husband today exactly the way you would love to be treated in that same area.",
+      "boundary": "The Golden Rule does not override consent or safety. Love never means unlimited access to you."
+    },
+    "Matthew 5:13–16": {
+      "context": "Immediately after the Beatitudes, still the sermon's opening. Before a single command about how to live, Jesus tells obscure Galilean disciples who they are: salt and light. Identity precedes activity.",
+      "fit": "Survival mode hides — stay small, stay safe, stay unseen. Jesus says hidden faith contradicts its nature: salt preserves by contact, light shines by exposure.",
+      "main": "You ARE salt and light; let your good works be visible so people glorify your Father — not you.",
+      "notMean": "This is not a call to perform righteousness for applause — 6:1 will warn against exactly that. Visibility serves God's glory, not your image.",
+      "tension": "Salt can lose its saltiness; light can be hidden under a basket. Identity can be neglected — which is why the warning comes with the calling, not after failure.",
+      "observe": [
+        "\"You are\" — identity stated before any instruction is given.",
+        "Salt that loses its saltiness is \"no longer good for anything except to be thrown out\" — uselessness, not punishment, is the warning.",
+        "\"A city set on a hill cannot be hidden\" — some visibility is unavoidable; the question is what people see.",
+        "The purpose clause: \"that they may see your good works and give glory to your Father\" — works visible, glory redirected."
+      ],
+      "movement": [
+        "You are the salt of the earth — but salt can go flat and be thrown out.",
+        "You are the light of the world — a city on a hill cannot be hidden.",
+        "No one lights a lamp to hide it; it is put on a stand to give light.",
+        "Let your light shine in good works — so your Father gets the glory."
+      ],
+      "companions": [
+        {
+          "passage": "Philippians 2:14–16",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Shine \"as lights in the world\" amid grumbling — Paul applies the image to ordinary congregational life."
+        },
+        {
+          "passage": "Isaiah 60:1–3",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "\"Arise, shine, for your light has come\" — the prophetic sunrise behind Jesus' words."
+        },
+        {
+          "passage": "1 Peter 2:12",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Keep conduct honorable among outsiders \"so that... they may glorify God\" — Peter quotes the purpose clause."
+        },
+        {
+          "passage": "Colossians 4:5–6",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "\"Walk in wisdom toward outsiders\" with gracious speech — salt as conversation, not just character."
+        }
+      ],
+      "prayer": "Father, I have been hiding my faith to stay safe — dimming the lamp and calling it humility. Make me salty and bright in the ordinary places You have put me. Take the glory; I'll take the joy.",
+      "practice": "Let one good work be seen today without announcing it — serve visibly, credit God silently.",
+      "boundary": "Visibility is not vulnerability without wisdom. Share your faith freely; share private details only with the trustworthy."
+    },
+    "Matthew 5:17–20": {
+      "context": "Right after salt and light, Jesus clarifies His relationship to the Law: He came not to abolish but to fulfill. Then the shock — your righteousness must exceed that of the scribes and Pharisees.",
+      "fit": "Survival mode obeys outwardly while the heart stays guarded and negotiating. Jesus wants heart-deep righteousness — obedience from the inside out, not rule-keeping as performance.",
+      "main": "Jesus fulfills the Law; kingdom righteousness must surpass external rule-keeping — it has to reach the heart.",
+      "notMean": "He is not discarding the Law's moral vision. \"Fulfill\" means embody and complete it, not throw it away.",
+      "tension": "\"Exceeds the scribes and Pharisees\" — the most observant people they knew — sets a standard no one reaches by effort. It points to a righteousness first received, then lived.",
+      "observe": [
+        "\"Do not think that I have come to abolish\" — Jesus anticipates the misunderstanding and kills it first.",
+        "\"Until heaven and earth pass away, not an iota\" — the Law's permanence is total, down to the smallest stroke.",
+        "\"Whoever relaxes one of the least of these commandments\" — small disobediences and small teachings both matter.",
+        "\"Unless your righteousness exceeds\" — the bar is set above the professionals of obedience."
+      ],
+      "movement": [
+        "I came not to abolish the Law and Prophets but to fulfill them.",
+        "Not the smallest stroke will pass until all is accomplished.",
+        "Who you are in the kingdom tracks with how you treat the commandments.",
+        "Your righteousness must exceed the scribes and Pharisees — or you will not enter."
+      ],
+      "companions": [
+        {
+          "passage": "Romans 8:3–4",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "What the law could not do, God did — so that its righteous requirement is fulfilled in us who walk by the Spirit."
+        },
+        {
+          "passage": "Jeremiah 31:33",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "\"I will put my law within them, and write it on their hearts\" — the promised heart-obedience Jesus brings."
+        },
+        {
+          "passage": "Romans 3:21–26",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "A righteousness \"apart from the law\" yet witnessed by it — Paul holds gift and demand together."
+        },
+        {
+          "passage": "Micah 6:8",
+          "category": "Prophets",
+          "relation": "prayerful response",
+          "reason": "Do justice, love kindness, walk humbly — the prophets' own summary of heart religion."
+        }
+      ],
+      "prayer": "Lord, I obey on the outside while negotiating on the inside. Write Your law on my heart the way You promised — make my obedience love, not leverage.",
+      "practice": "Pick one command you have been keeping technically but resenting inwardly; ask God to change the heart behind it, not just the behavior.",
+      "boundary": "Heart-obedience never contradicts Scripture's plain moral teaching. Test inner impressions against the Word and trusted counsel."
+    },
+    "Matthew 6:22–23": {
+      "context": "Set between the treasure teaching (6:19–21) and the two masters (6:24), the eye passage is the hinge. What fills your vision determines whether your inner life is full of light or darkness.",
+      "fit": "Survival mode stares at threats — accounts, symptoms, worst cases. Jesus says whatever you fix your eyes on fills your whole being; attention is formation.",
+      "main": "The eye is the body's lamp: a healthy eye fills you with light, a bad eye with darkness — and mislabeled darkness is the worst kind of all.",
+      "notMean": "This is not about physical eyesight or positive thinking. In this context the \"bad eye\" meant a stingy, grasping eye — it is about greed's gaze, not optimism.",
+      "tension": "\"If then the light in you is darkness, how great is the darkness!\" Self-deception is the real danger: calling your fixation \"wisdom\" or \"responsibility\" while it darkens you from the inside.",
+      "observe": [
+        "\"The eye is the lamp of the body\" — vision is presented as the body's light source.",
+        "The \"healthy\" eye (haplous — single, generous) versus the \"evil\" eye (ponēros — grasping, stingy).",
+        "\"Full of light\" versus \"full of darkness\" — the eye doesn't just see; it fills.",
+        "The closing warning targets those who think they see clearly while walking in darkness."
+      ],
+      "movement": [
+        "The eye is the lamp of the body.",
+        "A healthy, generous eye fills the whole body with light.",
+        "A bad, grasping eye fills the whole body with darkness.",
+        "If your supposed light is actually darkness — how deep that darkness is."
+      ],
+      "companions": [
+        {
+          "passage": "Proverbs 28:22",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "\"A stingy man hastens after wealth\" — the Teacher names the evil eye's hurry and its blindness."
+        },
+        {
+          "passage": "1 John 2:15–16",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "The \"lust of the eyes\" is listed among the world's passing desires — vision as appetite."
+        },
+        {
+          "passage": "Psalm 119:37",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "\"Turn my eyes from looking at worthless things\" — the psalmist's prayer for a healthy eye."
+        },
+        {
+          "passage": "Hebrews 12:1–2",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "\"Looking to Jesus\" — the healthy eye has an object, not just a technique."
+        }
+      ],
+      "prayer": "Lord, what am I staring at? Show me where my gaze has become grasping — and give me a single, generous eye fixed on You instead of on what I fear losing.",
+      "practice": "Notice what you look at most today — phone, accounts, worries; then fix your eyes on one true thing about God for five undistracted minutes.",
+      "boundary": "This is not a ban on noticing real problems. It is about what masters your attention — real threats still deserve wise, sober action."
+    },
+    "Matthew 6:24": {
+      "context": "One verse, closing the treasure section (6:19–24). After treasure placement and the eye's gaze comes the blunt summary: allegiance cannot be divided. Jesus states it as impossibility, not advice.",
+      "fit": "Survival mode tries to serve both — God plus the backup plan of money, control, or vigilance. Jesus says divided allegiance always resolves into a single master, whether you admit it or not.",
+      "main": "No one can serve two masters; you will hate one and love the other. You cannot serve God and money.",
+      "notMean": "Money itself is not declared evil here, nor are the poor automatically faithful. The issue is service — who commands your decisions.",
+      "tension": "Most of us do not feel like we \"hate\" God while managing money carefully. The verse exposes functional mastery rather than felt hatred — which is harder to see and harder to admit.",
+      "observe": [
+        "\"No one can\" — stated as impossibility, not difficulty.",
+        "The hate/love, devoted/despise pairings: divided service always curdles into single allegiance.",
+        "\"Mammon\" — wealth personified as a rival master, not a neutral resource.",
+        "One verse does the work of the whole section: treasure, eye, and master form a single argument."
+      ],
+      "movement": [
+        "Serving two masters is impossible.",
+        "You will hate the one and love the other.",
+        "You will be devoted to the one and despise the other.",
+        "Therefore: you cannot serve God and mammon."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 16:13",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke places the same saying after the shrewd manager — faithfulness with little reveals the master."
+        },
+        {
+          "passage": "1 Timothy 6:10",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "The love of money — not money — is the root of evils; some have \"pierced themselves\" chasing it."
+        },
+        {
+          "passage": "Joshua 24:15",
+          "category": "Narrative",
+          "relation": "prayerful response",
+          "reason": "\"Choose this day whom you will serve\" — the Old Testament's own single-master call to a household."
+        },
+        {
+          "passage": "Matthew 4:10",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "Jesus' own temptation answer: \"You shall worship the Lord your God and him only shall you serve.\""
+        }
+      ],
+      "prayer": "Father, show me where money has been making my decisions while I told myself I was being responsible. I choose You as master — teach my budget, my fears, and my plans to agree.",
+      "practice": "Review one recent money decision and ask honestly: who was master in that moment? Tell God the true answer.",
+      "boundary": "This verse diagnoses allegiance; it does not prescribe poverty or forbid saving. Apply it with counsel — especially in marriage, where money is shared."
+    },
+    "Matthew 7:13–14": {
+      "context": "The sermon's conclusion begins here: the narrow gate, then false prophets, then the two builders. The gate saying frames all the final warnings — everything after it is about choosing rightly.",
+      "fit": "Survival mode takes the wide, easy road: whatever reduces immediate pressure. The narrow way is the harder, life-giving road of trust and obedience — chosen daily, not once.",
+      "main": "Enter by the narrow gate; the wide road is easy and crowded and leads to destruction, while the narrow road is hard and few find it — but it leads to life.",
+      "notMean": "Difficulty alone does not prove you are on the right road; hardship is not automatically holiness. The point is the gate — Christ — not the width of your suffering.",
+      "tension": "\"Few find it\" is sobering, and Jesus does not soften the numbers to make anyone comfortable. The narrowness is real, and so is the life at the end of it.",
+      "observe": [
+        "\"Enter\" — a command, not a suggestion; the gate requires movement.",
+        "Wide gate, broad way, \"many\" — ease and crowds travel together.",
+        "Narrow gate, hard way, \"few\" — difficulty and scarcity travel together.",
+        "Both roads have destinations: destruction or life. The road chooses the end."
+      ],
+      "movement": [
+        "Enter by the narrow gate.",
+        "The wide gate and broad way are easy — and many take them to destruction.",
+        "The narrow gate and hard way lead to life — and few find them."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 13:23–24",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "\"Strive to enter through the narrow door\" — Luke's version adds the effort the gate requires."
+        },
+        {
+          "passage": "John 14:6",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "\"I am the way\" — the narrow gate has a name, and it is a Person."
+        },
+        {
+          "passage": "Proverbs 14:12",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "\"There is a way that seems right to a man, but its end is death\" — the wide road's ancient description."
+        },
+        {
+          "passage": "Philippians 3:13–14",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Forgetting what lies behind, straining forward — Paul walks the hard road on purpose."
+        }
+      ],
+      "prayer": "Lord, I keep choosing the wide, easy road when I am afraid — the road of control, avoidance, and self-protection. Put my feet on the narrow way and keep them there, even when it costs me.",
+      "practice": "Identify one \"wide road\" choice you are making from fear; take one concrete step on the narrower, harder, faithful road today.",
+      "boundary": "The narrow way is walked with companions. Do not isolate — walk it with your husband, your community, and wise counsel."
+    },
+    "Matthew 7:15–20": {
+      "context": "After the narrow gate and before the two builders: false prophets. In a sermon about inner righteousness, Jesus gives the fruit test — the way to tell true guides from dangerous ones.",
+      "fit": "Survival mode judges by appearances, promises, and charisma. Jesus says look at fruit — what a life actually produces over time — whether in teachers, influences, or yourself.",
+      "main": "Beware false prophets in sheep's clothing; you will recognize them by their fruit, not their words or appearance.",
+      "notMean": "This is not a license to fruit-inspect everyone constantly — 7:1–5 still stands. It is discernment about teachers and influences, applied with humility.",
+      "tension": "Fruit takes time, and in the short term wolves look exactly like sheep. Patience and community help you see clearly what urgency and isolation cannot.",
+      "observe": [
+        "\"Beware\" — vigilance is commanded, not paranoia.",
+        "\"Sheep's clothing\" over \"ravenous wolves\" — the danger is disguise, not obvious threat.",
+        "Grapes from thornbushes? Figs from thistles? — the absurdity test exposes the claim.",
+        "\"By their fruit you will recognize them\" — repeated twice, the verdict of the passage."
+      ],
+      "movement": [
+        "Warning: false prophets come disguised as sheep.",
+        "Inside the clothing: ravenous wolves.",
+        "The test: grapes don't come from thorns; good trees bear good fruit.",
+        "The outcome: bad trees are cut down — you will know them by fruit."
+      ],
+      "companions": [
+        {
+          "passage": "Galatians 5:22–23",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Paul lists the fruit itself — love, joy, peace — so you know what to look for."
+        },
+        {
+          "passage": "1 John 4:1",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "\"Test the spirits\" — John turns today's warning into a standing practice for the church."
+        },
+        {
+          "passage": "Jeremiah 23:16",
+          "category": "Prophets",
+          "relation": "canonical tension",
+          "reason": "False prophets speak \"visions of their own minds\" — the ancient version of today's wolves."
+        },
+        {
+          "passage": "Acts 20:29–30",
+          "category": "Narrative",
+          "relation": "thematic reinforcement",
+          "reason": "Paul warns the Ephesian elders that wolves will come \"from among your own selves\" — disguise included."
+        }
+      ],
+      "prayer": "Father, give me eyes for fruit, not just leaves. Protect me from impressive voices with empty lives — and make my own life bear the fruit You are looking for.",
+      "practice": "Evaluate one voice you follow — a teacher, influencer, or friend — by its long-term fruit rather than its charisma, today.",
+      "boundary": "Apply the fruit test first to teachings and to your own life — not as a weapon against people you dislike."
+    },
+    "Matthew 7:28–29": {
+      "context": "The sermon's epilogue — two verses. Jesus finishes speaking, and the crowds are astonished: \"he was teaching them as one who had authority, and not as their scribes.\"",
+      "fit": "The journey ends where it must: not with your resolve, but under His authority. Survival mode ends when Someone stronger holds you — partnership begins under a better Master.",
+      "main": "Jesus teaches with inherent authority, unlike the scribes' borrowed authority — and the crowds recognize the difference immediately.",
+      "notMean": "Amazement is not the same as faith; many who marveled still walked away. Authority demands response, not just admiration.",
+      "tension": "Living under authority means surrendered control — the very thing survival mode resists most. The journey's end is also its hardest step.",
+      "observe": [
+        "\"When Jesus finished these sayings\" — the sermon has a deliberate ending; the teaching is complete.",
+        "\"The crowds were astonished\" — the response is wonder before it is obedience.",
+        "\"As one who had authority\" — His authority is His own, not cited from others.",
+        "\"And not as their scribes\" — the contrast is with borrowed, secondhand teaching."
+      ],
+      "movement": [
+        "Jesus finishes the sermon.",
+        "The crowds are astonished at His teaching.",
+        "The reason: He teaches with His own authority.",
+        "Unlike the scribes, who can only quote authority."
+      ],
+      "companions": [
+        {
+          "passage": "Matthew 28:18",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "\"All authority in heaven and on earth has been given to me\" — the sermon's authority becomes the mission's foundation."
+        },
+        {
+          "passage": "Mark 1:22",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Mark records the same astonishment at Capernaum — authority recognized from the very start."
+        },
+        {
+          "passage": "John 7:46",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "\"No one ever spoke like this man!\" — even the arresting officers confess it."
+        },
+        {
+          "passage": "Hebrews 1:1–2",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "God has spoken \"by his Son\" — final, authoritative, unsurpassed."
+        }
+      ],
+      "prayer": "Jesus, I have lived as my own authority — managing, controlling, surviving. I lay that down. Teach me as one who has authority, and make me someone who actually obeys.",
+      "practice": "End this journey by naming one area you have kept from His authority; speak your surrender of it out loud today — and tell Alec.",
+      "boundary": "His authority never authorizes control over others. Christ's authority serves and liberates — imitate that with your husband."
+    }
+  },
+  "anxiety": {
+    "Matthew 6:25–27": {
+      "context": "The word 'therefore' ties this to the treasure section just before it (6:19–24). Jesus is on the mountainside teaching His disciples, with the crowds listening in. He has just said no one can serve God and wealth; now He addresses the anxiety that drives both hoarding and striving.",
+      "fit": "Worry is treated here not as a feeling to manage but as a rival master. The passage names anxiety's core lie — that the future is yours to secure — and answers it with the Father's character.",
+      "main": "Worry cannot add a single hour to your life; the Father who feeds the birds can be trusted with your needs.",
+      "notMean": "Jesus is not forbidding work, planning, or wise provision. He is confronting the anxious striving that treats God as absent.",
+      "tension": "Jesus' first hearers faced real hunger and real taxes, and the promise of the Father's care comes with no timetable. Faithful people still go without, and this passage does not explain why.",
+      "observe": [
+        "The command 'do not worry' comes with reasons, not threats — first the birds, then the logic of your worth.",
+        "'Is not life more than food, and the body more than clothing?' Jesus questions what a life actually consists of.",
+        "Verse 27's question exposes worry's productivity: zero. Anxiety is labor that produces nothing."
+      ],
+      "movement": [
+        "Jesus names the objects of worry: food, drink, clothing.",
+        "He points to the birds — they neither sow nor reap, yet your heavenly Father feeds them.",
+        "He lands the argument: you are worth more than birds, and worry adds nothing to your life."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 12:22–31",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's version adds 'do not be afraid, little flock' — the same teaching with the tenderness made explicit."
+        },
+        {
+          "passage": "Psalm 55:22",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "Cast your burden on the Lord and He will sustain you — the Old Testament's own answer to carrying tomorrow today."
+        },
+        {
+          "passage": "Philippians 4:6–7",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Paul replaces anxiety with prayer and promises God's peace as a guard, not just a feeling."
+        },
+        {
+          "passage": "1 Peter 5:7",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Cast all your anxiety on Him because He cares for you — the motive is His care, not your coping."
+        }
+      ],
+      "prayer": "Father, You see the list I rehearse at night — the bills, the what-ifs, the outcomes I cannot control. Teach me to notice Your care the way Jesus described it: specific, daily, enough. Loosen my grip on tomorrow and give me today's bread with thanks.",
+      "practice": "Write down the three worries circling loudest today, then write one true sentence about the Father next to each one.",
+      "boundary": "If worry is constant, physical, or keeps you from sleep and daily life, bring it to a counselor, pastor, or doctor — prayer and professional help are not rivals."
+    },
+    "Matthew 6:28–30": {
+      "context": "Same mountainside, same 'therefore' argument, one breath later. Jesus moves from birds (food) to wildflowers (clothing) — the two daily anxieties of His hearers, many of whom owned a single cloak. Solomon is invoked as the peak of human splendor.",
+      "fit": "Anxiety shrinks God; Jesus enlarges Him by pointing at the most temporary beauty in creation and saying He dresses even that.",
+      "main": "If God lavishes care on grass that lasts a day, His care for you is not in doubt.",
+      "notMean": "This is not a promise that believers will always look prosperous. The flowers are not rewarded for faith; they are simply cared for.",
+      "tension": "The grass is thrown into the oven — Jesus names its fate honestly. God's care does not exempt His people from endings and loss.",
+      "observe": [
+        "'Consider the lilies' — the verb means study, learn from. Jesus commands attention to creation as a spiritual discipline.",
+        "'Solomon in all his glory was not arrayed like one of these' — the kingdom's peak splendor loses to a weed.",
+        "'O you of little faith' is a gentle rebuke, not condemnation. Little faith is still faith, and Jesus keeps talking to it."
+      ],
+      "movement": [
+        "Jesus asks why you worry about clothing.",
+        "He points to the lilies: they neither toil nor spin, yet outshine Solomon.",
+        "He argues from lesser to greater: temporary grass is clothed — how much more you."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 12:27–28",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke preserves the same lilies teaching, confirming this was central to how Jesus taught trust."
+        },
+        {
+          "passage": "Isaiah 40:6–8",
+          "category": "Prophets",
+          "relation": "canonical tension",
+          "reason": "Grass withers and flowers fade, but the word of our God stands forever — the permanence Jesus' hearers were really hungry for."
+        },
+        {
+          "passage": "Psalm 103:15–18",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "Human days are like grass, yet the Lord's steadfast love is from everlasting to everlasting on those who fear Him."
+        },
+        {
+          "passage": "1 Peter 1:24–25",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Peter quotes Isaiah 40 on fading grass to anchor hope in the living and abiding word of God."
+        }
+      ],
+      "prayer": "Lord, my eyes are trained on what I lack — the wardrobe, the number, the plan. Retrain them. Let me see Your hand in small, temporary beauties today and remember: if You dress the grass, You have not forgotten me.",
+      "practice": "Step outside once today and find one growing thing; name one way God has clothed or provided for you this week.",
+      "boundary": "Contentment with God's care does not mean ignoring real lack — if basic needs are unmet, ask for help; the church and community are part of His provision."
+    },
+    "Matthew 6:31–34": {
+      "context": "The conclusion of the whole worry section (6:25–34). Jesus has argued from birds and flowers; now He gives the command its positive shape and closes with the line the journey is named for: 'Sufficient for the day is its own trouble.'",
+      "fit": "This is the journey's hinge passage — anxiety lives in tomorrow, and Jesus confines obedience to today.",
+      "main": "Seek God's kingdom first today, and let tomorrow's trouble wait until tomorrow.",
+      "notMean": "'Do not worry about tomorrow' is not permission to ignore the future. Proverbs praises the ant; Jesus forbids anxious preoccupation, not planning.",
+      "tension": "'Each day has enough trouble of its own' — Jesus does not promise trouble-free days, only grace measured daily. Some tomorrows bring the very thing you feared.",
+      "observe": [
+        "'The Gentiles seek after all these things' — worry is described as a pagan way of life, not a personality trait.",
+        "'Your heavenly Father knows that you need all these things' — the argument rests on His knowledge, not your performance.",
+        "Verse 34's 'evil' means trouble or hardship, not moral evil. Jesus is realistic, not naive, about what days contain."
+      ],
+      "movement": [
+        "Jesus forbids anxious speech: 'What shall we eat? What shall we drink? What shall we wear?'",
+        "He redirects desire: seek first the kingdom of God and His righteousness.",
+        "He sets the boundary of concern: today, not tomorrow — each day carries its own load."
+      ],
+      "companions": [
+        {
+          "passage": "Exodus 16:13–21",
+          "category": "Narrative",
+          "relation": "thematic reinforcement",
+          "reason": "Manna came as a daily portion and rotted when hoarded — the Old Testament's lived parable of sufficient-for-the-day grace."
+        },
+        {
+          "passage": "Proverbs 27:1",
+          "category": "Wisdom",
+          "relation": "canonical tension",
+          "reason": "Do not boast about tomorrow, for you do not know what a day may bring — planning is wise, presumption is not."
+        },
+        {
+          "passage": "Lamentations 3:22–23",
+          "category": "Prophets",
+          "relation": "prayerful response",
+          "reason": "Great is Your faithfulness; Your mercies are new every morning — the daily rhythm Jesus is pointing toward."
+        },
+        {
+          "passage": "James 4:13–15",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "If the Lord wills, we will live and do this or that — the New Testament's own guardrail on tomorrow-talk."
+        }
+      ],
+      "prayer": "Father, tomorrow is already loud in my head and it isn't even here. Teach me the manna lesson again: today's portion, today's obedience. When my mind runs ahead, bring it back to the kingdom work in front of me right now.",
+      "practice": "When a tomorrow-worry surfaces today, say out loud, 'That belongs to tomorrow,' and name one kingdom task for today.",
+      "boundary": "Planning for real future responsibilities — bills, health, family — is wisdom. If planning always curdles into dread, talk it through with someone wise."
+    },
+    "Matthew 7:7–11": {
+      "context": "New chapter, same Sermon. Jesus has finished the section on judgment (7:1–6) and turns to prayer with three escalating verbs. The audience is still the disciples on the mountain — people learning to live under the Father's care.",
+      "fit": "Anxiety whispers that asking is useless. Jesus portrays the Father as eager to give, rebuilding the confidence worry erodes.",
+      "main": "Keep asking, seeking, knocking — the Father gives good things to those who ask Him.",
+      "notMean": "This is not a blank check. 'Good things' are defined by the Father's wisdom, and some doors stay closed because He is good, not because He is absent.",
+      "tension": "Everyone who asks does not receive what they asked for. Unanswered prayer is real, and Jesus does not explain the gap here — only the Father's character behind it.",
+      "observe": [
+        "Ask, seek, knock are present tense — continuous action. Keep on asking, keep on seeking, keep on knocking.",
+        "The human argument: even flawed fathers don't give stones for bread. How much more the Father.",
+        "Bread, fish, egg — ordinary daily needs, not luxuries. Jesus dignifies small requests."
+      ],
+      "movement": [
+        "Jesus commands persistent prayer in three verbs.",
+        "He promises the outcome: everyone who asks receives, who seeks finds, who knocks has it opened.",
+        "He reasons from earthly fathers to the heavenly Father's far greater goodness."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 11:9–13",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's version ends with the Father giving the Holy Spirit — the best good thing of all."
+        },
+        {
+          "passage": "Psalm 34:4–10",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "Those who seek the Lord lack no good thing — David's testimony to the same Father Jesus describes."
+        },
+        {
+          "passage": "1 John 5:14–15",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Asking according to His will is the frame — confidence in prayer has a shape, not just a volume."
+        },
+        {
+          "passage": "Jeremiah 29:12–13",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "You will seek Me and find Me when you search for Me with all your heart — seeking as whole-hearted pursuit."
+        }
+      ],
+      "prayer": "Father, I have stopped asking for some things because I decided the answer was no. Forgive my quiet resignation. Teach me to ask again — plainly, persistently — and to trust Your goodness even when the answer is wait or no.",
+      "practice": "Pray one specific, honest request today that you had given up on — out loud, by name.",
+      "boundary": "Persistent prayer is not a technique to force God's hand. If you find yourself bargaining or despairing over an unanswered prayer, bring it to a trusted believer."
+    },
+    "Matthew 6:9–13": {
+      "context": "The Sermon's center on prayer. Jesus has warned against showy prayer (the hypocrites, 6:5) and babbling prayer (the Gentiles, 6:7); now He gives His disciples the pattern — 'pray like this.' His hearers prayed set hours daily and knew liturgy well.",
+      "fit": "'Give us today our daily bread' makes dependence a daily discipline — the journey's whole theme in a single line.",
+      "main": "Pray for today's needs today, forgive as you have been forgiven, and trust the Father with temptation and evil.",
+      "notMean": "The prayer is a pattern, not an incantation. Jesus forbids the very 'vain repetitions' some later made of these words.",
+      "tension": "'Deliver us from evil' sits beside real evil that is not always averted. This prayer has been prayed in prisons and hospitals by people who still suffered.",
+      "observe": [
+        "'Our Father' is plural and communal — even private prayer is family prayer.",
+        "Daily bread comes after God's name, kingdom, and will. Needs are real, but they are not first.",
+        "'As we also have forgiven' ties receiving forgiveness to giving it, with no loophole attached."
+      ],
+      "movement": [
+        "Worship first: Father, Your name, Your kingdom, Your will.",
+        "Then dependence: bread for today, forgiveness, guidance away from temptation.",
+        "The prayer begins and ends with God — His glory framing our need."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 11:2–4",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's shorter form confirms the prayer's core — Father, kingdom, bread, forgiveness, guidance — without the later additions."
+        },
+        {
+          "passage": "Exodus 16:4",
+          "category": "Law",
+          "relation": "thematic reinforcement",
+          "reason": "'Daily bread' was born in the manna story — bread from heaven, portioned by the day, teaching dependence."
+        },
+        {
+          "passage": "Proverbs 30:7–9",
+          "category": "Wisdom",
+          "relation": "prayerful response",
+          "reason": "Give me neither poverty nor riches, but only my daily bread — Agur's prayer for exactly what Jesus teaches."
+        },
+        {
+          "passage": "1 Thessalonians 5:17–18",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Pray without ceasing, give thanks in everything — the Lord's Prayer as a whole way of life."
+        }
+      ],
+      "prayer": "Our Father, hallowed be Your name — before my list, Your glory. Give us today our daily bread: not tomorrow's stockpile, today's portion. Forgive my debts as I forgive; I name the ones I still hold. Lead me away from temptation and deliver me from evil today.",
+      "practice": "Pray the Lord's Prayer slowly today, pausing after each line to make it personal before moving on.",
+      "boundary": "If guilt over unforgiveness feels crushing rather than convicting, talk with a pastor or counselor — conviction leads to Christ, not to despair."
+    },
+    "Matthew 5:1–12": {
+      "context": "The Sermon's opening. Jesus sees the crowds, goes up the mountain, sits down — the posture of a rabbi — and teaches His disciples. Everything that follows, including the anxiety teaching, stands on this foundation.",
+      "fit": "The Beatitudes bless the very conditions anxiety calls cursed — need, mourning, hunger — reframing them as places where God is near.",
+      "main": "God's favor rests on the humble, the grieving, and the hungry — not on the self-sufficient.",
+      "notMean": "These are not eight steps to earn blessing. They describe the people Jesus welcomes, not a ladder to climb.",
+      "tension": "'Blessed are those who mourn' — the comfort is promised, not always felt. Many mourners read this through tears with no relief in sight.",
+      "observe": [
+        "Every blessing pairs a present condition with a future promise — 'theirs is,' 'they shall be.'",
+        "'Poor in spirit' comes first. The doorway is need, not strength.",
+        "The list ends with persecution — twice — as if Jesus knew blessing would be mistaken for comfort."
+      ],
+      "movement": [
+        "Jesus pronounces blessing on inward postures: poor in spirit, mourning, meek, hungering for righteousness.",
+        "He blesses outward mercies: the merciful, the pure in heart, the peacemakers.",
+        "He blesses the persecuted — and tells them to rejoice and be glad."
+      ],
+      "companions": [
+        {
+          "passage": "Isaiah 61:1–3",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "Good news to the poor, comfort for all who mourn — the prophecy Jesus was embodying on the mountain."
+        },
+        {
+          "passage": "Psalm 34:18",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "The Lord is near to the brokenhearted — David's experience of the nearness Jesus pronounces."
+        },
+        {
+          "passage": "Luke 6:20–23",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's plain version — blessed are the poor, the hungry, the weeping — with the woes that sharpen the point."
+        },
+        {
+          "passage": "James 1:2–4",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Consider it joy in trials — the New Testament's hardest echo of blessing inside hardship."
+        }
+      ],
+      "prayer": "Lord, I have treated my need as evidence of Your absence. You call it the very place of blessing. Meet me in the mourning, the hunger, the poverty of spirit — not after I fix them, but in them, today.",
+      "practice": "Read the Beatitudes aloud and put your name in one: 'Blessed are the [your condition], for...' — then sit with it.",
+      "boundary": "Blessing in need does not romanticize suffering. If you are in crisis, deep grief, or danger, reach for real help — not just a verse."
+    },
+    "Matthew 6:19–21": {
+      "context": "After the Lord's Prayer and the note on forgiveness (6:9–15), Jesus turns to possessions. His hearers lived under Roman taxation with no safety nets; storing up was survival — which is exactly why the teaching cuts so deep.",
+      "fit": "Anxiety and hoarding share a root: the belief that security is something you build. Jesus relocates security to heaven.",
+      "main": "Store your treasure where it cannot rot or be stolen, because your heart follows your treasure.",
+      "notMean": "Jesus is not forbidding savings, provision for family, or wise stewardship. He forbids treasure as master and identity.",
+      "tension": "'Treasures in heaven' are invisible, uncounted, and unspendable here. The command asks for trust without a balance statement.",
+      "observe": [
+        "Moth and rust — the two destroyers of the ancient world: garments (wealth stored as clothing) and metal.",
+        "'Where your treasure is, there your heart will be also' — the heart follows the money, not the reverse.",
+        "The verbs are present imperative: stop storing, start storing. A redirection, not just a prohibition."
+      ],
+      "movement": [
+        "Jesus forbids earthly stockpiling and names its fragility: moth, rust, thieves.",
+        "He commands heavenly investment, where nothing destroys or steals.",
+        "He gives the diagnostic: treasure locates the heart."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 12:33–34",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Sell your possessions and give to the poor — Luke's version makes the heavenly investment concrete."
+        },
+        {
+          "passage": "Proverbs 23:4–5",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "Riches sprout wings and fly away like an eagle — the Old Testament's own moth-and-rust warning."
+        },
+        {
+          "passage": "1 Timothy 6:17–19",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Be rich in good works and store up treasure for the future — Paul's instruction for handling wealth without serving it."
+        },
+        {
+          "passage": "Colossians 3:1–2",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Set your minds on things above — the same relocation of treasure, stated as a habit of attention."
+        }
+      ],
+      "prayer": "Father, show me where my treasure actually is — the account I check, the purchase I rehearse, the security I polish. Move my heart by moving my treasure: show me one eternal investment to make with what I hold.",
+      "practice": "Give something away today — money, time, or a possession — as a deliberate transfer to heaven's account.",
+      "boundary": "Generosity should be planned and honest, never coerced or guilt-driven. If giving is being used to control you, seek counsel."
+    },
+    "Matthew 6:22–23": {
+      "context": "A short, strange saying tucked between treasure (6:19–21) and masters (6:24). In the ancient world the eye was thought to emit light; Jesus uses the image to talk about the inner life's orientation — and Matthew places it deliberately inside the money section.",
+      "fit": "Anxiety is, in part, an eye problem. What you fix your gaze on fills your whole inner world with light or darkness.",
+      "main": "A healthy, generous eye fills your life with light; a diseased eye fills it with darkness.",
+      "notMean": "Jesus is not teaching optics or positive thinking. The 'eye' is the heart's attention, and the issue is allegiance, not attitude.",
+      "tension": "'If the light in you is darkness, how great is the darkness' — Jesus offers no technique here for fixing the eye, only the stark diagnosis.",
+      "observe": [
+        "The word for 'healthy' can also mean single or generous — the opposite of the 'evil eye,' which in Jewish idiom meant stinginess.",
+        "The whole body follows the eye. Vision determines the inner climate.",
+        "The verse sits between two money texts — the eye in view is likely the eye toward wealth."
+      ],
+      "movement": [
+        "Jesus states the principle: the eye is the lamp of the body.",
+        "He gives the two outcomes: a healthy eye means a light-filled body; an evil eye, a dark one.",
+        "He warns that mislabeled darkness — light you think you have — is the worst kind."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 11:34–36",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Luke's version adds the call to watch that the light in you is not darkness — vigilance over the inner eye."
+        },
+        {
+          "passage": "Proverbs 22:9",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "The generous eye will be blessed, for he shares his bread with the poor — generosity as clear vision."
+        },
+        {
+          "passage": "Proverbs 28:22",
+          "category": "Wisdom",
+          "relation": "canonical tension",
+          "reason": "The stingy eye hastens after wealth and does not know poverty will come — the dark eye's trajectory."
+        },
+        {
+          "passage": "Psalm 119:37",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "Turn my eyes from looking at worthless things — the psalmist's prayer for exactly this surgery."
+        }
+      ],
+      "prayer": "Lord, my eyes have been feeding on worry — scrolling, comparing, rehearsing lack. Give me a single, healthy eye: fixed on You, generous toward others, honest about what is actually true today.",
+      "practice": "Notice what your eyes consumed most today — phone, news, comparisons — and replace fifteen minutes of it with one fixed gaze: Scripture, prayer, or a walk.",
+      "boundary": "If your inner world feels persistently dark — a hopelessness that will not lift — tell someone and consider professional help. Darkness that deep needs more than willpower."
+    },
+    "Matthew 6:24": {
+      "context": "One verse, the hinge of the whole section. Jesus has talked treasure (19–21) and the eye (22–23); now He names the master. 'Mammon' is an Aramaic word for wealth treated as a god — His hearers knew exactly what He meant.",
+      "fit": "Divided loyalty is anxiety's engine. You cannot serve both God and wealth, and trying is what worry feels like.",
+      "main": "You will love one master and despise the other. Choose — neutrality is not an option.",
+      "notMean": "Jesus is not saying money is evil or that the poor are automatically faithful. The issue is servitude, not possession.",
+      "tension": "Most of us do not feel like we 'serve' money — we feel like we manage it. Jesus says the heart's allegiance is visible in whom you actually obey.",
+      "observe": [
+        "'No one can' — not 'should not.' It is impossible, not merely inadvisable.",
+        "Love and hate, devoted and despise — totalizing verbs. Partial loyalty is the illusion being dismantled.",
+        "Mammon is personified as a rival god, not a neutral tool. Wealth wants worship."
+      ],
+      "movement": [
+        "Jesus states the impossibility of dual service.",
+        "He describes the inevitable outcome: love one, hate the other; devotion to one, contempt for the other.",
+        "He names the rival plainly: God or Mammon."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 16:13",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Spoken after the parable of the shrewd manager — faithfulness with little as the proof of which master you serve."
+        },
+        {
+          "passage": "Joshua 24:15",
+          "category": "Narrative",
+          "relation": "thematic reinforcement",
+          "reason": "Choose this day whom you will serve — the Old Testament's own demand for undivided allegiance."
+        },
+        {
+          "passage": "1 Kings 18:21",
+          "category": "Narrative",
+          "relation": "canonical tension",
+          "reason": "How long will you waver between two opinions? Elijah's challenge to a divided people on Mount Carmel."
+        },
+        {
+          "passage": "James 1:6–8",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "The double-minded person is unstable in all their ways — James names the inner experience of verse 24."
+        }
+      ],
+      "prayer": "Father, I say You are my master, but my anxiety keeps auditing my true allegiances. Show me where Mammon still gets my first obedience — my time, my fear, my decisions — and teach me single-hearted service.",
+      "practice": "Look at last week's calendar and spending; ask of each major block: which master did this serve?",
+      "boundary": "Conviction about money should lead to repentance and planning, not panic. If financial fear is overwhelming, get wise counsel before making big moves."
+    },
+    "Matthew 5:44–48": {
+      "context": "The last of the six antitheses — 'you have heard it said... but I say to you.' Jesus quotes the popular distortion, 'love your neighbor and hate your enemy' (the second half appears nowhere in the Law), and overturns it. His disciples lived under occupation; enemies were not theoretical.",
+      "fit": "Fear of enemies breeds its own anxiety — the dread of what they will do. Jesus answers not with safety but with a share in the Father's indiscriminate generosity.",
+      "main": "Love your enemies and pray for your persecutors, becoming like your Father who gives sun and rain to all.",
+      "notMean": "Love here is not approval, trust, or reconciliation without repentance. It is willing the good of the other, beginning with prayer.",
+      "tension": "Praying for persecutors while they still persecute is the tension. Jesus gives no timeline for change and no exception for the truly dangerous.",
+      "observe": [
+        "The command escalates: love, bless, do good, pray. Love is active, not sentimental.",
+        "The motive is sonship — 'that you may be sons of your Father.' Likeness, not reward, drives the command.",
+        "'Be perfect' means complete or mature, like the Father's all-embracing mercy — not flawless."
+      ],
+      "movement": [
+        "Jesus replaces the distorted maxim with the command to love enemies and pray for persecutors.",
+        "He grounds it in the Father's example: sun rising on the evil and the good, rain on the just and unjust.",
+        "He sets the standard: completeness like your heavenly Father."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:27–28, 35–36",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Be merciful, even as your Father is merciful — Luke's version makes the Father's mercy the explicit pattern."
+        },
+        {
+          "passage": "Romans 12:14, 20–21",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Bless those who persecute you; overcome evil with good — Paul carrying Jesus' command into the church's life."
+        },
+        {
+          "passage": "Proverbs 25:21–22",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "If your enemy is hungry, give him bread to eat — the Old Testament root of enemy-love."
+        },
+        {
+          "passage": "Exodus 23:4–5",
+          "category": "Law",
+          "relation": "canonical tension",
+          "reason": "Return your enemy's straying ox — the Law already required practical good toward enemies."
+        }
+      ],
+      "prayer": "Father, I name the one I fear or resent — You know the name. I do not feel love, so I begin with obedience: I pray Your blessing on them. Make me like You — generous even toward those who would not be generous to me.",
+      "practice": "Pray one concrete blessing for someone you consider an enemy or threat — by name, out loud.",
+      "boundary": "Loving enemies never requires staying in harm's way. Maintain wise boundaries and protection; prayer is not a substitute for safety."
+    },
+    "Matthew 7:24–27": {
+      "context": "The Sermon's closing parable. Jesus has finished teaching — narrow gate, false prophets, true obedience — and now tells His hearers what to do with it all. The crowds are still listening; their astonishment follows in 7:28.",
+      "fit": "Storms come regardless. Anxiety asks, 'What if the storm comes?' Jesus answers, 'Build for it.'",
+      "main": "Hearing Jesus' words and doing them is the rock foundation that survives the storm.",
+      "notMean": "The rock is not a trouble-free life, a strong personality, or correct doctrine alone. It is obedient hearing.",
+      "tension": "Both houses look fine until the storm. Jesus offers no way to inspect your foundation except the coming rain — and the rain falls on both.",
+      "observe": [
+        "The difference is not hearing but doing. Both builders heard.",
+        "The storm is described identically for both houses: rain, floods, winds. Suffering is not the diagnostic.",
+        "'Great was its fall' — the collapse of a sand-built life is total, not partial."
+      ],
+      "movement": [
+        "Jesus describes the wise builder: hears these words and does them, builds on the rock.",
+        "The storm hits — rain, floods, winds — and the house stands.",
+        "He describes the foolish builder: hears and does not do — and the house falls with a great crash."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:46–49",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "'Why do you call me Lord, Lord, and do not do what I say?' — Luke preserves the rebuke that frames the parable."
+        },
+        {
+          "passage": "Psalm 62:1–2, 5–7",
+          "category": "Psalm",
+          "relation": "thematic reinforcement",
+          "reason": "He alone is my rock and my salvation — David's own foundation language for storm seasons."
+        },
+        {
+          "passage": "Proverbs 10:25",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "When the whirlwind passes, the wicked is no more, but the righteous has an everlasting foundation."
+        },
+        {
+          "passage": "James 1:22–25",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Be doers of the word, not hearers only — James turns the parable into direct exhortation."
+        }
+      ],
+      "prayer": "Lord, I have been a hearer who admires the blueprint but never builds. Show me one word of Yours I keep nodding at and not doing — and give me the grace to pick up the hammer today.",
+      "practice": "Choose one specific teaching of Jesus you have been postponing and take the first concrete step of obedience today.",
+      "boundary": "Building on the rock includes wise preparation — insurance, health, counsel. Obedience is not a substitute for prudence."
+    },
+    "Matthew 5:13–16": {
+      "context": "Immediately after the Beatitudes and the blessing on the persecuted (5:10–12). Jesus turns from who you are to what you are for — salt and light — spoken to the same mountain crowd that had just heard blessing pronounced on mourners.",
+      "fit": "Anxiety turns you inward. Jesus turns you outward — you are light not for your own comfort but for a dark world.",
+      "main": "You are salt and light. Let your good works shine so people glorify your Father.",
+      "notMean": "This is not a call to perform righteousness for applause — 6:1 will forbid exactly that. The light points to the Father, not to you.",
+      "tension": "Salt stings and light exposes. Being 'for the world' includes friction — and Jesus has just finished blessing the persecuted.",
+      "observe": [
+        "'You are' — indicative, not imperative. Identity comes before assignment.",
+        "Salt that loses its saltiness is 'good for nothing.' The warning is uselessness, not punishment.",
+        "A city on a hill cannot be hidden. Visibility is assumed, not optional."
+      ],
+      "movement": [
+        "Jesus names their identity: you are the salt of the earth.",
+        "He names their function: you are the light of the world — a city, a lamp.",
+        "He gives the purpose: good works that lead others to glorify your Father in heaven."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 8:16",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "No one lights a lamp and covers it — the same teaching applied to hearing and holding the word."
+        },
+        {
+          "passage": "Isaiah 60:1–3",
+          "category": "Prophets",
+          "relation": "thematic reinforcement",
+          "reason": "Arise, shine, for your light has come — the prophetic vision of light drawing the nations."
+        },
+        {
+          "passage": "Proverbs 4:18",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "The path of the righteous is like the light of dawn, shining brighter till full day."
+        },
+        {
+          "passage": "Philippians 2:14–15",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Shine as lights in the world — Paul's direct echo of the Sermon to a grumbling generation."
+        }
+      ],
+      "prayer": "Father, my anxiety has made my world very small — me, my fears, my needs. Remind me I am salt and light: preserved and placed for others. Show me one person today who needs the light You put in me.",
+      "practice": "Do one visible good work today — specific, for a specific person — with no announcement.",
+      "boundary": "Being light does not mean being endlessly available. Rest and limits are part of stewardship, not selfishness."
+    },
+    "Matthew 6:5–8": {
+      "context": "The Sermon's teaching on prayer begins. Jesus contrasts three prayers: the hypocrites' (for show), the Gentiles' (for volume), and the disciple's. His hearers prayed the set hours daily; they knew exactly who He meant.",
+      "fit": "Anxiety prays like the Gentiles — many words, as if God must be informed or persuaded. Jesus says the Father already knows.",
+      "main": "Pray simply and secretly. Your Father knows what you need before you ask.",
+      "notMean": "'He knows' does not make prayer pointless — Jesus commands it anyway. Prayer is relationship, not information transfer.",
+      "tension": "If He already knows, why do the needy still wait? Jesus does not resolve the mystery; He reframes prayer as trust, not notification.",
+      "observe": [
+        "'When you pray' — assumed, not 'if.' Prayer is the given.",
+        "The hypocrites' reward is the applause itself: 'they have received their reward in full.'",
+        "'Do not heap up empty phrases' — the word suggests stammering babble. God is not hard of hearing."
+      ],
+      "movement": [
+        "Jesus forbids performative prayer: not like the hypocrites in synagogues and streets.",
+        "He forbids babbling prayer: not like the Gentiles with their many words.",
+        "He gives the reason for simplicity: your Father knows what you need before you ask Him."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 18:9–14",
+          "category": "Gospel",
+          "relation": "canonical tension",
+          "reason": "The tax collector's short prayer — 'God, be merciful to me, a sinner' — went home justified over the Pharisee's long one."
+        },
+        {
+          "passage": "Psalm 139:1–4",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "You know my words before they are on my tongue — David's wonder at the God who needs no briefing."
+        },
+        {
+          "passage": "Ecclesiastes 5:2",
+          "category": "Wisdom",
+          "relation": "thematic reinforcement",
+          "reason": "Let your words be few, for God is in heaven and you are on earth — reverent brevity as wisdom."
+        },
+        {
+          "passage": "1 Kings 18:26–29",
+          "category": "Narrative",
+          "relation": "canonical tension",
+          "reason": "Baal's prophets babbled all day with no answer — the Old Testament's vivid picture of what Jesus forbids."
+        }
+      ],
+      "prayer": "Father, I come with my long explanations, as if You hadn't been watching. You know what I need before I open my mouth. Teach me short, honest prayer — the kind that trusts instead of performs.",
+      "practice": "Pray for two minutes today with no rehearsed phrases — just tell Him plainly what you need.",
+      "boundary": "Simple prayer is not careless prayer. Bring real needs, including the help of counselors, doctors, and friends, as part of His answer."
+    },
+    "Matthew 6:16–18": {
+      "context": "The third 'secret' discipline — after alms (6:1–4) and prayer (6:5–15) comes fasting. Jesus assumes it ('when you fast') and corrects its performance for the same mountain audience.",
+      "fit": "Anxiety craves visible reassurance. Jesus forms faith in secret, where only the Father sees.",
+      "main": "Fast without performing. Your Father who sees in secret will reward you.",
+      "notMean": "Jesus is not forbidding all visible devotion — He forbids devotion performed for visibility.",
+      "tension": "The reward is promised but undefined and unscheduled. Secret faithfulness often feels entirely unrewarded.",
+      "observe": [
+        "'Do not look gloomy' — the hypocrites disfigure their faces as advertisement for their piety.",
+        "'Anoint your head and wash your face' — look normal. Holiness is not a costume.",
+        "Three times the refrain returns: your Father who sees in secret. The audience of one."
+      ],
+      "movement": [
+        "Jesus forbids gloomy, advertised fasting.",
+        "He commands ordinary appearance: anoint, wash, carry on.",
+        "He promises the Father's reward — given in secret, seen by Him alone."
+      ],
+      "companions": [
+        {
+          "passage": "Isaiah 58:3–9",
+          "category": "Prophets",
+          "relation": "canonical tension",
+          "reason": "The fast God chooses: loose the bonds of wickedness, share bread with the hungry — fasting that moves outward."
+        },
+        {
+          "passage": "Joel 2:12–13",
+          "category": "Prophets",
+          "relation": "prayerful response",
+          "reason": "Rend your hearts and not your garments — the inward fasting God actually wants."
+        },
+        {
+          "passage": "Matthew 9:14–15",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "Fasting belongs with the bridegroom's absence — Jesus ties the discipline to longing for Him."
+        },
+        {
+          "passage": "Psalm 69:10",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "I wept and humbled my soul with fasting — David's own hidden discipline before God."
+        }
+      ],
+      "prayer": "Father who sees in secret, I am tired of curating my spiritual life for an audience. Teach me the hidden disciplines — the fast no one applauds, the prayer no one hears — and let Your seeing be enough.",
+      "practice": "Do one act of devotion today that no one will ever know about — and tell no one.",
+      "boundary": "Fasting from food is not required of everyone and is unwise for some — medical conditions, eating disorders, pregnancy. Fast from something else, or seek guidance first."
+    },
+    "Matthew 7:1–5": {
+      "context": "Chapter 7 opens the Sermon's final movement. After the long section on worry, Jesus turns to the community's inner life: judgment. The same disciples who worried about tomorrow also measured each other.",
+      "fit": "Anxiety often wears a judge's robe — scanning others for faults is a way to feel in control. Jesus removes the robe.",
+      "main": "Do not judge with a condemning measure. First remove your own beam; then you can help your brother.",
+      "notMean": "Jesus is not forbidding all discernment — 7:6 and 7:15 require it. He forbids the censorious, self-blind judgment.",
+      "tension": "The beam is, by definition, the fault you cannot see. Jesus commands self-examination of the very thing you are blind to.",
+      "observe": [
+        "'With the judgment you pronounce you will be judged' — the measure boomerangs.",
+        "Speck versus beam — comic disproportion. Jesus uses humor as a scalpel.",
+        "'First take the log out of your own eye' — self-examination precedes helping your brother; it does not replace it."
+      ],
+      "movement": [
+        "Jesus forbids judging and states the reciprocity principle: the measure you use will be measured to you.",
+        "He exposes the absurdity: speck-spotting with a beam in your own eye.",
+        "He orders the work: first your beam, then you will see clearly to help your brother."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:37–42",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Judge not and you will not be judged — Luke's version ends with the same beam-and-speck surgery."
+        },
+        {
+          "passage": "Romans 2:1",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "In judging another you condemn yourself — Paul's mirror held up to the moralist."
+        },
+        {
+          "passage": "James 4:11–12",
+          "category": "Epistle",
+          "relation": "canonical tension",
+          "reason": "Who are you to judge your neighbor? There is one lawgiver and judge — and it is not you."
+        },
+        {
+          "passage": "Galatians 6:1",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Restore the one caught in sin gently, keeping watch on yourself — correction without the beam."
+        }
+      ],
+      "prayer": "Lord, I have been quick to diagnose everyone else's speck — Alec's, friends', strangers'. Show me my beam. I cannot see it clearly on my own, so I am asking You and one trusted person to help me see.",
+      "practice": "When you catch yourself judging someone today, stop and name one beam of your own first.",
+      "boundary": "Removing the beam does not mean tolerating abuse. Judgment-free is not boundary-free — if someone is harming you, get help."
+    },
+    "Matthew 7:12": {
+      "context": "A single verse Matthew presents as the summary of 'the Law and the Prophets.' Everything from 5:17 to 7:11 funnels into this sentence, spoken as the Sermon turns toward its close.",
+      "fit": "Anxiety is self-absorbed. The golden rule is the smallest possible exit — one loving act toward one neighbor, now.",
+      "main": "Treat others as you want to be treated. This sums up Scripture's whole moral teaching.",
+      "notMean": "This is not a bargain — 'I'll be nice so they'll be nice.' It is the shape of love, not a strategy for getting your way.",
+      "tension": "The rule is simple; the doing is not — especially toward people who have never treated you that way.",
+      "observe": [
+        "'In everything' — no category is exempted, including enemies from 5:44.",
+        "The formulation is positive: not 'don't do harm' but 'do the good you desire.'",
+        "'This is the Law and the Prophets' — Jesus claims the entire Old Testament converges here."
+      ],
+      "movement": [
+        "Jesus states the principle in one sentence: whatever you wish others would do to you, do also to them.",
+        "He claims its scope: in everything.",
+        "He anchors it: for this is the Law and the Prophets."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:31",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Do to others as you would have them do to you — the same rule in Luke's Sermon on the Plain."
+        },
+        {
+          "passage": "Leviticus 19:18",
+          "category": "Law",
+          "relation": "thematic reinforcement",
+          "reason": "Love your neighbor as yourself — the command Jesus is summarizing."
+        },
+        {
+          "passage": "Romans 13:8–10",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Love is the fulfilling of the law — Paul's unpacking of exactly this verse."
+        },
+        {
+          "passage": "James 2:8",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "The royal law — love your neighbor as yourself — kept as the mark of genuine faith."
+        }
+      ],
+      "prayer": "Father, my mind has been a closed room of my own worries. Open the door: show me one person today and what love would do for them — the way I wish someone would do for me.",
+      "practice": "Do one specific thing for someone today that you wish someone would do for you — and don't explain why.",
+      "boundary": "The golden rule does not override consent or wisdom. Love sometimes means a firm no, not an endless yes."
+    },
+    "Matthew 5:38–42": {
+      "context": "The fifth antithesis. 'Eye for eye' was originally a limit on vengeance (Exodus 21); by Jesus' day it had become a license for it. He speaks to people who knew both Roman force and daily personal insult.",
+      "fit": "The need to control others — to make them pay, yield, or behave — is anxiety in armor. Jesus disarms it.",
+      "main": "Do not retaliate. Answer evil with surprising generosity.",
+      "notMean": "Jesus is not commanding passivity before violence or abolishing justice. He forbids personal vengeance and the spirit that demands it.",
+      "tension": "Turning the cheek does not always change the striker. Jesus promises no outcome here — only the character of the kingdom.",
+      "observe": [
+        "Four concrete scenarios: cheek, cloak, mile, beggar — insult, lawsuit, forced labor, need.",
+        "'Do not resist' is a military term. Jesus refuses the war-footing entirely.",
+        "Each response goes beyond fairness into excess: the second mile, the cloak along with the tunic."
+      ],
+      "movement": [
+        "Jesus quotes the old limit on revenge: eye for eye, tooth for tooth.",
+        "He forbids the retaliatory stance: do not resist the one who is evil.",
+        "He gives four excesses of generosity in its place."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:29–30",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "The same four excesses in Luke's sermon — confirming this was Jesus' settled teaching, not a passing remark."
+        },
+        {
+          "passage": "Exodus 21:23–25",
+          "category": "Law",
+          "relation": "canonical tension",
+          "reason": "The original lex talionis — a ceiling on revenge that Jesus now replaces with generosity."
+        },
+        {
+          "passage": "Romans 12:17–21",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "Do not repay evil for evil; overcome evil with good — Paul's citizen-level application."
+        },
+        {
+          "passage": "1 Peter 3:9",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Do not return insult for insult, but give a blessing instead — the command carried into suffering churches."
+        }
+      ],
+      "prayer": "Lord, I want to manage everyone — their words, their choices, their debts to me. It exhausts me and it isn't working. Teach me Your way: release the ledger, answer insult with grace, and trust You with outcomes.",
+      "practice": "Identify one person you are trying to control or make pay; do one generous thing for them instead — or simply release the demand today.",
+      "boundary": "Non-retaliation is not non-protection. Abuse, theft, and danger require boundaries, authorities, and help — not a turned cheek."
+    },
+    "Matthew 5:43–48": {
+      "context": "The sixth and final antithesis — the Sermon's summit before chapter 6. 'You have heard it said, you shall love your neighbor and hate your enemy': the second clause appears nowhere in the Law; it was the culture's addition. Jesus corrects it on the mountain.",
+      "fit": "Entrusting enemies to God is the deepest release of control — refusing to carry the verdict on those who wronged you.",
+      "main": "Love even your enemies in prayer and deed, reflecting the Father who is kind to all — and so grow into His completeness.",
+      "notMean": "This does not mean trusting the untrustworthy, reconciling without repentance, or calling evil good.",
+      "tension": "The Father's sun rises on the evil while they remain evil. God's kindness does not always reform — and Jesus leaves that mystery standing.",
+      "observe": [
+        "Jesus names the added clause — 'hate your enemy' — exposing what Scripture never actually said.",
+        "The examples are cosmic and daily: sun, rain. God's generosity is indiscriminate.",
+        "'What more are you doing than others?' Tax collectors and Gentiles love their friends; kingdom love must exceed the ordinary."
+      ],
+      "movement": [
+        "Jesus quotes the distorted maxim.",
+        "He commands enemy-love and explains it as sonship: that you may be sons of your Father.",
+        "He points to the Father's example and sets the goal: be complete, as He is complete."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:32–36",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Be merciful, even as your Father is merciful — Luke's version names the family resemblance directly."
+        },
+        {
+          "passage": "Romans 5:8–10",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "While we were enemies, Christ died for us — the gospel as the ground of enemy-love."
+        },
+        {
+          "passage": "Proverbs 24:17–18",
+          "category": "Wisdom",
+          "relation": "canonical tension",
+          "reason": "Do not rejoice when your enemy falls — the Old Testament already guarded the heart against vengeance-joy."
+        },
+        {
+          "passage": "Jonah 4",
+          "category": "Narrative",
+          "relation": "canonical tension",
+          "reason": "Jonah resents God's mercy on his enemies — the prophet who wanted the verdict seat for himself."
+        }
+      ],
+      "prayer": "Father, I have been carrying the verdict on someone — rehearsing what they deserve. That is Your seat, not mine. I hand them to You: their future, their reckoning, their mercy. Free my hands for the work You have actually given me.",
+      "practice": "Write down the name of someone you consider an enemy or threat, then write beside it: 'I entrust you to God' — and mean it as today's act.",
+      "boundary": "Entrusting someone to God does not mean re-entering harm. Keep wise distance and protection where needed; forgiveness and access are different things."
+    },
+    "Matthew 7:13–14": {
+      "context": "The Sermon nears its end. After the golden rule, Jesus gets urgent: two gates, two ways, two destinations. The crowd that has listened for three chapters must now choose.",
+      "fit": "Anxiety offers many wide, easy paths — avoidance, numbing, control. Jesus says the life-giving way is narrow, but it is a way, not a tightrope.",
+      "main": "Enter by the narrow gate. The way to life is constricted and few find it — but it leads to life.",
+      "notMean": "Narrow does not mean joyless, elite, or earned. The gate is a person, not a performance standard.",
+      "tension": "'Few are those who find it' — Jesus lets the sobering statistic stand without softening. The way is genuinely hard to stay on.",
+      "observe": [
+        "Two of everything: gates, ways, destinations, crowds. The choice is binary.",
+        "'Enter' is imperative and present — a decisive, ongoing action.",
+        "The narrow way 'leads to life.' The difficulty is in the walking, not the destination."
+      ],
+      "movement": [
+        "Jesus commands entry by the narrow gate.",
+        "He describes the broad way: easy, crowded, and leading to destruction.",
+        "He describes the narrow way: hard, lonely, and leading to life."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 13:24",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "Strive to enter through the narrow door — Luke's version keeps the urgency and the effort."
+        },
+        {
+          "passage": "John 10:9",
+          "category": "Gospel",
+          "relation": "thematic reinforcement",
+          "reason": "I am the door — Jesus identifies Himself as the narrow gate He commands us to enter."
+        },
+        {
+          "passage": "Proverbs 14:12",
+          "category": "Wisdom",
+          "relation": "canonical tension",
+          "reason": "There is a way that seems right to a man, but its end is death — the broad way's Old Testament portrait."
+        },
+        {
+          "passage": "Psalm 16:11",
+          "category": "Psalm",
+          "relation": "prayerful response",
+          "reason": "You make known to me the path of life — the narrow way as joy, not just difficulty."
+        }
+      ],
+      "prayer": "Lord, the wide ways are so loud — numbing, striving, controlling, avoiding. They promise ease and deliver emptiness. Keep me on the narrow way today: the honest prayer, the obedient step, the trust that feels small but leads to life.",
+      "practice": "Name your favorite wide path — the easy escape you reach for — and choose the narrow alternative once today.",
+      "boundary": "The narrow way is not self-punishment. If 'discipline' is becoming self-harm or despair, that is not the gate Jesus described — talk to someone."
+    },
+    "Matthew 7:15–20": {
+      "context": "Still the Sermon's closing warnings. After the narrow gate comes the danger on the path: false prophets. Jesus' hearers knew many teachers; He gives them the test.",
+      "fit": "Fear makes you gullible — anxious people chase whoever promises certainty. Jesus gives a slower test: fruit, over time.",
+      "main": "Beware false prophets. You will know them by their fruit, not their words or wonders.",
+      "notMean": "This is not permission for constant suspicion of every teacher. It is a call to patient, observable discernment.",
+      "tension": "Fruit takes seasons to see. Jesus offers no shortcut for spotting wolves today — only the long test of character.",
+      "observe": [
+        "'Sheep's clothing' — the danger is resemblance, not obvious threat.",
+        "'Ravenous wolves' — the image is predatory. False teaching devours.",
+        "Twice Jesus says it: 'By their fruits you will know them.' Repetition is the emphasis."
+      ],
+      "movement": [
+        "Jesus warns: beware the disguised — they come looking like sheep.",
+        "He states the principle: trees are known by fruit; thorns don't produce figs.",
+        "He applies it: a good tree bears good fruit, and the test is observable life."
+      ],
+      "companions": [
+        {
+          "passage": "Luke 6:43–45",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "No good tree bears bad fruit — Luke's version extends the test to the overflow of the heart."
+        },
+        {
+          "passage": "Galatians 5:22–23",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "The fruit of the Spirit — Paul's catalog of what good fruit actually looks like."
+        },
+        {
+          "passage": "1 John 4:1",
+          "category": "Epistle",
+          "relation": "prayerful response",
+          "reason": "Test the spirits to see whether they are from God — the church's ongoing practice of this verse."
+        },
+        {
+          "passage": "Jeremiah 23:16–17",
+          "category": "Prophets",
+          "relation": "canonical tension",
+          "reason": "Prophets who promise peace falsely — Jeremiah's portrait of the wolves in his own day."
+        }
+      ],
+      "prayer": "Father, my fear wants a guru with quick answers. Give me instead Your slow wisdom: the patience to watch for fruit — in teachers, in advice, in my own life — and the courage to walk away from wolves, however soft their wool.",
+      "practice": "Evaluate one voice you follow — a teacher, influencer, or advisor — by its fruit over time: not its promises, its outcomes.",
+      "boundary": "Discernment is not cynicism. If you find yourself trusting no one, including the church, bring that isolation into the light with a mature believer."
+    },
+    "Matthew 7:28–29": {
+      "context": "The Sermon's final two verses — and Matthew's first 'when Jesus had finished' marker. The crowds, not just the disciples, respond: astonishment at a kind of authority unlike the scribes'.",
+      "fit": "The journey ends where anxiety ends: not in having every answer, but in resting under the authority of the One who does.",
+      "main": "Jesus teaches with an authority the scribes never had — and the crowds recognize it.",
+      "notMean": "Authority here is not volume, credentials, or charisma — the scribes had those. Jesus' authority is inherent: the voice of God Himself.",
+      "tension": "Astonishment is not the same as obedience. The crowds marvel here, and many will walk away; recognizing authority and submitting to it are different things.",
+      "observe": [
+        "'The crowds were astonished' — the Greek suggests being struck, overwhelmed.",
+        "'Not as their scribes' — the scribes cited tradition; Jesus speaks from Himself.",
+        "This is the first of five such closings in Matthew. The Sermon is presented as foundational."
+      ],
+      "movement": [
+        "Jesus finishes speaking.",
+        "The crowds react with astonishment.",
+        "Matthew explains why: He taught with authority, unlike the scribes."
+      ],
+      "companions": [
+        {
+          "passage": "Mark 1:22",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "The same astonishment at Capernaum — authority recognized again at the start of His ministry."
+        },
+        {
+          "passage": "Luke 4:32",
+          "category": "Gospel",
+          "relation": "parallel account",
+          "reason": "His word was with authority — Luke's identical verdict on Jesus' teaching."
+        },
+        {
+          "passage": "Hebrews 1:1–2",
+          "category": "Epistle",
+          "relation": "thematic reinforcement",
+          "reason": "God has spoken to us by His Son — the authority Matthew's crowds sensed, stated as doctrine."
+        },
+        {
+          "passage": "Deuteronomy 18:15–19",
+          "category": "Law",
+          "relation": "thematic reinforcement",
+          "reason": "The prophet like Moses whom Israel must hear — the ancient promise this authority fulfills."
+        }
+      ],
+      "prayer": "Lord Jesus, after twenty-one days in Your Sermon, I end where the crowds did: astonished. You do not cite authority — You are authority. Teach me to rest in that: not in my understanding, not in my control, but in Your voice over my life.",
+      "practice": "End this journey by reading Matthew 7:28–29 aloud, then sit in silence for five minutes under His authority — no requests, just rest.",
+      "boundary": "Resting in His authority includes resting your body. If exhaustion is driving your anxiety, sleep, sabbath, and care are obedience too."
+    }
+  }
+};
+
 function dayContentBase(j,day){
  const item=j.days[day-1]||j.days[0], passage=item[0], theme=item[1];
  const specific=passageStudies.find(study=>study.match(passage));
- const daily=moneyJourneyDaily[passage];
+ const daily=j.id==="money"?moneyJourneyDaily[passage]:(heldCuratedDaily[j.id]||{})[passage];
 
- if(j.id==="money"||(daily&&specific)){
+ if(j.id==="money"||daily){
    const base=(j.id==="money"&&typeof lukeMoneyStudies!=="undefined"&&lukeMoneyStudies[passage])||specific||defaultStudy(passage,theme);
    if(daily){
      return {
        passage,theme,genre:heldGenre(passage),curated:true,
        scripture:`Read ${passage} in the World English Bible (WEB) before opening the explanation.`,
-       context:base.context,fit:base.fit,main:base.main||daily.main||`The passage addresses ${theme.toLowerCase()}.`,
-       notMean:base.notMean,tension:daily.tension,observe:daily.observe,movement:daily.movement,
-       companions:daily.companions,p1:daily.p1,p2:daily.p2,prayer:daily.prayer,
-       practice:daily.practice,boundary:daily.boundary,word:base.word||null
+       context:daily.context||base.context,fit:daily.fit||base.fit,main:daily.main||base.main||`The passage addresses ${theme.toLowerCase()}.`,
+       notMean:daily.notMean||base.notMean,tension:daily.tension||base.tension,observe:daily.observe||base.observe,movement:daily.movement||base.movement,
+       companions:daily.companions||base.companions,p1:daily.p1,p2:daily.p2,prayer:daily.prayer||base.prayer,
+       practice:daily.practice||base.practice,boundary:daily.boundary||base.boundary,word:base.word||null
      };
    }
  }
